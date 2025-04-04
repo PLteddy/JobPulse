@@ -1,0 +1,39 @@
+form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+form div {
+    flex: 1 1 calc(50% - 20px); /* Chaque champ occupe 50% de la largeur avec un espace entre eux */
+    min-width: 200px; /* Largeur minimale pour éviter que les champs soient trop petits */
+}
+
+form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+form input {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}

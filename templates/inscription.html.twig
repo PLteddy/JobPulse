@@ -1,0 +1,81 @@
+
+
+{% block content %}
+    <head>
+        <link rel="stylesheet" href="{{ asset('css/inscription.css') }}">
+    </head>
+
+
+    <h1>Inscription</h1>
+    <form action="{{ path('inscription', { type: type }) }}" method="POST" enctype="multipart/form-data">
+        
+
+        
+
+        <!-- Champs spécifiques à l'Entreprise -->
+        {% if type == 'entreprise' %}
+        <div id="entreprise-fields">
+            <label for="nom">Nom*</label>
+            <input type="text" id="nom" name="nom" required>
+            
+            <label for="email">E-mail*</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Mot de passe*</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="siret">N° de SIRET*</label>
+            <input type="text" id="siret" name="siret" required>
+
+            <label for="adresse">Adresse de l'entreprise*</label>
+            <input type="text" id="adresse" name="adresse" required>
+        </div>
+        {% endif %}
+
+        
+                <!-- Champs spécifiques au Candidat -->
+        {% if type == 'etudiant' %}
+        <div id="candidat-fields">
+            <label for="nom">Nom*</label>
+            <input type="text" id="nom" name="nom" required>
+
+            <label for="prenom">Prénom*</label>
+            <input type="text" id="prenom" name="prenom" required>
+
+            <label for="ville">Ville*</label>
+            <input type="text" id="ville" name="ville">
+
+            <label for="email">E-mail*</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Mot de passe*</label>
+            <input type="password" id="password" name="password" required>
+
+            <!-- Champ pour le CV -->
+            <label for="cv">Télécharger votre CV*</label>
+            <input type="file" id="cv" name="cv" accept=".pdf">
+        </div>
+        {% endif %}
+        
+
+        <!-- Champs spécifiques au Tuteur -->
+        {% if type == 'tuteur' %}
+        <div id="tuteur-fields">
+            <label for="nom">Nom*</label>
+            <input type="text" id="nom" name="nom" required>
+            <label for="prenom">Prénom*</label>
+            <input type="text" id="prenom" name="prenom" required>
+            <label for="etablissement">Établissement*</label>
+            <input type="text" id="etablissement" name="etablissement" required>
+            <label for="email">E-mail*</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Mot de passe*</label>
+            <input type="password" id="password" name="password" required>
+
+        </div>
+        {% endif %}
+
+        <button type="submit">Valider</button>
+    </form>
+{% endblock %}

@@ -1,0 +1,13 @@
+{# filepath: c:\laragon\www\JobPulse\templates\home\index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block body %}
+    <h1>Bienvenue sur JobPulse</h1>
+    <ul>
+        <li><a href="{{ path('inscription', { type: 'entreprise' }) }}">Inscription Entreprise</a></li>
+        <li><a href="{{ path('inscription', { type: 'tuteur' }) }}">Inscription Tuteur</a></li>
+        <li><a href="{{ path('inscription', { type: 'etudiant' }) }}">Inscription Étudiant</a></li>
+    </ul>
+{% endblock %}

@@ -12,6 +12,6 @@ class HomeController extends AbstractController
     #quand on veut que ce soit l'url c  #[Route(path:'lucky/number')] par exemple et dcp quand on va dans lucky/number on tombera sur ça
     public function index(): Response
     {
-        return new Response('OK');
+        return $this->render('home/index.html.twig');
     }
 }
