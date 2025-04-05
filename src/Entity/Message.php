@@ -20,6 +20,17 @@ class Message
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $moment = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Utilisateur $fromUser = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Utilisateur $toUser = null;
+
+    #[ORM\Column]
+    private ?bool $isRead = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -48,4 +59,45 @@ class Message
 
         return $this;
     }
+
+    public function getFromUser(): ?Utilisateur
+    {
+        return $this->fromUser;
+    }
+
+    public function setFromUser(?Utilisateur $fromUser): static
+    {
+        $this->fromUser = $fromUser;
+
+        return $this;
+    }
+
+    public function getToUser(): ?Utilisateur
+    {
+        return $this->toUser;
+    }
+
+    public function setToUser(?Utilisateur $toUser): static
+    {
+        $this->toUser = $toUser;
+
+        return $this;
+    }
+
+    public function isRead(): ?bool
+    {
+        return $this->isRead;
+    }
+
+    public function setIsRead(bool $isRead): static
+    {
+        $this->isRead = $isRead;
+
+        return $this;
+    }
+    public function __construct()
+{
+    $this->moment = new \DateTime();
+    $this->isRead = false;
+}
 }

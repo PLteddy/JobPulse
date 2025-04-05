@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes messages{% endblock %}
+
+{% block body %}
+    <h1>Mes messages</h1>
+    
+    <a href="{{ path('app_message_new') }}" class="btn btn-primary">
+        Nouveau message
+    </a>
+    
+    <div class="messages mt-4">
+        {% for message in messages %}
+            <div class="card mb-3 {{ message.isRead ? '' : 'border-primary' }}">
+                <div class="card-header">
+                    De: {{ message.fromUser.name }}
+                    <small class="text-muted float-end">
+                        {{ message.moment|date('d/m/Y H:i') }}
+                    </small>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ message.content }}</p>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">Aucun message</div>
+        {% endfor %}
+    </div>
+{% endblock %}
