@@ -4,22 +4,25 @@
 
 {% block body %}
     <h1>Mes messages</h1>
+
+    <!-- 🔙 Bouton de retour à l'accueil -->
+    <a href="{{ path('home') }}" class="btn btn-secondary mb-3">🏠 Accueil</a>
     
-    <a href="{{ path('app_message_new') }}" class="btn btn-primary">
-        Nouveau message
+    <a href="{{ path('app_message_new') }}" class="btn btn-primary mb-3 ms-2">
+        ✉️ Nouveau message
     </a>
     
     <div class="messages mt-4">
         {% for message in messages %}
             <div class="card mb-3 {{ message.isRead ? '' : 'border-primary' }}">
                 <div class="card-header">
-                    De: {{ message.fromUser.name }}
+                    De: {{ message.fromUser.prenom }}
                     <small class="text-muted float-end">
                         {{ message.moment|date('d/m/Y H:i') }}
                     </small>
                 </div>
                 <div class="card-body">
-                    <p class="card-text">{{ message.content }}</p>
+                    <p class="card-text">{{ message.contenu }}</p>
                 </div>
             </div>
         {% else %}

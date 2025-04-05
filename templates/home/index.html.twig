@@ -1,14 +1,23 @@
-{# filepath: c:\laragon\www\JobPulse\templates\home\index.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}Accueil{% endblock %}
 
 {% block body %}
     <h1>Bienvenue sur JobPulse</h1>
-    <ul>
-        <li><a href="{{ path('inscription', { type: 'entreprise' }) }}">Inscription Entreprise</a></li>
+    
+    {% if app.user %}
+        <div class="mb-4">
+            <p>Connecté en tant que {{ app.user.prenom }} {{ app.user.nom }}</p>
+            <a href="{{ path('app_logout') }}" class="btn btn-danger">Déconnexion</a>
+        </div>
+        
+        <ul>
+            <li><a href="{{ path('app_message_index') }}">Ma messagerie</a></li>
+            <li><a href="{{ path('inscription', { type: 'entreprise' }) }}">Inscription Entreprise</a></li>
         <li><a href="{{ path('inscription', { type: 'tuteur' }) }}">Inscription Tuteur</a></li>
         <li><a href="{{ path('inscription', { type: 'etudiant' }) }}">Inscription Étudiant</a></li>
-        <li><a href="{{ path('app_message_index') }}">Ma messagerie</a></li>
-    </ul>
+        </ul>
+    {% else %}
+        <a href="{{ path('app_login') }}" class="btn btn-primary">Connexion</a>
+    {% endif %}
 {% endblock %}
