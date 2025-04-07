@@ -12,7 +12,7 @@
         {% include 'partials/header.html.twig' %}
     {% endblock %}
 
-    <div class="login-form-container">
+    <div class="ogin-form-container">
         {% if error %}
             <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
         {% endif %}
@@ -30,6 +30,13 @@
             <button class="login-button" type="submit">Connexion</button>
         </form>
     </div>
-
+<div class="register-link">
+    <p>Pas encore de compte ?</p>
+    <ul>
+        <li><a href="{{ path('inscription', { type: 'etudiant' }) }}">Inscription Étudiant</a></li>
+        <li><a href="{{ path('inscription', { type: 'entreprise' }) }}">Inscription Entreprise</a></li>
+        <li><a href="{{ path('inscription', { type: 'tuteur' }) }}">Inscription Tuteur</a></li>
+    </ul>
+</div>
 </div>
 {% endblock %}

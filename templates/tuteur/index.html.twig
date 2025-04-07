@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        
+    </head>
+    <body>
+        <h1>Tuteur</h1>
+                <div class="mb-4">
+            <p>Connecté en tant que {{ app.user.prenom }} {{ app.user.nom }}</p>
+            <a href="{{ path('app_logout') }}" class="btn btn-danger">Déconnexion</a>
+        </div>
+    </body>
+</html>

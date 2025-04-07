@@ -3,9 +3,9 @@ security:
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 
             algorithm: auto
-            cost: 12 # Valeur normale pour bcrypt
-            time_cost: 3 # Valeur normale pour argon
-            memory_cost: 64 # Valeur normale pour argon
+            cost: 12
+            time_cost: 3
+            memory_cost: 64
 
     providers:
         app_user_provider:
@@ -25,13 +25,20 @@ security:
                 check_path: app_login
                 username_parameter: email
                 password_parameter: password
-                default_target_path: app_home
             logout:
                 path: app_logout
 
     access_control:
         - { path: ^/login, roles: PUBLIC_ACCESS }
-        - { path: ^/, roles: ROLE_USER }
+        - { path: ^/entreprise, roles: ROLE_ENTREPRISE }
+        - { path: ^/tuteur, roles: ROLE_TUTEUR }
+        - { path: ^/etudiant, roles: ROLE_ETUDIANT }
+        - { path: ^/messagerie, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/$, roles: PUBLIC_ACCESS }
+        - { path: ^/home, roles: PUBLIC_ACCESS }
+        - { path: ^/inscription, roles: PUBLIC_ACCESS }
+        # Le reste des routes nécessitera une authentification
+        - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
     security:
