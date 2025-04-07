@@ -1,0 +1,17 @@
+{# templates/partials/header.html.twig #}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/header.css') }}">
+{% endblock %}
+
+<header class="site-header">
+    <div class="header-container">
+        <a>
+            <img src="{{ asset('images/logo.png') }}" alt="Job Pulse" class="header-logo">
+        </a>
+        <nav class="header-nav">
+            <a>Entreprise</a>
+            <a>Tuteur</a>
+            <a>Étudiant</a>
+        </nav>
+    </div>
+</header>
