@@ -6,6 +6,7 @@ use App\Enum\Contrat;
 use App\Enum\Duree;
 use App\Enum\Type_presence;
 use App\Repository\PosteRepository;
+use App\Entity\Utilisateur;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -53,6 +54,11 @@ class Poste
     #[ORM\Column(type: Types::SIMPLE_ARRAY, enumType: Duree::class)]
     private array $duree = [];
 
+    // Ajoutez cette propriété à la classe Poste (avec les autres propriétés)
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'postes')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Utilisateur $entreprise = null;
+
     #[ORM\Column(length: 500)]
     private ?string $missions = null;
 
@@ -75,12 +81,12 @@ class Poste
 
     public function getDescription(): ?string
     {
-        return $this->Description;
+        return $this->description;
     }
 
-    public function setDescription(string $Description): static
+    public function setDescription(string $description): static
     {
-        $this->Description = $Description;
+        $this->description = $description;
 
         return $this;
     }
@@ -114,12 +120,12 @@ class Poste
 
     public function getLocalisation(): ?string
     {
-        return $this->Localisation;
+        return $this->localisation;
     }
 
-    public function setLocalisation(string $Localisation): static
+    public function setLocalisation(string $localisation): static
     {
-        $this->Localisation = $Localisation;
+        $this->localisation = $localisation;
 
         return $this;
     }
@@ -210,6 +216,20 @@ class Poste
 
         return $this;
     }
+
+
+    // Ajoutez ces méthodes (à la fin de la classe, avant la dernière })
+    public function getEntreprise(): ?Utilisateur
+    {
+        return $this->entreprise;
+    }
+    
+    public function setEntreprise(?Utilisateur $entreprise): static
+    {
+        $this->entreprise = $entreprise;
+        return $this;
+    }
+
 
     public function getMissions(): ?string
     {

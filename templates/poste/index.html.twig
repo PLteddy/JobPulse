@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes offres{% endblock %}
+
+{% block body %}
+    <h1>Mes offres d'emploi</h1>
+
+    <a href="{{ path('app_poste_new') }}" class="btn btn-primary">Créer une nouvelle offre</a>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Intitulé</th>
+                <th>Domaine</th>
+                <th>Localisation</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for poste in postes %}
+            <tr>
+                <td>{{ poste.intitule }}</td>
+                <td>{{ poste.domaine }}</td>
+                <td>{{ poste.localisation }}</td>
+                <td>
+                    <a href="{{ path('app_poste_edit', {'id': poste.id}) }}" class="btn btn-secondary">Modifier</a>
+                    <form method="post" action="{{ path('app_poste_delete', {'id': poste.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette offre?');" style="display: inline-block;">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ poste.id) }}">
+                        <button class="btn btn-danger">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">Aucune offre trouvée</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <a href="{{ path('entreprise_dashboard') }}" class="btn btn-secondary">Retour en arrière</a>
+    </table>
+{% endblock %}

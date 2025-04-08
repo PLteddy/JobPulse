@@ -7,9 +7,13 @@ use App\Repository\UtilisateurRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+
 class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -71,6 +75,11 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $plus_sur_moi = null;
 
+    #[ORM\OneToMany(targetEntity: Poste::class, mappedBy: 'entreprise')]
+    private Collection $postes;
+    
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -87,7 +96,10 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
+    public function __construct()
+    {
+        $this->postes = new ArrayCollection();
+    }
     /**
      * A visual identifier that represents this user.
      *
@@ -277,6 +289,38 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+
+// Ajoutez ces méthodes
+/**
+ * @return Collection<int, Poste>
+ */
+public function getPostes(): Collection
+{
+    return $this->postes;
+}
+
+public function addPoste(Poste $poste): static
+{
+    if (!$this->postes->contains($poste)) {
+        $this->postes->add($poste);
+        $poste->setEntreprise($this);
+    }
+    return $this;
+}
+
+public function removePoste(Poste $poste): static
+{
+    if ($this->postes->removeElement($poste)) {
+        // set the owning side to null (unless already changed)
+        if ($poste->getEntreprise() === $this) {
+            $poste->setEntreprise(null);
+        }
+    }
+    return $this;
+}
+
+
 
     public function getPlusSurMoi(): ?string
     {

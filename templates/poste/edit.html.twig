@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ (poste.id) ? 'Modifier' : 'Créer' }} une offre{% endblock %}
+
+{% block body %}
+    <h1>{{ (poste.id) ? 'Modifier' : 'Créer' }} une offre</h1>
+
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <button class="btn btn-primary">{{ (poste.id) ? 'Mettre à jour' : 'Créer' }}</button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('app_poste_index') }}" class="btn btn-secondary">Retour à la liste</a>
+{% endblock %}
