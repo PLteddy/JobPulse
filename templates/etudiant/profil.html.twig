@@ -1,0 +1,22 @@
+
+
+{% block body %}
+    <head>
+        <link rel="stylesheet" href="{{ asset('css/profil.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    </head>
+    <section class="hero-section">
+        <div class="imgProfil-div">
+            <img 
+            src="{{ app.user.photo_profil ? asset('uploads/profils/' ~ app.user.photo_profil) : asset('img/profil.png') }}" 
+            alt="Photo de profil" 
+            class="img-profil"
+            >
+        </div>
+    
+        <div class="profil-div">
+            {{ app.user.prenom }} {{ app.user.nom }}
+        </div>
+    </section>
+    
+{% endblock %}
