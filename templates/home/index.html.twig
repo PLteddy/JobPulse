@@ -1,25 +1,199 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('css/home.css') }}">
+{% endblock %}
+
 {% block title %}Accueil{% endblock %}
 
 {% block body %}
-    <h1>Bienvenue sur JobPulse</h1>
-    
-    {% if app.user %}
-        <div class="mb-4">
-            <p>Connecté en tant que {{ app.user.prenom }} {{ app.user.nom }}</p>
-            <a href="{{ path('app_logout') }}" class="btn btn-danger">Déconnexion</a>
-        </div>
+    <div class="container">
+        <h1 class="my-4">Bienvenue sur JobPulse</h1>
         
-        <ul>
-            <li><a href="{{ path('app_message_index') }}">Ma messagerie</a></li>
-        </ul>
-    {% else %}
-        <a href="{{ path('app_login') }}" class="btn btn-primary">Connexion</a>
-        <ul>
-        <li><a href="{{ path('inscription', { type: 'entreprise' }) }}">Inscription Entreprise</a></li>
-        <li><a href="{{ path('inscription', { type: 'tuteur' }) }}">Inscription Tuteur</a></li>
-        <li><a href="{{ path('inscription', { type: 'etudiant' }) }}">Inscription Étudiant</a></li>
-        </ul>
-    {% endif %}
+        {% if app.user %}
+            <div class="user-info mb-4">
+                <p>Connecté en tant que {{ app.user.prenom }} {{ app.user.nom }}</p>
+                <a href="{{ path('app_logout') }}" class="btn btn-danger">Déconnexion</a>
+            </div>
+            
+            <ul class="quick-links">
+                <li><a href="{{ path('app_message_index') }}">Ma messagerie</a></li>
+            </ul>
+        {% else %}
+            <div class="auth-actions">
+                <a href="{{ path('app_login') }}" class="btn btn-primary">Connexion</a>
+                <div class="inscription-links">
+                    <span>S'inscrire en tant que :</span>
+                    <a href="{{ path('inscription', { type: 'entreprise' }) }}">Entreprise</a>
+                    <a href="{{ path('inscription', { type: 'tuteur' }) }}">Tuteur</a>
+                    <a href="{{ path('inscription', { type: 'etudiant' }) }}">Étudiant</a>
+                </div>
+            </div>
+        {% endif %}
+
+        {# Barre de recherche et filtres #}
+        <div class="search-container card my-4">
+            <div class="card-body">
+                <form method="get" action="{{ path('home') }}">
+                    <div class="search-bar">
+                        <input type="text" 
+                               name="q" 
+                               class="search-input" 
+                               placeholder="Rechercher des offres..." 
+                               value="{{ searchTerm }}">
+                        <button class="btn btn-primary search-btn" type="submit">Rechercher</button>
+                        <button type="button" class="btn btn-secondary filter-toggle" id="showFilters">
+                            <i class="fas fa-sliders-h"></i> Filtres
+                        </button>
+                    </div>
+
+                    {# Overlay des filtres #}
+                    <div class="filters-overlay" id="filtersOverlay">
+                        <div class="filters-header">
+                            <h3>Filtrer les offres</h3>
+                            <button type="button" class="close-filters" id="hideFilters">&times;</button>
+                        </div>
+                        
+                        <div class="filters-grid">
+                            {# Type de contrat #}
+                            <div class="filter-group">
+                                <h5>Type de contrat</h5>
+                                {% for contrat in contratTypes %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" 
+                                               type="checkbox" 
+                                               name="contrat[]" 
+                                               value="{{ contrat.value }}"
+                                               id="contrat_{{ contrat.value }}"
+                                               {% if contrat.value in selectedContrat %}checked{% endif %}>
+                                        <label class="form-check-label" for="contrat_{{ contrat.value }}">
+                                            {{ contrat.name }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            {# Durée #}
+                            <div class="filter-group">
+                                <h5>Durée</h5>
+                                {% for duree in durees %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" 
+                                               type="checkbox" 
+                                               name="duree[]" 
+                                               value="{{ duree.value }}"
+                                               id="duree_{{ duree.value }}"
+                                               {% if duree.value in selectedDuree %}checked{% endif %}>
+                                        <label class="form-check-label" for="duree_{{ duree.value }}">
+                                            {{ duree.name }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            {# Salaire minimum #}
+                            <div class="filter-group">
+                                <h5>Salaire minimum</h5>
+                                <div class="salary-input">
+                                    <input type="number" 
+                                           name="salaire_min" 
+                                           class="form-control" 
+                                           placeholder="€" 
+                                           value="{{ selectedSalaireMin }}">
+                                </div>
+                            </div>
+
+                            {# Télétravail #}
+                            <div class="filter-group">
+                                <h5>Mode de travail</h5>
+                                <select name="presence" class="form-select">
+                                    <option value="">Tous</option>
+                                    {% for presence in presences %}
+                                        <option value="{{ presence.value }}" 
+                                                {% if presence.value == selectedPresence %}selected{% endif %}>
+                                            {{ presence.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="filters-actions">
+                            <button type="submit" class="btn btn-primary">Appliquer les filtres</button>
+                            {% if searchTerm or selectedContrat or selectedDuree or selectedSalaireMin or selectedPresence %}
+                                <a href="{{ path('home') }}" class="btn btn-outline-secondary">Réinitialiser</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {# Résultats #}
+        <div class="results-container">
+            {% if postes|length > 0 %}
+                <div class="results-grid">
+                    {% for poste in postes %}
+                        <div class="job-card card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ poste.intitule }}</h5>
+                                <h6 class="card-subtitle">{{ poste.entreprise.nom }}</h6>
+                                <p class="card-text">{{ poste.description|slice(0, 150) }}...</p>
+                                <div class="job-details">
+                                    <p><strong>Salaire:</strong> {{ poste.salaire }}€</p>
+                                    <p><strong>Contrat:</strong> 
+                                        {% for contrat in poste.contratType %}
+                                            {{ contrat.name }}{% if not loop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </p>
+                                    <p><strong>Durée:</strong> 
+                                        {% for duree in poste.duree %}
+                                            {{ duree.name }}{% if not loop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </p>
+                                    <p><strong>Mode de travail:</strong> {{ poste.presence.name }}</p>
+                                </div>
+                                <a href="#" class="btn btn-sm btn-primary">Voir l'offre</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-results">
+                    <div class="alert alert-info">
+                        Aucune offre trouvée. Essayez de modifier vos critères de recherche.
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const showFilters = document.getElementById('showFilters');
+        const hideFilters = document.getElementById('hideFilters');
+        const filtersOverlay = document.getElementById('filtersOverlay');
+        
+        showFilters.addEventListener('click', function() {
+            filtersOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        hideFilters.addEventListener('click', function() {
+            filtersOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+        
+        // Fermer l'overlay en cliquant à l'extérieur
+        filtersOverlay.addEventListener('click', function(e) {
+            if (e.target === filtersOverlay) {
+                filtersOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    });
+    </script>
 {% endblock %}
