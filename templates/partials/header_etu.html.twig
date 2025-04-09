@@ -10,10 +10,10 @@
                     <img src="{{ asset('images/logo.png') }}" alt="Job Pulse" class="header-logo">
                 </a>
                 <nav class="header-nav">
-                    <a href="{{ path('app_login') }}">Connexion</a>
-                    <a href="{{ path('inscription', { type: 'etudiant' }) }}">Inscription Étudiant</a>
-                    <a href="{{ path('inscription', { type: 'entreprise' }) }}">Inscription Entreprise</a>
-                    <a href="{{ path('inscription', { type: 'tuteur' }) }}">Inscription Tuteur</a>
+                    <a href="{{ path('app_logout') }}">Deconnexion</a>
+                    <a href="{{ path('inscription', { type: 'etudiant' }) }}">Mes candidatures</a>
+                    <a href="{{ path('inscription', { type: 'entreprise' }) }}">Mes enregistrements</a>
+                    <a href="{{ path('inscription', { type: 'tuteur' }) }}">Tuteur</a>
                 </nav>
             </div>
 </header>

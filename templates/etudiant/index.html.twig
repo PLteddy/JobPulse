@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -6,6 +7,8 @@
         
     </head>
     <body>
+    <!-- Inclusion du header -->
+    {% include './partials/header_etu.html.twig' %}
         <h1>Etudiant</h1>
                 <div class="mb-4">
             <p>Connecté en tant que {{ app.user.prenom }} {{ app.user.nom }}</p>
