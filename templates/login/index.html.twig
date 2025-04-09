@@ -12,7 +12,7 @@
         {% include 'partials/header.html.twig' %}
     {% endblock %}
 
-    <div class="ogin-form-container">
+    <div class="login-form-container">
         {% if error %}
             <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
         {% endif %}
@@ -27,16 +27,18 @@
                 <input type="password" name="password" id="inputPassword" class="form-input" required>
             </div>
             <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-            <button class="login-button" type="submit">Connexion</button>
+            
+            <div class="button-container">
+                <div class="register-link">
+                    <p>Pas encore de compte ?</p>
+                    <ul>
+                        <li><a href="{{ path('inscription', { type: 'etudiant' }) }}">Étudiant</a></li>
+                        <li><a href="{{ path('inscription', { type: 'entreprise' }) }}">Entreprise</a></li>
+                        <li><a href="{{ path('inscription', { type: 'tuteur' }) }}">Tuteur</a></li>
+                    </ul>
+                </div>
+                <button class="login-button" type="submit">Connexion</button>
+            </div>
         </form>
     </div>
-<div class="register-link">
-    <p>Pas encore de compte ?</p>
-    <ul>
-        <li><a href="{{ path('inscription', { type: 'etudiant' }) }}">Inscription Étudiant</a></li>
-        <li><a href="{{ path('inscription', { type: 'entreprise' }) }}">Inscription Entreprise</a></li>
-        <li><a href="{{ path('inscription', { type: 'tuteur' }) }}">Inscription Tuteur</a></li>
-    </ul>
-</div>
-</div>
 {% endblock %}

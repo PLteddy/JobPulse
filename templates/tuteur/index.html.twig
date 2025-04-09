@@ -2,14 +2,37 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        
+        <title>{% block title %}Tableau de bord Tuteur{% endblock %}</title>
     </head>
     <body>
-        <h1>Tuteur</h1>
-                <div class="mb-4">
-            <p>Connecté en tant que {{ app.user.prenom }} {{ app.user.nom }}</p>
-            <a href="{{ path('app_logout') }}" class="btn btn-danger">Déconnexion</a>
+        <div class="container mt-4">
+            <h1>Tableau de bord Tuteur</h1>
+            
+            <div class="mb-4">
+                <p>Connecté en tant que {{ app.user.prenom }} {{ app.user.nom }}</p>
+                <a href="{{ path('app_logout') }}" class="btn btn-danger">Déconnexion</a>
+            </div>
+            
+            <h2>Toutes les offres disponibles</h2>
+            
+            {% if postes is empty %}
+                <p>Aucune offre disponible actuellement.</p>
+            {% else %}
+                <div class="row">
+                    {% for poste in postes %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ poste.intitule }}</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">{{ poste.entreprise.nom }}</h6>
+                                    <p class="card-text">{{ poste.description|slice(0, 100) }}{% if poste.description|length > 100 %}...{% endif %}</p>
+                                    {# <a href="{{ path('poste_show', {'id': poste.id}) }}" class="btn btn-primary">Voir détails</a> #}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
     </body>
 </html>
