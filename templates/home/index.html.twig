@@ -130,41 +130,47 @@
         </div>
 
         {# Résultats #}
-        <div class="results-container">
-            {% if postes|length > 0 %}
-                <div class="results-grid">
-                    {% for poste in postes %}
-                        <div class="job-card card">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ poste.intitule }}</h5>
-                                <h6 class="card-subtitle">{{ poste.entreprise.nom }}</h6>
-                                <p class="card-text">{{ poste.description|slice(0, 150) }}...</p>
-                                <div class="job-details">
-                                    <p><strong>Salaire:</strong> {{ poste.salaire }}€</p>
-                                    <p><strong>Contrat:</strong> 
-                                        {% for contrat in poste.contratType %}
-                                            {{ contrat.name }}{% if not loop.last %}, {% endif %}
-                                        {% endfor %}
-                                    </p>
-                                    <p><strong>Durée:</strong> 
-                                        {% for duree in poste.duree %}
-                                            {{ duree.name }}{% if not loop.last %}, {% endif %}
-                                        {% endfor %}
-                                    </p>
-                                    <p><strong>Mode de travail:</strong> {{ poste.presence.name }}</p>
-                                </div>
-                                <a href="#" class="btn btn-sm btn-primary">Voir l'offre</a>
-                            </div>
+                <div class="results-container">
+    {% if postes|length > 0 %}
+        <div class="results-grid">
+            {% for poste in postes %}
+                <div class="job-card card">
+                    {% if poste.image %}
+                        <div class="card-img-top-container text-center" style="padding: 15px;">
+                            <img src="{{ asset('uploads/images/' ~ poste.image) }}" alt="{{ poste.intitule }}" class="card-img-top" style="max-height: 150px; width: auto; object-fit: contain;">
                         </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="no-results">
-                    <div class="alert alert-info">
-                        Aucune offre trouvée. Essayez de modifier vos critères de recherche.
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ poste.intitule }}</h5>
+                        <h6 class="card-subtitle">{{ poste.entreprise.nom }}</h6>
+                        <p class="card-text">{{ poste.description|slice(0, 150) }}...</p>
+                        <div class="job-details">
+                            <p><strong>Salaire:</strong> {{ poste.salaire }}€</p>
+                            <p><strong>Contrat:</strong> 
+                                {% for contrat in poste.contratType %}
+                                    {{ contrat.name }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </p>
+                            <p><strong>Durée:</strong> 
+                                {% for duree in poste.duree %}
+                                    {{ duree.name }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </p>
+                            <p><strong>Mode de travail:</strong> {{ poste.presence.name }}</p>
+                        </div>
+                        <a href="{{ path('offre_details', {'id': poste.id}) }}" class="btn btn-sm btn-primary">Voir l'offre</a>
                     </div>
                 </div>
-            {% endif %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-results">
+            <div class="alert alert-info">
+                Aucune offre trouvée. Essayez de modifier vos critères de recherche.
+            </div>
+        </div>
+    {% endif %}
+</div>
         </div>
     </div>
 {% endblock %}

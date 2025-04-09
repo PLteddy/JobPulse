@@ -10,6 +10,7 @@
     <table class="table">
         <thead>
             <tr>
+                <th>Image</th>
                 <th>Intitulé</th>
                 <th>Domaine</th>
                 <th>Localisation</th>
@@ -19,6 +20,13 @@
         <tbody>
         {% for poste in postes %}
             <tr>
+                <td>
+                    {% if poste.image %}
+                        <img src="{{ asset('uploads/images/' ~ poste.image) }}" alt="{{ poste.intitule }}" width="80" height="60" class="img-thumbnail">
+                    {% else %}
+                        <span class="text-muted">Aucune image</span>
+                    {% endif %}
+                </td>
                 <td>{{ poste.intitule }}</td>
                 <td>{{ poste.domaine }}</td>
                 <td>{{ poste.localisation }}</td>
@@ -32,10 +40,10 @@
             </tr>
         {% else %}
             <tr>
-                <td colspan="4">Aucune offre trouvée</td>
+                <td colspan="5">Aucune offre trouvée</td> {# Mise à jour du colspan à 5 #}
             </tr>
         {% endfor %}
         </tbody>
-        <a href="{{ path('entreprise_dashboard') }}" class="btn btn-secondary">Retour en arrière</a>
     </table>
+    <a href="{{ path('entreprise_dashboard') }}" class="btn btn-secondary">Retour en arrière</a>
 {% endblock %}

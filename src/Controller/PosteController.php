@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/entreprise/poste')]
 class PosteController extends AbstractController
@@ -26,8 +28,9 @@ class PosteController extends AbstractController
             'postes' => $postes,
         ]);
     }
+
     #[Route('/new', name: 'app_poste_new')]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
         $poste = new Poste();
         
@@ -44,9 +47,32 @@ class PosteController extends AbstractController
         
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            // Gestion de l'upload d'image
+            $imageFile = $form->get('imageFile')->getData();
+            
+            if ($imageFile) {
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // Sécurisation du nom de fichier
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$imageFile->guessExtension();
+                
+                try {
+                    $imageFile->move(
+                        $this->getParameter('images_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Une erreur est survenue lors de l\'upload de l\'image');
+                }
+                
+                // Met à jour la propriété 'image' pour stocker le nom du fichier
+                $poste->setImage($newFilename);
+            }
+            
             $entityManager->persist($poste);
             $entityManager->flush();
 
+            $this->addFlash('success', 'Votre offre a été créée avec succès');
             return $this->redirectToRoute('app_poste_index');
         }
 
@@ -57,7 +83,7 @@ class PosteController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_poste_edit')]
-    public function edit(Request $request, Poste $poste, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Poste $poste, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
         // Vérifier si l'utilisateur est le propriétaire du poste
         if ($poste->getEntreprise() !== $this->getUser()) {
@@ -68,8 +94,39 @@ class PosteController extends AbstractController
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
+            // Gestion de l'upload d'image
+            $imageFile = $form->get('imageFile')->getData();
+            
+            if ($imageFile) {
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // Sécurisation du nom de fichier
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$imageFile->guessExtension();
+                
+                try {
+                    // Si une ancienne image existe, on pourrait la supprimer ici
+                    if ($poste->getImage()) {
+                        $oldImagePath = $this->getParameter('images_directory').'/'.$poste->getImage();
+                        if (file_exists($oldImagePath)) {
+                            unlink($oldImagePath);
+                        }
+                    }
+                    
+                    $imageFile->move(
+                        $this->getParameter('images_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Une erreur est survenue lors de l\'upload de l\'image');
+                }
+                
+                // Met à jour la propriété 'image' pour stocker le nom du fichier
+                $poste->setImage($newFilename);
+            }
+            
             $entityManager->flush();
             
+            $this->addFlash('success', 'Votre offre a été mise à jour avec succès');
             return $this->redirectToRoute('app_poste_index');
         }
         
@@ -89,8 +146,18 @@ class PosteController extends AbstractController
         
         $token = $request->request->get('_token');
         if ($this->isCsrfTokenValid('delete'.$poste->getId(), $token)) {
+            // Suppression de l'image si elle existe
+            if ($poste->getImage()) {
+                $imagePath = $this->getParameter('images_directory').'/'.$poste->getImage();
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
+                }
+            }
+            
             $entityManager->remove($poste);
             $entityManager->flush();
+            
+            $this->addFlash('success', 'L\'offre a été supprimée avec succès');
         }
         
         return $this->redirectToRoute('app_poste_index');

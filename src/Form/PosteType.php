@@ -14,6 +14,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FileType; // Ajoutez cette ligne
+use Symfony\Component\Validator\Constraints\File; // Ajoutez cette ligne
 
 class PosteType extends AbstractType
 {
@@ -45,7 +47,22 @@ class PosteType extends AbstractType
                 'multiple' => true,
                 'expanded' => true,
             ])
-            ->add('missions', TextareaType::class);
+            ->add('missions', TextareaType::class)
+            ->add('imageFile', FileType::class, [
+                'label' => 'Image de l\'offre',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '1024k',
+                        'mimeTypes' => [
+                            'image/jpeg',
+                            'image/png',
+                        ],
+                        'mimeTypesMessage' => 'Veuillez uploader une image valide (JPG ou PNG)',
+                    ])
+                ],
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

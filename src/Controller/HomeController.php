@@ -95,4 +95,11 @@ class HomeController extends AbstractController
         // Par défaut, on le redirige vers l'accueil si aucun rôle ne correspond
         return $this->redirectToRoute('home');
     }
+    #[Route('/offre/{id}', name: 'offre_details')]
+    public function offreDetails(Poste $poste): Response
+    {
+        return $this->render('home/offre_details.html.twig', [
+            'poste' => $poste
+        ]);
+    }    
 }

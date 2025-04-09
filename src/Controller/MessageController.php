@@ -18,7 +18,7 @@ class MessageController extends AbstractController
     {
         $user = $this->getUser();
         
-        // Corrige 'moment' en 'createdAt' si nécessaire (selon ton entité)
+        
         $messages = $messageRepo->findBy(
             ['toUser' => $user],
             ['moment' => 'DESC'] // Garde 'moment' si c'est le nom dans ton entité

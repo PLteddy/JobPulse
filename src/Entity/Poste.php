@@ -21,7 +21,7 @@ class Poste
     #[ORM\Column(length: 255)]
     private ?string $intitule = null;
 
-    #[ORM\Column(length: 500)]
+    #[ORM\Column(length: 1000)]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::SIMPLE_ARRAY, enumType: Contrat::class)]
@@ -61,6 +61,9 @@ class Poste
 
     #[ORM\Column(length: 500)]
     private ?string $missions = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $image = null;
 
     public function getId(): ?int
     {
@@ -239,6 +242,18 @@ class Poste
     public function setMissions(string $missions): static
     {
         $this->missions = $missions;
+
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): static
+    {
+        $this->image = $image;
 
         return $this;
     }

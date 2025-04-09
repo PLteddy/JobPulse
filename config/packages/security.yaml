@@ -37,6 +37,7 @@ security:
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/inscription, roles: PUBLIC_ACCESS }
         - { path: ^/home, roles: PUBLIC_ACCESS }
+        - { path: ^/offre, roles: PUBLIC_ACCESS } 
         - { path: ^/$, roles: PUBLIC_ACCESS }
         - { path: ^/entreprise, roles: ROLE_ENTREPRISE }
         - { path: ^/tuteur, roles: ROLE_TUTEUR }

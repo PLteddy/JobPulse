@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de l'offre - {{ poste.intitule }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('home') }}">Accueil</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ poste.intitule }}</li>
+        </ol>
+    </nav>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h1>{{ poste.intitule }}</h1>
+            <p class="text-muted">{{ poste.domaine }} - {{ poste.localisation }}</p>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    {% if poste.image %}
+                    <div class="mb-4 text-center">
+                        <img src="{{ asset('uploads/images/' ~ poste.image) }}" alt="{{ poste.intitule }}" class="img-fluid rounded" style="max-height: 300px;">
+                    </div>
+                    {% endif %}
+                    
+                    <h2>Description</h2>
+                    <p>{{ poste.description }}</p>
+                    
+                    <h2>Missions</h2>
+                    <p>{{ poste.missions }}</p>
+                    
+                    <h2>Profil recherché</h2>
+                    <p>{{ poste.profilRecherche }}</p>
+                    
+                    {% if poste.infoSupp %}
+                    <h2>Informations supplémentaires</h2>
+                    <p>{{ poste.infoSupp }}</p>
+                    {% endif %}
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Détails de l'offre</h3>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Type de contrat:</strong> 
+                                {% for contrat in poste.contratType %}
+                                    {{ contrat.name }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </p>
+                            <p><strong>Durée:</strong> 
+                                {% for d in poste.duree %}
+                                    {{ d.name }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </p>
+                            <p><strong>Présence:</strong> {{ poste.presence.name }}</p>
+                            <p><strong>Salaire:</strong> {{ poste.salaire }} €</p>
+                            <p><strong>Contact:</strong> {{ poste.contact }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h3>L'entreprise</h3>
+                        </div>
+                        <div class="card-body">
+                            <h4>{{ poste.entreprise.nom }}</h4>
+                            <p>{{ poste.presentationEntreprise }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
