@@ -1,13 +1,48 @@
-
 {% extends 'base.html.twig' %}
 
 {% block title %}Nouveau message{% endblock %}
 
 {% block body %}
-    <h1>Envoyer un message</h1>
-    
-    {{ form_start(form) }}
-        {{ form_widget(form) }}
-        <button class="btn btn-primary">Envoyer</button>
-    {{ form_end(form) }}
+    <div class="container">
+        <h1>Envoyer un message</h1>
+        
+        <a href="{{ path('app_message_index') }}" class="btn btn-secondary mb-4">
+            ← Retour aux conversations
+        </a>
+        
+        <form action="{{ path('app_message_search') }}" method="GET" class="mb-4">
+            <div class="input-group">
+                <input type="text" name="q" value="{{ search|default('') }}" class="form-control" placeholder="Rechercher par nom, prénom ou email...">
+                <button type="submit" class="btn btn-primary">Rechercher</button>
+            </div>
+        </form>
+        
+        {% if search is defined and search|length < 2 and search|length > 0 %}
+            <div class="alert alert-info">Veuillez saisir au moins 2 caractères pour la recherche.</div>
+        {% endif %}
+        
+        {% if results is defined %}
+            <div class="list-group">
+                {% for user in results %}
+                    {% if user != app.user %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-1">{{ user.prenom }} {{ user.nom }}</h5>
+                                    <p class="mb-1 text-muted">{{ user.email }}</p>
+                                </div>
+                                <a href="{{ path('app_message_new') }}?to_user={{ user.id }}" class="btn btn-primary">
+                                    Envoyer un message
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    {% if search is defined and search|length >= 2 %}
+                        <div class="alert alert-info">Aucun utilisateur trouvé pour "{{ search }}".</div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}

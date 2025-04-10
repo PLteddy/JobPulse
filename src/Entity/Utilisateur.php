@@ -9,6 +9,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use App\Entity\Poste;
 
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
@@ -78,7 +79,53 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Poste::class, mappedBy: 'entreprise')]
     private Collection $postes;
     
+    #[ORM\ManyToMany(targetEntity: Poste::class)]
+    #[ORM\JoinTable(name: 'utilisateur_poste_sauvegarde')]
+    private Collection $postesSauvegardes;
 
+    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'tuteurs')]
+    #[ORM\JoinTable(name: 'tuteur_etudiant')]
+    private Collection $etudiants;
+
+    #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'etudiants')]
+    private Collection $tuteurs;
+
+    public function __construct()
+    {
+        $this->postes = new ArrayCollection();
+        $this->postesSauvegardes = new ArrayCollection();
+        $this->etudiants = new ArrayCollection();
+        $this->tuteurs = new ArrayCollection();
+    }
+
+    /**
+     * @return Collection<int, Poste>
+     */
+    public function getPostesSauvegardes(): Collection
+    {
+        return $this->postesSauvegardes;
+    }
+
+    public function addPosteSauvegarde(Poste $poste): static
+    {
+        if (!$this->postesSauvegardes->contains($poste)) {
+            $this->postesSauvegardes->add($poste);
+        }
+
+        return $this;
+    }
+
+    public function removePosteSauvegarde(Poste $poste): static
+    {
+        $this->postesSauvegardes->removeElement($poste);
+
+        return $this;
+    }
+
+    public function hasPosteSauvegarde(Poste $poste): bool
+    {
+        return $this->postesSauvegardes->contains($poste);
+    }
 
     public function getId(): ?int
     {
@@ -95,10 +142,6 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         $this->email = $email;
 
         return $this;
-    }
-    public function __construct()
-    {
-        $this->postes = new ArrayCollection();
     }
     /**
      * A visual identifier that represents this user.
@@ -290,8 +333,6 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-
-// Ajoutez ces méthodes
 /**
  * @return Collection<int, Poste>
  */
@@ -333,4 +374,61 @@ public function removePoste(Poste $poste): static
 
         return $this;
     }
+
+
+    /**
+ * @return Collection<int, Utilisateur>
+ */
+public function getEtudiants(): Collection
+{
+    return $this->etudiants;
+}
+
+public function addEtudiant(self $etudiant): static
+{
+    if (!$this->etudiants->contains($etudiant)) {
+        $this->etudiants->add($etudiant);
+        $etudiant->addTuteur($this);
+    }
+
+    return $this;
+}
+
+public function removeEtudiant(self $etudiant): static
+{
+    if ($this->etudiants->removeElement($etudiant)) {
+        $etudiant->removeTuteur($this);
+    }
+
+    return $this;
+}
+
+/**
+ * @return Collection<int, Utilisateur>
+ */
+public function getTuteurs(): Collection
+{
+    return $this->tuteurs;
+}
+
+public function addTuteur(self $tuteur): static
+{
+    if (!$this->tuteurs->contains($tuteur)) {
+        $this->tuteurs->add($tuteur);
+    }
+
+    return $this;
+}
+
+public function removeTuteur(self $tuteur): static
+{
+    $this->tuteurs->removeElement($tuteur);
+
+    return $this;
+}
+
+public function hasEtudiant(self $etudiant): bool
+{
+    return $this->etudiants->contains($etudiant);
+}
 }

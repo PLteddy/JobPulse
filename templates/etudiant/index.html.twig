@@ -14,7 +14,9 @@
             <p>Connecté en tant que {{ app.user.prenom }} {{ app.user.nom }}</p>
             <a href="{{ path('app_logout') }}" class="btn btn-danger">Déconnexion</a>
 
-
+                    <a href="{{ path('app_message_index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-envelope"></i> Messages
+                    </a>
         </div>
     </body>
 </html>

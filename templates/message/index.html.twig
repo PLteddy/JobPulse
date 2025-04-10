@@ -2,31 +2,75 @@
 
 {% block title %}Mes messages{% endblock %}
 
-{% block body %}
-    <h1>Mes messages</h1>
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="{{ asset('css/messages.css') }}">
+{% endblock %}
 
-    <!-- 🔙 Bouton de retour à l'accueil -->
-    <a href="{{ path('home') }}" class="btn btn-secondary mb-3">🏠 Accueil</a>
-    
-    <a href="{{ path('app_message_new') }}" class="btn btn-primary mb-3 ms-2">
-        ✉️ Nouveau message
-    </a>
-    
-    <div class="messages mt-4">
-        {% for message in messages %}
-            <div class="card mb-3 {{ message.isRead ? '' : 'border-primary' }}">
-                <div class="card-header">
-                    De: {{ message.fromUser.prenom }}
-                    <small class="text-muted float-end">
-                        {{ message.moment|date('d/m/Y H:i') }}
-                    </small>
+{% block body %}
+<div class="messages-layout">
+    <!-- Panneau latéral gauche avec la liste des conversations -->
+    <div class="conversations-panel">
+        <h1>Mes messages</h1>
+        
+        <div class="search-container">
+            <form action="{{ path('app_message_search') }}" method="GET">
+                <input type="text" name="q" class="search-input" placeholder="Rechercher...">
+                <button type="submit" class="search-button">🔍</button>
+            </form>
+        </div>
+        
+        <div class="conversation-list">
+            {% for convo in conversations %}
+                {% set partner = convo.user %}
+                {% set lastMsg = convo.lastMessage %}
+                {% set hasUnread = (lastMsg.toUser == app.user and not lastMsg.isRead) %}
+                
+                <a href="{{ path('app_message_conversation', {'id': partner.id}) }}" 
+                   class="conversation-item {% if hasUnread %}unread{% endif %}">
+                    <div class="avatar">
+                        {% if partner.photoProfil %}
+                            <img src="{{ asset('uploads/profile/' ~ partner.photoProfil) }}" alt="{{ partner.prenom }}">
+                        {% else %}
+                            <div class="avatar-placeholder">{{ partner.prenom|first|upper }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="conversation-content">
+                        <div class="conversation-header">
+                            <h3>{{ partner.prenom }} {{ partner.nom }}</h3>
+                            <span class="date">{{ lastMsg.moment|date('H:i') }}</span>
+                        </div>
+                        <p class="message-preview">
+                            {% if lastMsg.fromUser == app.user %}Vous: {% endif %}
+                            {{ lastMsg.contenu|length > 40 ? lastMsg.contenu|slice(0, 40) ~ '...' : lastMsg.contenu }}
+                        </p>
+                    </div>
+                </a>
+            {% else %}
+                <div class="no-conversations">
+                    <p>Vous n'avez pas encore de conversations.</p>
+                    <a href="{{ path('app_message_new') }}" class="new-message-btn">✉️ Nouveau message</a>
                 </div>
-                <div class="card-body">
-                    <p class="card-text">{{ message.contenu }}</p>
-                </div>
+            {% endfor %}
+        </div>
+        
+        <div class="actions">
+            <a href="{{ path('home') }}" class="action-btn home-btn">🏠</a>
+            <a href="{{ path('app_message_new') }}" class="action-btn new-message-btn">✉️</a>
+        </div>
+    </div>
+
+    <!-- Panneau droit avec le contenu de la conversation -->
+    <div class="conversation-panel">
+        {% if app.request.get('_route') == 'app_message_index' %}
+            <div class="welcome-message">
+                <div class="message-icon">✉️</div>
+                <h2>Sélectionnez une conversation</h2>
+                <p>Choisissez une conversation dans la liste ou créez un nouveau message.</p>
             </div>
         {% else %}
-            <div class="alert alert-info">Aucun message</div>
-        {% endfor %}
+            {{ render(controller('App\\Controller\\MessageController::conversation', {'id': app.request.get('id')})) }}
+        {% endif %}
     </div>
+</div>
 {% endblock %}

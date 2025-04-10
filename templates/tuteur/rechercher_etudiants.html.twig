@@ -1,0 +1,85 @@
+{# templates/tuteur/rechercher_etudiants.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Rechercher des Étudiants{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1>Rechercher des Étudiants</h1>
+    
+    <div class="mb-4">
+        <div class="d-flex gap-2 mb-3">
+            <a href="{{ path('tuteur_mes_etudiants') }}" class="btn btn-secondary">Retour à mes étudiants</a>
+        </div>
+    </div>
+    
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+    
+    {% for message in app.flashes('info') %}
+        <div class="alert alert-info">
+            {{ message }}
+        </div>
+    {% endfor %}
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" action="{{ path('tuteur_rechercher_etudiants') }}" class="row g-3">
+                <div class="col-md-10">
+                    <input type="text" name="q" class="form-control" placeholder="Rechercher par nom, prénom ou email" value="{{ searchTerm }}">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Rechercher</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    {% if searchTerm %}
+        <h2>Résultats de la recherche</h2>
+        
+        {% if resultats is empty %}
+            <p>Aucun étudiant trouvé pour la recherche "{{ searchTerm }}"</p>
+        {% else %}
+            <div class="row">
+                {% for etudiant in resultats %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            {% if etudiant.photoProfil %}
+                                <img src="{{ asset('uploads/photos/' ~ etudiant.photoProfil) }}" class="card-img-top" alt="Photo de profil">
+                            {% else %}
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 150px;">
+                                    <i class="fas fa-user fa-3x text-secondary"></i>
+                                </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ etudiant.prenom }} {{ etudiant.nom }}</h5>
+                                {% if etudiant.formation %}
+                                    <p class="card-text"><strong>Formation :</strong> {{ etudiant.formation }}</p>
+                                {% endif %}
+                                {% if etudiant.etablissement %}
+                                    <p class="card-text"><strong>Établissement :</strong> {{ etudiant.etablissement }}</p>
+                                {% endif %}
+                                <div class="d-flex justify-content-end">
+                                    {% if app.user.etudiants.contains(etudiant) %}
+                                        <button class="btn btn-sm btn-success" disabled>
+                                            <i class="fas fa-check"></i> Déjà ajouté
+                                        </button>
+                                    {% else %}
+                                        <a href="{{ path('tuteur_ajouter_etudiant', {'id': etudiant.id}) }}" class="btn btn-sm btn-primary">
+                                            Ajouter à ma liste
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

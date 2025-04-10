@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Utilisateur;
+use App\Enum\Type;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -32,6 +33,37 @@ class UtilisateurRepository extends ServiceEntityRepository implements PasswordU
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
     }
+
+    /**
+    * Recherche des utilisateurs par terme de recherche et type
+    */
+    public function findBySearchTermAndType(string $searchTerm, Type $type): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.type = :type')
+            ->andWhere('(u.nom LIKE :search OR u.prenom LIKE :search OR u.email LIKE :search)')
+            ->setParameter('type', $type)
+            ->setParameter('search', '%' . $searchTerm . '%')
+            ->orderBy('u.nom', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+    
+    /**
+     * Recherche des utilisateurs par nom, prénom ou email
+     */
+    public function findBySearch(string $search): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.nom LIKE :search OR u.prenom LIKE :search OR u.email LIKE :search')
+            ->setParameter('search', '%' . $search . '%')
+            ->orderBy('u.nom', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+
+
 
     //    /**
     //     * @return Utilisateur[] Returns an array of Utilisateur objects

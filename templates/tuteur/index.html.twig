@@ -10,8 +10,27 @@
             
             <div class="mb-4">
                 <p>Connecté en tant que {{ app.user.prenom }} {{ app.user.nom }}</p>
-                <a href="{{ path('app_logout') }}" class="btn btn-danger">Déconnexion</a>
+                <div class="d-flex gap-2 mb-4">
+                    <a href="{{ path('tuteur_mes_enregistrements') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-bookmark"></i> Mes enregistrements
+                    </a>
+                    <a href="{{ path('tuteur_mes_etudiants') }}" class="btn btn-outline-success">
+                        <i class="fas fa-user-graduate"></i> Mes étudiants
+                    </a>
+                    <a href="{{ path('app_message_index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-envelope"></i> Messages
+                    </a>
+                    <a href="{{ path('app_logout') }}" class="btn btn-danger">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </a>
+                </div>
             </div>
+            
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success">
+                    {{ message }}
+                </div>
+            {% endfor %}
             
             <h2>Toutes les offres disponibles</h2>
             
@@ -22,11 +41,23 @@
                     {% for poste in postes %}
                         <div class="col-md-4 mb-4">
                             <div class="card">
+                                {% if poste.image %}
+                                    <img src="{{ asset('uploads/postes/' ~ poste.image) }}" class="card-img-top" alt="Image de l'offre">
+                                {% endif %}
                                 <div class="card-body">
                                     <h5 class="card-title">{{ poste.intitule }}</h5>
                                     <h6 class="card-subtitle mb-2 text-muted">{{ poste.entreprise.nom }}</h6>
                                     <p class="card-text">{{ poste.description|slice(0, 100) }}{% if poste.description|length > 100 %}...{% endif %}</p>
-                                    {# <a href="{{ path('poste_show', {'id': poste.id}) }}" class="btn btn-primary">Voir détails</a> #}
+                                    <div class="d-flex justify-content-between">
+                                        <a href="{{ path('offre_details', {'id': poste.id}) }}" class="btn btn-sm btn-primary">Voir l'offre</a>
+                                        <a href="{{ path('tuteur_sauvegarder_poste', {'id': poste.id}) }}" class="btn btn-sm {{ app.user.postesSauvegardes.contains(poste) ? 'btn-warning' : 'btn-outline-warning' }}">
+                                            {% if app.user.postesSauvegardes.contains(poste) %}
+                                                <i class="fas fa-bookmark"></i> Enregistré
+                                            {% else %}
+                                                <i class="far fa-bookmark"></i> Enregistrer
+                                            {% endif %}
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -34,5 +65,6 @@
                 </div>
             {% endif %}
         </div>
+
     </body>
 </html>
