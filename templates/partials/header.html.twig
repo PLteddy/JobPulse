@@ -1,5 +1,6 @@
 {# templates/partials/header.html.twig #}
 {% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
     <link rel="stylesheet" href="{{ asset('css/header.css') }}">
 {% endblock %}
 
@@ -11,9 +12,6 @@
                 </a>
                 <nav class="header-nav">
                     <a href="{{ path('app_login') }}">Connexion</a>
-                    <a href="{{ path('inscription', { type: 'etudiant' }) }}">Inscription Étudiant</a>
-                    <a href="{{ path('inscription', { type: 'entreprise' }) }}">Inscription Entreprise</a>
-                    <a href="{{ path('inscription', { type: 'tuteur' }) }}">Inscription Tuteur</a>
                 </nav>
             </div>
 </header>
