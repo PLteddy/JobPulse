@@ -1,16 +1,37 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Conversation{% endblock %}
-
-{% block stylesheets %}
-{{ parent() }}
-<link rel="stylesheet" href="{{ asset('css/messages.css') }}">
-{% endblock %}
-
-{% block body %}
-<div class="messages-layout">
-    <div class="conversation-panel">
-        {% include 'message/conversation_content.html.twig' %}
+<div class="conversation-header-panel">
+    <div class="conversation-user">
+        {% if partner.photoProfil %}
+            <img src="{{ asset('uploads/profile/' ~ partner.photoProfil) }}" alt="{{ partner.prenom }}" class="user-avatar">
+        {% else %}
+            <div class="avatar-placeholder">{{ partner.prenom|first|upper }}</div>
+        {% endif %}
+        <h2>{{ partner.prenom }} {{ partner.nom }}</h2>
     </div>
 </div>
-{% endblock %}
+
+<div class="messages-container">
+    {% for message in messages %}
+        {% set isFromMe = message.fromUser == app.user %}
+        <div class="message-wrapper {{ isFromMe ? 'sent' : 'received' }}">
+            <div class="message-bubble">
+                <p>{{ message.contenu }}</p>
+                <span class="message-time">{{ message.moment|date('H:i') }}</span>
+            </div>
+        </div>
+    {% else %}
+        <div class="no-messages">
+            <p>Aucun message dans cette conversation.</p>
+            <p>Envoyez le premier message !</p>
+        </div>
+    {% endfor %}
+</div>
+
+<div class="message-input-container">
+    {{ form_start(form, {'attr': {'class': 'message-form'}}) }}
+        <div class="message-input-wrapper">
+            {{ form_widget(form.contenu, {'attr': {'class': 'message-input', 'placeholder': 'Votre message...'}}) }}
+            <button type="submit" class="send-button">Envoyer</button>
+        </div>
+        {{ form_errors(form.contenu) }}
+    {{ form_end(form) }}
+</div>

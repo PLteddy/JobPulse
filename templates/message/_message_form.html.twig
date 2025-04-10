@@ -1,0 +1,7 @@
+{{ form_start(form, {'attr': {'class': 'message-form'}}) }}
+    <div class="message-input-wrapper">
+        {{ form_widget(form.contenu, {'attr': {'class': 'message-input', 'placeholder': 'Votre message...'}}) }}
+        <button type="submit" class="send-button">Envoyer</button>
+    </div>
+    {{ form_errors(form.contenu) }}
+{{ form_end(form) }}

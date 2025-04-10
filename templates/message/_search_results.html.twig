@@ -1,0 +1,39 @@
+<div class="search-results-container">
+    {% if results|length > 0 %}
+        <div class="list-group">
+            {% for user in results %}
+                {% if user != app.user %}
+                    <div class="list-group-item user-result">
+                        <div class="d-flex align-items-center">
+                            <div class="user-avatar-small">
+                                {% if user.photoProfil %}
+                                    <img src="{{ asset('uploads/profile/' ~ user.photoProfil) }}" alt="{{ user.prenom }}">
+                                {% else %}
+                                    <div class="avatar-placeholder-small">{{ user.prenom|first|upper }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="user-info">
+                                <h5 class="mb-1">{{ user.prenom }} {{ user.nom }}</h5>
+                                <p class="mb-1 text-muted">{{ user.email }}</p>
+                            </div>
+                            <div class="user-actions">
+                                <a href="#" 
+                                   class="btn btn-primary conversation-btn" 
+                                   data-user-id="{{ user.id }}"
+                                   data-action="view-conversation">
+                                    Voir la conversation
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% else %}
+        {% if search|length >= 2 %}
+            <div class="alert alert-info">Aucun utilisateur trouvé pour "{{ search }}".</div>
+        {% else %}
+            <div class="alert alert-info">Commencez à taper pour rechercher un utilisateur...</div>
+        {% endif %}
+    {% endif %}
+</div>

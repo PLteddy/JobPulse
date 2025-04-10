@@ -1,0 +1,32 @@
+{# _conversation_list.html.twig #}
+{% for convo in conversations %}
+    {% set partner = convo.user %}
+    {% set lastMsg = convo.lastMessage %}
+    {% set hasUnread = (lastMsg.toUser == app.user and not lastMsg.isRead) %}
+    
+    <a href="{{ path('app_message_conversation', {'id': partner.id}) }}" 
+       class="conversation-item {% if hasUnread %}unread{% endif %} {% if app.request.get('id') == partner.id %}active{% endif %}"
+       data-partner-id="{{ partner.id }}">
+        <div class="avatar">
+            {% if partner.photoProfil %}
+                <img src="{{ asset('uploads/profile/' ~ partner.photoProfil) }}" alt="{{ partner.prenom }}">
+            {% else %}
+                <div class="avatar-placeholder">{{ partner.prenom|first|upper }}</div>
+            {% endif %}
+        </div>
+        <div class="conversation-content">
+            <div class="conversation-header">
+                <h3>{{ partner.prenom }} {{ partner.nom }}</h3>
+                <span class="date">{{ lastMsg.moment|date('H:i') }}</span>
+            </div>
+            <p class="message-preview">
+                {% if lastMsg.fromUser == app.user %}Vous: {% endif %}
+                {{ lastMsg.contenu|length > 40 ? lastMsg.contenu|slice(0, 40) ~ '...' : lastMsg.contenu }}
+            </p>
+        </div>
+    </a>
+{% else %}
+    <div class="no-conversations">
+        <p>Vous n'avez pas encore de conversations.</p>
+    </div>
+{% endfor %}

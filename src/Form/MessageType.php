@@ -13,7 +13,6 @@ class MessageType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
 {
-    // Si on est en mode conversation, on n'affiche pas le champ destinataire
     if (!$options['conversation_mode']) {
         $builder->add('toUser', EntityType::class, [
             'class' => Utilisateur::class,
@@ -24,7 +23,6 @@ class MessageType extends AbstractType
             'required' => true,
             'query_builder' => function ($er) use ($options) {
                 $qb = $er->createQueryBuilder('u');
-                // Si l'option filter_by_type est définie, filtrer par type d'utilisateur
                 if (!empty($options['filter_by_type'])) {
                     $qb->andWhere('u.type = :type')
                         ->setParameter('type', $options['filter_by_type']);

@@ -105,6 +105,35 @@ public function countUnreadMessages($user): int
         ->getQuery()
         ->getSingleScalarResult();
 }
+/**
+ * Pour rechercher un utilisateur par son nom, prénom ou email
+ */
+public function findBySearch(string $search): array
+{
+    return $this->createQueryBuilder('u')
+        ->where('LOWER(u.prenom) LIKE LOWER(:search) OR LOWER(u.nom) LIKE LOWER(:search) OR LOWER(u.email) LIKE LOWER(:search)')
+        ->setParameter('search', '%' . $search . '%')
+        ->orderBy('u.prenom', 'ASC')
+        ->addOrderBy('u.nom', 'ASC')
+        ->getQuery()
+        ->getResult();
+}
+
+
+public function markAsRead($user, $partner): int
+{
+    return $this->createQueryBuilder('m')
+        ->update()
+        ->set('m.isRead', 'true')
+        ->where('m.toUser = :user')
+        ->andWhere('m.fromUser = :partner')
+        ->andWhere('m.isRead = :isRead')
+        ->setParameter('user', $user)
+        ->setParameter('partner', $partner)
+        ->setParameter('isRead', false)
+        ->getQuery()
+        ->execute();
+}
 //    /**
 //     * @return Message[] Returns an array of Message objects
 //     */

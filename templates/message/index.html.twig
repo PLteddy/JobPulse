@@ -14,10 +14,8 @@
         <h1>Mes messages</h1>
         
         <div class="search-container">
-            <form action="{{ path('app_message_search') }}" method="GET">
-                <input type="text" name="q" class="search-input" placeholder="Rechercher...">
-                <button type="submit" class="search-button">🔍</button>
-            </form>
+            <input type="text" id="user-search" class="search-input" placeholder="Rechercher un utilisateur...">
+            <button id="search-button" class="search-button">🔍</button>
         </div>
         
         <div class="conversation-list">
@@ -27,7 +25,8 @@
                 {% set hasUnread = (lastMsg.toUser == app.user and not lastMsg.isRead) %}
                 
                 <a href="{{ path('app_message_conversation', {'id': partner.id}) }}" 
-                   class="conversation-item {% if hasUnread %}unread{% endif %}">
+                   class="conversation-item {% if hasUnread %}unread{% endif %} {% if app.request.get('id') == partner.id %}active{% endif %}"
+                   data-partner-id="{{ partner.id }}">
                     <div class="avatar">
                         {% if partner.photoProfil %}
                             <img src="{{ asset('uploads/profile/' ~ partner.photoProfil) }}" alt="{{ partner.prenom }}">
@@ -49,28 +48,123 @@
             {% else %}
                 <div class="no-conversations">
                     <p>Vous n'avez pas encore de conversations.</p>
-                    <a href="{{ path('app_message_new') }}" class="new-message-btn">✉️ Nouveau message</a>
                 </div>
             {% endfor %}
         </div>
         
         <div class="actions">
             <a href="{{ path('home') }}" class="action-btn home-btn">🏠</a>
-            <a href="{{ path('app_message_new') }}" class="action-btn new-message-btn">✉️</a>
+            <button id="new-message-btn" class="action-btn new-message-btn">✉️</button>
         </div>
     </div>
 
-    <!-- Panneau droit avec le contenu de la conversation -->
-    <div class="conversation-panel">
-        {% if app.request.get('_route') == 'app_message_index' %}
+    <!-- Panneau droit avec le contenu dynamique -->
+    <div class="conversation-panel" id="conversation-container">
+        {% if activeConversation is defined and activeConversation %}
+            <!-- Conversation active -->
+            <div class="conversation-header-panel">
+                <div class="conversation-user">
+                    {% if activeConversation.partner.photoProfil %}
+                        <img src="{{ asset('uploads/profile/' ~ activeConversation.partner.photoProfil) }}" alt="{{ activeConversation.partner.prenom }}" class="user-avatar">
+                    {% else %}
+                        <div class="avatar-placeholder">{{ activeConversation.partner.prenom|first|upper }}</div>
+                    {% endif %}
+                    <h2>{{ activeConversation.partner.prenom }} {{ activeConversation.partner.nom }}</h2>
+                </div>
+            </div>
+
+            <div class="messages-container">
+                {% for message in activeConversation.messages %}
+                    {% set isFromMe = message.fromUser == app.user %}
+                    <div class="message-wrapper {{ isFromMe ? 'sent' : 'received' }}">
+                        <div class="message-bubble">
+                            <p>{{ message.contenu }}</p>
+                            <span class="message-time">{{ message.moment|date('H:i') }}</span>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="no-messages">
+                        <p>Aucun message dans cette conversation.</p>
+                        <p>Envoyez le premier message !</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="message-input-container">
+                {{ form_start(activeConversation.form, {'attr': {'class': 'message-form'}}) }}
+                    <div class="message-input-wrapper">
+                        {{ form_widget(activeConversation.form.contenu, {'attr': {'class': 'message-input', 'placeholder': 'Votre message...'}}) }}
+                        <button type="submit" class="send-button">Envoyer</button>
+                    </div>
+                    {{ form_errors(activeConversation.form.contenu) }}
+                {{ form_end(activeConversation.form) }}
+            </div>
+        {% else %}
             <div class="welcome-message">
                 <div class="message-icon">✉️</div>
                 <h2>Sélectionnez une conversation</h2>
                 <p>Choisissez une conversation dans la liste ou créez un nouveau message.</p>
             </div>
-        {% else %}
-            {{ render(controller('App\\Controller\\MessageController::conversation', {'id': app.request.get('id')})) }}
         {% endif %}
     </div>
+
+    <!-- Panneau de recherche/nouveau message (caché par défaut) -->
+    <div class="user-search-panel" id="user-search-panel" style="display: none;">
+        <div class="panel-header">
+            <h2 id="search-panel-title">Rechercher un utilisateur</h2>
+            <button id="close-search-panel" class="close-btn">×</button>
+        </div>
+
+        <div class="search-results" id="search-results">
+            <!-- Les résultats de recherche seront affichés ici -->
+        </div>
+
+        <div id="new-message-form-container" style="display: none;">
+            <!-- Le formulaire de nouveau message sera injecté ici -->
+        </div>
+    </div>
 </div>
+
+<!-- Templates pour les composants dynamiques (utilisés avec JavaScript) -->
+<template id="conversation-template">
+    <div class="conversation-header-panel">
+        <div class="conversation-user">
+            <div class="avatar-placeholder">{INITIAL}</div>
+            <h2>{NAME}</h2>
+        </div>
+    </div>
+
+    <div class="messages-container">
+        <!-- Les messages seront insérés ici -->
+    </div>
+
+    <div class="message-input-container">
+        <!-- Le formulaire sera inséré ici -->
+    </div>
+</template>
+
+<template id="loading-template">
+    <div class="loading-indicator">
+        <div class="spinner"></div>
+        <p>{MESSAGE}</p>
+    </div>
+</template>
+
+<template id="error-template">
+    <div class="error-message">
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i>
+            {MESSAGE}
+        </div>
+    </div>
+</template>
+
+<script>
+    const conversationBaseUrl = "{{ path('app_message_conversation', {'id': '0'}) }}";
+    const newMessageUrl = "{{ path('app_message_new') }}";
+    const messageIndexUrl = "{{ path('app_message_index') }}";
+    const unreadMessageCountUrl = "{{ path('app_message_count_unread') }}";
+    const searchUrl = "{{ path('app_message_search') }}";
+</script>
+<script src="{{ asset('js/message_script.js') }}"></script>
 {% endblock %}
