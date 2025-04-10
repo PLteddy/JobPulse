@@ -4,14 +4,14 @@
     <link rel="stylesheet" href="{{ asset('css/header.css') }}">
 {% endblock %}
 
-<header class="site-header">
+<header>
    
-            <div class="header-container">
+            <section class="header-section">
                 <a>
                     <img src="{{ asset('img/logo.png') }}" alt="Job Pulse" class="header-logo">
                 </a>
                 <nav class="header-nav">
-                    <a href="{{ path('app_login') }}">Connexion</a>
+                    <a class="bouton-connexion" href="{{ path('app_login') }}">Connexion</a>
                 </nav>
-            </div>
+            </section>
 </header>

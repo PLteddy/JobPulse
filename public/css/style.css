@@ -1,19 +1,6 @@
-@font-face {
-    font-family: 'Kanit';
-    src: url('fonts/Kanit-Regular.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'Kanit';
-    src: url('fonts/Kanit-Bold.ttf') format('truetype');
-    font-weight: bold;
-    font-style: normal;
-}
 
 body {
-    font-family: 'Kanit', sans-serif;
+    font-family: 'roboto', sans-serif;
     background-color: #EFEFD0;
 
 }
@@ -24,7 +11,7 @@ body {
 }
 
 h1 {
-    font-family: "Kanit", sans-serif;
+    font-family: 'roboto', sans-serif;
     font-size: 48px;
     color: #000000;
 }
@@ -47,4 +34,23 @@ h4 {
 p {
     font-size: 16px;
     color: #000000;
+}
+.bouton-connexion{
+    color: #ffffff;
+    background-color: #004E89;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    position: relative;
+    border-radius: 10px;
+    padding: 15px;
+}
+a{
+    text-decoration: none;
+    color: #000000;
+    font-size: 1.25rem;
+}
+.bouton-connexion:hover {
+    background-color: #1A659E;
+    transition: background-color 0.3s ease;
 }

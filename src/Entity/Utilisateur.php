@@ -41,7 +41,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     private ?Type $type = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $photo_profil = null;
+    private ?string $photoProfil = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $siret = null;
@@ -203,12 +203,12 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getPhotoProfil(): ?string
     {
-        return $this->photo_profil;
+        return $this->photoProfil;
     }
 
-    public function setPhotoProfil(?string $photo_profil): static
+    public function setPhotoProfil(?string $photoProfil): static
     {
-        $this->photo_profil = $photo_profil;
+        $this->photoProfil = $photoProfil;
 
         return $this;
     }

@@ -8,8 +8,21 @@
     </head>
     <section class="hero-section">
         <div class="imgProfil-div">
+            {if app.user.photo_profil is not null}
+                <img 
+                    src="{{ asset('uploads/images/' ~ app.user.photo_profil) }}"
+                    alt="Photo de profil" 
+                    class="img-profil"
+                >
+            {else}
+                <img 
+                    src="{{ asset('img/profil.png') }}"
+                    alt="Photo de profil" 
+                    class="img-profil"
+                >
+            {/if}
             <img 
-            src="{{ app.user.photo_profil ? asset('uploads/profils/' ~ app.user.photo_profil) : asset('img/profil.png') }}" 
+            src="{{ asset('img/profil.png') }}"
             alt="Photo de profil" 
             class="img-profil"
             >
