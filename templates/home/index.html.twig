@@ -1,35 +1,23 @@
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
-<link rel="stylesheet" href="{{ asset('css/home.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
 {% endblock %}
 
 {% block title %}Accueil{% endblock %}
 
 {% block body %}
+    {% include './partials/header.html.twig' %}
+
     <div class="container">
-        <h1 class="my-4">Bienvenue sur JobPulse</h1>
-        
-        {% if app.user %}
-            <div class="user-info mb-4">
-                <p>Connecté en tant que {{ app.user.prenom }} {{ app.user.nom }}</p>
-                <a href="{{ path('app_logout') }}" class="btn btn-danger">Déconnexion</a>
+        <div class="welcome">
+            <img src="{{ asset('img/telework-6795505.jpg') }}" alt="Job Pulse">
+            <div class="welcome-text">
+                <h1>Tu as besoin de trouver une alternance ou un stage ?</h1>
             </div>
-            
-            <ul class="quick-links">
-                <li><a href="{{ path('app_message_index') }}">Ma messagerie</a></li>
-            </ul>
-        {% else %}
-            <div class="auth-actions">
-                <a href="{{ path('app_login') }}" class="btn btn-primary">Connexion</a>
-                <div class="inscription-links">
-                    <span>S'inscrire en tant que :</span>
-                    <a href="{{ path('inscription', { type: 'entreprise' }) }}">Entreprise</a>
-                    <a href="{{ path('inscription', { type: 'tuteur' }) }}">Tuteur</a>
-                    <a href="{{ path('inscription', { type: 'etudiant' }) }}">Étudiant</a>
-                </div>
-            </div>
-        {% endif %}
+        </div>
 
         {# Barre de recherche et filtres #}
         <div class="search-container card my-4">

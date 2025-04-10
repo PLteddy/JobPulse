@@ -30,26 +30,26 @@ class CreateTestUser extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $user = new Utilisateur();
-        $user->setEmail('test2@example.com');
-        $user->setPassword($this->passwordHasher->hashPassword($user, 'password2'));
-        $user->setNom('Test2');
-        $user->setPrenom('User2');
+        $user->setEmail('test@example.com');
+        $user->setPassword($this->passwordHasher->hashPassword($user, 'password'));
+        $user->setNom('Test');
+        $user->setPrenom('User');
         $user->setType(Type::ENTREPRISE);
         $user->setSiret('123456789');
         $user->setRoles(['ROLE_ENTREPRISE']);
         
         // Ajoute ces lignes pour les champs obligatoires
-        $user->setAdresse('Adresse test2');
-        $user->setFormation('Formation test2');
-        $user->setEtablissement('Établissement test2');
+        $user->setAdresse('Adresse test');
+        $user->setFormation('Formation test');
+        $user->setEtablissement('Établissement test');
         // Ajoute d'autres champs obligatoires si nécessaire
     
         $this->entityManager->persist($user);
         $this->entityManager->flush();
     
         $output->writeln('Utilisateur test créé avec succès !');
-        $output->writeln('Email: test2@example.com');
-        $output->writeln('Mot de passe: password2');
+        $output->writeln('Email: test@example.com');
+        $output->writeln('Mot de passe: password');
     
         return Command::SUCCESS;
     }
