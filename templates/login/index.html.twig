@@ -8,37 +8,35 @@
 {% block title %}Connexion{% endblock %}
 
 {% block body %}
-    {% block header %}
-        {% include 'partials/header.html.twig' %}
-    {% endblock %}
+    <body>
+        <div class="login-form-container">
+            {% if error %}
+                <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
 
-    <div class="login-form-container">
-        {% if error %}
-            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-        {% endif %}
-
-        <form method="post" class="login-form">
-            <div class="form-group">
-                <label for="inputEmail" class="form-label">E-mail</label>
-                <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-input" required autofocus>
-            </div>
-            <div class="form-group">
-                <label for="inputPassword" class="form-label">Mot de passe</label>
-                <input type="password" name="password" id="inputPassword" class="form-input" required>
-            </div>
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-            
-            <div class="button-container">
-                <div class="register-link">
-                    <p>Pas encore de compte ?</p>
-                    <ul>
-                        <li><a href="{{ path('inscription', { type: 'etudiant' }) }}">Étudiant</a></li>
-                        <li><a href="{{ path('inscription', { type: 'entreprise' }) }}">Entreprise</a></li>
-                        <li><a href="{{ path('inscription', { type: 'tuteur' }) }}">Tuteur</a></li>
-                    </ul>
+            <form method="post" class="login-form">
+                <div class="form-group">
+                    <label for="inputEmail" class="form-label">E-mail</label>
+                    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-input" required autofocus>
                 </div>
-                <button class="login-button" type="submit">Connexion</button>
-            </div>
-        </form>
-    </div>
+                <div class="form-group">
+                    <label for="inputPassword" class="form-label">Mot de passe</label>
+                    <input type="password" name="password" id="inputPassword" class="form-input" required>
+                </div>
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                
+                <div class="button-container">
+                    <div class="register-link">
+                        <p>Pas encore de compte ?</p>
+                        <ul>
+                            <li><a href="{{ path('inscription', { type: 'etudiant' }) }}">Étudiant</a></li>
+                            <li><a href="{{ path('inscription', { type: 'entreprise' }) }}">Entreprise</a></li>
+                            <li><a href="{{ path('inscription', { type: 'tuteur' }) }}">Tuteur</a></li>
+                        </ul>
+                    </div>
+                    <button class="login-button" type="submit">Connexion</button>
+                </div>
+            </form>
+        </div>
+    </body>
 {% endblock %}

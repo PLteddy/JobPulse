@@ -1,13 +1,16 @@
 footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
     background-color: #f8f9fa;
-    padding: 39px 157px;
+    padding: 39px 0;
     margin-top: 150px;
 }
 .footer-section {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 0 auto;
 }
 .footer-nav{
     display: flex;
