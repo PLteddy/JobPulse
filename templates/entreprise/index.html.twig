@@ -1,19 +1,11 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        
-    </head>
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes offres{% endblock %}
+
+
+{% block body %}
     <body>
         <h1>Entreprise</h1>
-                <div class="mb-4">
-            <p>Connecté en tant que {{ app.user.prenom }} {{ app.user.nom }}</p>
-            <a href="{{ path('app_logout') }}" class="btn btn-danger">Déconnexion</a>
-        </div>
-                <ul>
-            <li><a href="{{ path('app_message_index') }}">Ma messagerie</a></li>
-            <li><a href="{{ path('app_poste_index') }}">Mes offres</a></li>
-        </ul>
+         
     </body>
-</html>
+{% endblock %}

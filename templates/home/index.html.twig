@@ -32,14 +32,16 @@
                         <input type="text" 
                                name="q" 
                                class="search-input" 
-                               placeholder="Rechercher des offres..." 
+                               placeholder="Nom du métier, ville, région..." 
                                value="{{ searchTerm }}">
-                        <button class="btn btn-primary search-btn" type="submit">Rechercher</button>
-                        <button type="button" class="btn btn-secondary filter-toggle" id="showFilters">
+                        <button type="button" class="bouton-filtres" id="showFilters">
                             <i class="fas fa-sliders-h"></i> Filtres
                         </button>
+                        <button type="button" class="bouton-modifier">
+                            <a> </a>
+                        </button>
                     </div>
-
+            {# LE CSS DES FILTRES EST ENTIEREMENT A REFAIRE #}
                     {# Overlay des filtres #}
                     <div class="filters-overlay" id="filtersOverlay">
                         <div class="filters-header">

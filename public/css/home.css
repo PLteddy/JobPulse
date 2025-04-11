@@ -75,6 +75,7 @@
     display: flex;
 }
 
+
 .search-input {
     flex: 1;
     padding: 30px;
@@ -84,6 +85,10 @@
     border-radius: 50px;
     font-size: 1.5rem;
     border:#F7C59F solid 3px;
+}
+.search-input::placeholder {
+    color: white;
+    opacity: 1; /* Assurez-vous que l'opacité est définie */
 }
 
 .search-btn, .filter-toggle {

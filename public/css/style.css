@@ -37,6 +37,7 @@ p {
     font-size: 16px;
     color: #000000;
     font-family: 'roboto', sans-serif;
+    line-height: auto;
 }
 .bouton-connexion{
     color: #ffffff;
@@ -56,4 +57,17 @@ a{
 .bouton-connexion:hover {
     background-color: #1A659E;
     transition: background-color 0.3s ease;
+}
+
+.bouton-filtres{
+    background-color: #FF6B35;
+    color: #ffffff;
+}
+
+.bouton-modifier{
+    background-color:#004E89;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    border: none;
 }

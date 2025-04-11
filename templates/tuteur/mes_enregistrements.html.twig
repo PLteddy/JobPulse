@@ -1,51 +1,50 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Mes enregistrements</title>
-    </head>
-    <body>
-        <div class="container mt-4">
-            <h1>Mes offres enregistrées</h1>
-            
-            <div class="mb-4">
-                <p>Connecté en tant que {{ app.user.prenom }} {{ app.user.nom }}</p>
-                <div class="d-flex gap-2">
-                    <a href="{{ path('tuteur_dashboard') }}" class="btn btn-primary">Retour au tableau de bord</a>
-                    <a href="{{ path('app_logout') }}" class="btn btn-danger">Déconnexion</a>
-                </div>
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes enregistrements{% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
+    
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+{% endblock %}
+
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Mes offres enregistrées</h1>
+                    
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
             </div>
-            
-            {% for message in app.flashes('success') %}
-                <div class="alert alert-success">
-                    {{ message }}
-                </div>
-            {% endfor %}
-            
-            {% if postesSauvegardes.empty %}
-                <p>Vous n'avez pas encore enregistré d'offres.</p>
-            {% else %}
-                <div class="row">
+        {% endfor %}
+        
+        {% if postesSauvegardes.empty %}
+            <p>Vous n'avez pas encore enregistré d'offres.</p>
+        {% else %}
+            <div class="results-container">
+                <div class="results-grid">
                     {% for poste in postesSauvegardes %}
-                        <div class="col-md-4 mb-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ poste.intitule }}</h5>
-                                    <h6 class="card-subtitle mb-2 text-muted">{{ poste.entreprise.nom }}</h6>
-                                    <p class="card-text">{{ poste.description|slice(0, 100) }}{% if poste.description|length > 100 %}...{% endif %}</p>
-                                    <div class="d-flex justify-content-between">
-                                        <a href="{{ path('offre_details', {'id': poste.id}) }}" class="btn btn-sm btn-primary">Voir l'offre</a>
-                                        <a href="{{ path('tuteur_sauvegarder_poste', {'id': poste.id}) }}" class="btn btn-sm btn-warning">
-                                            <i class="fas fa-bookmark"></i> Retirer
-                                        </a>
-                                    </div>
+                        <div class="job-card card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ poste.intitule }}</h5>
+                                <h6 class="card-subtitle">{{ poste.entreprise.nom }}</h6>
+                                <p class="card-text">{{ poste.description|slice(0, 100) }}{% if poste.description|length > 100 %}...{% endif %}</p>
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ path('offre_details', {'id': poste.id}) }}" class="btn btn-sm btn-primary">Voir l'offre</a>
+                                    <a href="{{ path('tuteur_sauvegarder_poste', {'id': poste.id}) }}" class="btn btn-sm btn-warning">
+                                        <img src="{{ asset('img/enregistre.png') }}" alt="enregistre">
+                                    </a>
                                 </div>
                             </div>
                         </div>
                     {% endfor %}
                 </div>
-            {% endif %}
-        </div>
-    
-    </body>
-</html>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

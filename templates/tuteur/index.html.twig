@@ -1,7 +1,16 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Tableau de bord tuteur{% endblock %}
-
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
+    
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+{% endblock %}
 
 {% block body %}
         <div class="container mt-4">
@@ -15,36 +24,56 @@
             
             <h2>Toutes les offres disponibles</h2>
             
-            {% if postes is empty %}
-                <p>Aucune offre disponible actuellement.</p>
-            {% else %}
-                <div class="row">
-                    {% for poste in postes %}
-                        <div class="col-md-4 mb-4">
-                            <div class="card">
-                                {% if poste.image %}
-                                    <img src="{{ asset('uploads/postes/' ~ poste.image) }}" class="card-img-top" alt="Image de l'offre">
-                                {% endif %}
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ poste.intitule }}</h5>
-                                    <h6 class="card-subtitle mb-2 text-muted">{{ poste.entreprise.nom }}</h6>
-                                    <p class="card-text">{{ poste.description|slice(0, 100) }}{% if poste.description|length > 100 %}...{% endif %}</p>
-                                    <div class="d-flex justify-content-between">
-                                        <a href="{{ path('offre_details', {'id': poste.id}) }}" class="btn btn-sm btn-primary">Voir l'offre</a>
-                                        <a href="{{ path('tuteur_sauvegarder_poste', {'id': poste.id}) }}" class="btn btn-sm {{ app.user.postesSauvegardes.contains(poste) ? 'btn-warning' : 'btn-outline-warning' }}">
-                                            {% if app.user.postesSauvegardes.contains(poste) %}
-                                                <i class="fas fa-bookmark"></i> Enregistré
-                                            {% else %}
-                                                <i class="far fa-bookmark"></i> Enregistrer
-                                            {% endif %}
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
+ <div class="results-container">
+    {% if postes|length > 0 %}
+        <div class="results-grid">
+            {% for poste in postes %}
+                <div class="job-card card">
+                    {% if poste.image %}
+                        <div class="card-img-top-container text-center" style="padding: 15px;">
+                            <img src="{{ asset('uploads/images/' ~ poste.image) }}" alt="{{ poste.intitule }}" class="card-img-top" style="max-height: 150px; width: auto; object-fit: contain;">
                         </div>
-                    {% endfor %}
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ poste.intitule }}</h5>
+                        <h6 class="card-subtitle">{{ poste.entreprise.nom }}</h6>
+                        <p class="card-text">{{ poste.description|slice(0, 150) }}...</p>
+                        <div class="job-details">
+                            <p><strong>Salaire:</strong> {{ poste.salaire }}€</p>
+                            <p><strong>Contrat:</strong> 
+                                {% for contrat in poste.contratType %}
+                                    {{ contrat.name }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </p>
+                            <p><strong>Durée:</strong> 
+                                {% for duree in poste.duree %}
+                                    {{ duree.name }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </p>
+                            <p><strong>Mode de travail:</strong> {{ poste.presence.name }}</p>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ path('offre_details', {'id': poste.id}) }}" class="btn btn-sm btn-primary">Voir l'offre</a>
+                            <a href="{{ path('tuteur_sauvegarder_poste', {'id': poste.id}) }}" class="btn btn-sm {{ app.user.postesSauvegardes.contains(poste) ? 'btn-warning' : 'btn-outline-warning' }}">
+                                {% if app.user.postesSauvegardes.contains(poste) %}
+                                    <img src="{{ asset('img/enregistre.png') }}" alt="Enregistré">
+                                {% else %}
+                                    <img src="{{ asset('img/non_enregistre.png') }}" alt="Non enregistré">
+                                {% endif %}
+                            </a>
+                        </div>
+                    </div>
                 </div>
-            {% endif %}
+            {% endfor %}
         </div>
+    {% else %}
+        <div class="no-results">
+            <div class="alert alert-info">
+                Aucune offre trouvée. Essayez de modifier vos critères de recherche.
+            </div>
+        </div>
+    {% endif %}
+</div>
+
 
 {% endblock %}
