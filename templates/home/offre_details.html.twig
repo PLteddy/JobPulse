@@ -1,7 +1,12 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Détails de l'offre - {{ poste.intitule }}{% endblock %}
-<link rel="stylesheet" href="{{ asset('css/reset.css') }}">
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
+{% endblock %}
+
 {% block body %}
 <div class="container mt-4">
     <nav aria-label="breadcrumb">

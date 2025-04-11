@@ -1,0 +1,27 @@
+{# templates/partials/footer.html.twig #}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/footer.css') }}">
+{% endblock %}
+
+<footer>
+    <section class="footer-section">
+        <a>
+            <img src="{{ asset('img/logo.png') }}" alt="Job Pulse" class="footer-logo">
+        </a>
+        <div class="footer-nav">
+            <a href="{{ path('app_login') }}">Se connecter</a>
+        </div>
+        <div class="footer-other">
+            <div class="instit-logo">
+                <img src="{{ asset('img/logo_univ.png') }}" alt="Job Pulse" class="header-logo">
+                <img src="{{ asset('img/mmi.png') }}" alt="Job Pulse" class="header-logo">
+            </div>
+            <div class="little-footer">
+                <a href="{{ path('app_login') }}">Politique de confidentialité</a>
+                <a href="{{ path('app_login') }}">Mentions légales</a>
+                <p>&copy;2025 Étudiants MMI</p>
+            </div>
+        </div>
+    </section>
+</footer>
