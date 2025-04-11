@@ -19,14 +19,15 @@
         </div>
         
         <div class="conversation-list">
-            {% for convo in conversations %}
-                {% set partner = convo.user %}
-                {% set lastMsg = convo.lastMessage %}
-                {% set hasUnread = (lastMsg.toUser == app.user and not lastMsg.isRead) %}
-                
+    {% for convo in conversations %}
+        {% set partner = convo.user %}
+        {% set lastMsg = convo.lastMessage %}
+        {% set hasUnread = (lastMsg.toUser == app.user and not lastMsg.isRead) %}
+        
+            <div class="conversation-wrapper">
                 <a href="{{ path('app_message_conversation', {'id': partner.id}) }}" 
-                   class="conversation-item {% if hasUnread %}unread{% endif %} {% if app.request.get('id') == partner.id %}active{% endif %}"
-                   data-partner-id="{{ partner.id }}">
+                class="conversation-item {% if hasUnread %}unread{% endif %} {% if app.request.get('id') == partner.id %}active{% endif %}"
+                data-partner-id="{{ partner.id }}">
                     <div class="avatar">
                         {% if partner.photoProfil %}
                             <img src="{{ asset('uploads/profile/' ~ partner.photoProfil) }}" alt="{{ partner.prenom }}">
@@ -45,12 +46,16 @@
                         </p>
                     </div>
                 </a>
-            {% else %}
-                <div class="no-conversations">
-                    <p>Vous n'avez pas encore de conversations.</p>
-                </div>
-            {% endfor %}
-        </div>
+            <button class="delete-conversation-btn" data-conversation-id="{{ partner.id }}" title="Supprimer la conversation">
+                <i class="fas fa-trash"></i>
+            </button>
+            </div>
+        {% else %}
+            <div class="no-conversations">
+                <p>Vous n'avez pas encore de conversations.</p>
+            </div>
+        {% endfor %}
+    </div>
         
     </div>
 
@@ -161,6 +166,7 @@
     const messageIndexUrl = "{{ path('app_message_index') }}";
     const unreadMessageCountUrl = "{{ path('app_message_count_unread') }}";
     const searchUrl = "{{ path('app_message_search') }}";
+    const deleteConversationUrl = "{{ path('app_message_delete', {'id': '0'}) }}";
 </script>
 <script src="{{ asset('js/message_script.js') }}"></script>
 {% endblock %}

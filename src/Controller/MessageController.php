@@ -178,6 +178,28 @@ public function search(Request $request, UtilisateurRepository $userRepo): Respo
         ]);
     }
 
+
+    #[Route('/delete/{id<\d+>}', name: '_delete', methods: ['POST'])]
+public function deleteConversation(
+    int $id, 
+    UtilisateurRepository $userRepo,
+    MessageRepository $messageRepo
+): JsonResponse
+{
+    $currentUser = $this->getUser();
+    $partner = $userRepo->find($id);
+    
+    if (!$partner) {
+        return $this->json(['success' => false, 'message' => 'Utilisateur non trouvé'], 404);
+    }
+    
+    $deletedCount = $messageRepo->deleteConversationMessages($currentUser, $partner);
+    
+    return $this->json([
+        'success' => true, 
+        'deletedCount' => $deletedCount
+    ]);
+}
     #[Route('/count-unread', name: '_count_unread', methods: ['GET'])]
     public function countUnread(MessageRepository $messageRepo): JsonResponse
     {

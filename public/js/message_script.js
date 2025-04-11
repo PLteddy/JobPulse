@@ -11,6 +11,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const newMessageFormContainer = document.getElementById('new-message-form-container');
     const searchPanelTitle = document.getElementById('search-panel-title');
     
+    const conversationList = document.querySelector('.conversation-list');
+    if (conversationList) {
+        conversationList.addEventListener('click', function(e) {
+            if (e.target.classList.contains('delete-conversation-btn') || 
+                e.target.closest('.delete-conversation-btn')) {
+                
+                const deleteBtn = e.target.classList.contains('delete-conversation-btn') ? 
+                                e.target : e.target.closest('.delete-conversation-btn');
+                
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const partnerId = deleteBtn.dataset.conversationId;
+                
+                if (confirm('Êtes-vous sûr de vouloir supprimer cette conversation ? Cette action est irréversible.')) {
+                    deleteConversation(partnerId);
+                }
+            }
+        });
+    }
+    
+
     // Délai pour la recherche instantanée
     let searchTimeout = null;
     
@@ -111,8 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
     }
-    
- // Attacher les événements au formulaire de message
+
 // Attacher les événements au formulaire de message
 function attachMessageFormEvents() {
     const messageForm = conversationContainer.querySelector('.message-form');
@@ -207,7 +228,67 @@ function attachMessageFormEvents() {
         });
     }
 }
+
+
+function deleteConversation(partnerId) {
+    // Afficher un indicateur de chargement
+    const conversationItem = document.querySelector(`.conversation-item[data-partner-id="${partnerId}"]`).closest('.conversation-wrapper');
+    if (!conversationItem) return;
     
+    conversationItem.classList.add('deleting');
+    
+    // Utilisez la variable deleteConversationUrl définie dans le template
+    fetch(deleteConversationUrl.replace('0', partnerId), {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/json'
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Suppression réussie, retirer l'élément de la liste
+            conversationItem.remove();
+            
+            // Si la conversation supprimée était la conversation active,
+            // afficher le message de bienvenue
+            const urlParams = new URLSearchParams(window.location.search);
+            const activePartnerId = urlParams.get('id');
+            if (activePartnerId === partnerId) {
+                const welcomeTemplate = `
+                    <div class="welcome-message">
+                        <div class="message-icon">✉️</div>
+                        <h2>Sélectionnez une conversation</h2>
+                        <p>Choisissez une conversation dans la liste ou créez un nouveau message.</p>
+                    </div>
+                `;
+                document.getElementById('conversation-container').innerHTML = welcomeTemplate;
+                
+                // Mettre à jour l'URL
+                history.pushState(null, '', messageIndexUrl);
+            }
+        } else {
+            // Erreur lors de la suppression
+            alert(data.message || 'Erreur lors de la suppression de la conversation. Veuillez réessayer.');
+            conversationItem.classList.remove('deleting');
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        alert('Une erreur est survenue. Veuillez réessayer.');
+        conversationItem.classList.remove('deleting');
+    });
+}
+
+
+
     // Fonction pour rechercher des utilisateurs avec un délai
     function searchUsers(query) {
         // Effacer le timeout existant
@@ -373,79 +454,82 @@ function loadNewMessageForm(userId = null) {
         });
 }
     
-    // Fonction pour recharger la liste des conversations
-    function reloadConversationList() {
-        fetch(`${messageIndexUrl}?list_only=1`, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.text())
-        .then(html => {
-            const conversationList = document.querySelector('.conversation-list');
-            if (conversationList) {
-                conversationList.innerHTML = html;
-                
-                // Réattacher les événements aux nouvelles conversations
-                attachConversationEvents();
+// Fonction pour recharger la liste des conversations
+function reloadConversationList() {
+    fetch(`${messageIndexUrl}?list_only=1`, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.text())
+    .then(html => {
+        const conversationList = document.querySelector('.conversation-list');
+        if (conversationList) {
+            conversationList.innerHTML = html;
+            
+            // Réattacher les événements aux nouvelles conversations
+            attachConversationEvents();
+        }
+    })
+    .catch(error => {
+        console.error('Erreur lors du rechargement des conversations:', error);
+    });
+}
+
+    
+
+ // Événement pour la recherche
+ searchButton.addEventListener('click', function() {
+    searchPanelTitle.textContent = 'Rechercher un utilisateur';
+    userSearchPanel.style.display = 'block';
+    searchResults.style.display = 'block';
+    newMessageFormContainer.style.display = 'none';
+    searchInput.focus();
+    searchUsers(searchInput.value);
+});
+
+searchInput.addEventListener('input', function() {
+    searchUsers(this.value);
+});
+
+// J'ai enlevé ça dans le html donc je l'enlève ici mais au cas où je le garde
+// newMessageBtn.addEventListener('click', function() {
+//     searchPanelTitle.textContent = 'Nouveau message';
+//     userSearchPanel.style.display = 'block';
+//     searchResults.style.display = 'none';
+//     searchInput.value = '';
+    
+//     // Charger le formulaire de nouveau message
+//     loadNewMessageForm();
+// });
+
+// Événement pour fermer le panneau de recherche
+closeSearchPanelBtn.addEventListener('click', function() {
+    userSearchPanel.style.display = 'none';
+});
+
+// Fonction pour vérifier les nouveaux messages périodiquement
+function checkUnreadMessages() {
+    fetch(unreadMessageCountUrl)
+        .then(response => response.json())
+        .then(data => {
+            // Mettre à jour l'interface avec le nombre de messages non lus
+            if (data.count > 0) {
+                document.title = `(${data.count}) Mes messages`;
+                // Vous pouvez ajouter un badge ou une notification ici
+            } else {
+                document.title = 'Mes messages';
             }
         })
         .catch(error => {
-            console.error('Erreur lors du rechargement des conversations:', error);
+            console.error('Erreur lors de la vérification des messages non lus:', error);
         });
-    }
-    
-    // Événement pour la recherche
-    searchButton.addEventListener('click', function() {
-        searchPanelTitle.textContent = 'Rechercher un utilisateur';
-        userSearchPanel.style.display = 'block';
-        searchResults.style.display = 'block';
-        newMessageFormContainer.style.display = 'none';
-        searchInput.focus();
-        searchUsers(searchInput.value);
-    });
-    
-    searchInput.addEventListener('input', function() {
-        searchUsers(this.value);
-    });
-    
-    // Événement pour le nouveau message
-    newMessageBtn.addEventListener('click', function() {
-        searchPanelTitle.textContent = 'Nouveau message';
-        userSearchPanel.style.display = 'block';
-        searchResults.style.display = 'none';
-        searchInput.value = '';
-        
-        // Charger le formulaire de nouveau message
-        loadNewMessageForm();
-    });
-    
-    // Événement pour fermer le panneau de recherche
-    closeSearchPanelBtn.addEventListener('click', function() {
-        userSearchPanel.style.display = 'none';
-    });
-    
-    // Fonction pour vérifier les nouveaux messages périodiquement
-    function checkUnreadMessages() {
-        fetch(unreadMessageCountUrl)
-            .then(response => response.json())
-            .then(data => {
-                // Mettre à jour l'interface avec le nombre de messages non lus
-                if (data.count > 0) {
-                    document.title = `(${data.count}) Mes messages`;
-                    // Vous pouvez ajouter un badge ou une notification ici
-                } else {
-                    document.title = 'Mes messages';
-                }
-            })
-            .catch(error => {
-                console.error('Erreur lors de la vérification des messages non lus:', error);
-            });
-    }
-    
-    // Vérifier les nouveaux messages toutes les 30 secondes
-    setInterval(checkUnreadMessages, 30000);
-    
-    // Vérifier les nouveaux messages au chargement de la page
-    checkUnreadMessages();
+}
+
+// Vérifier les nouveaux messages toutes les 30 secondes
+setInterval(checkUnreadMessages, 30000);
+
+// Vérifier les nouveaux messages au chargement de la page
+checkUnreadMessages();
+
 });

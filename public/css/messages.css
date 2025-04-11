@@ -171,6 +171,56 @@
     background-color: #0074cc;
     color: white;
 }
+.delete-conversation-btn {
+    background-color: transparent;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 8px;
+    opacity: 0;
+    transition: opacity 0.2s, color 0.2s;
+}
+.conversation-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.conversation-wrapper .conversation-item {
+    flex-grow: 1;
+}
+
+.delete-conversation-btn {
+    background-color: transparent;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 8px;
+    opacity: 0;
+    transition: opacity 0.2s, color 0.2s;
+}
+
+.conversation-wrapper:hover .delete-conversation-btn {
+    opacity: 1;
+}
+
+.delete-conversation-btn:hover {
+    color: #e74c3c;
+}
+
+.conversation-wrapper.deleting {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Icône de corbeille */
+.delete-conversation-btn i {
+    pointer-events: none;
+}
+
 
 /* Panneau de conversation */
 .conversation-panel {

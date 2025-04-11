@@ -213,6 +213,7 @@ class TuteurController extends AbstractController
         $message = new \App\Entity\Message();
         $message->setFromUser($user);
         $message->setToUser($etudiant);
+        //C LA QUIL FAUDRA CHANGER LES LIENS QUAND CE SERA EN LIGNE 
         $message->setContenu(
             "Je vous recommande cette offre : {$poste->getIntitule()} chez {$poste->getEntreprise()->getNom()}. " .
             "Vous pouvez la consulter à ce lien : /offre/{$poste->getId()}"

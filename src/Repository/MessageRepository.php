@@ -134,6 +134,18 @@ public function markAsRead($user, $partner): int
         ->getQuery()
         ->execute();
 }
+public function deleteConversationMessages(Utilisateur $user1, Utilisateur $user2): int
+{
+    return $this->createQueryBuilder('m')
+        ->delete()
+        ->where('(m.fromUser = :user1 AND m.toUser = :user2) OR (m.fromUser = :user2 AND m.toUser = :user1)')
+        ->setParameter('user1', $user1)
+        ->setParameter('user2', $user2)
+        ->getQuery()
+        ->execute();
+}
+
+
 //    /**
 //     * @return Message[] Returns an array of Message objects
 //     */
