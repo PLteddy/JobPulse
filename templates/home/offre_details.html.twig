@@ -14,7 +14,9 @@
     <img src="{{ asset('uploads/images/' ~ poste.image) }}" alt="{{ poste.intitule }}">
     </div>
     
-    <a href="{{ path('home') }}"><img src="{{ asset('img/fleche_retour.svg') }}" alt="flèche retour" class="fleche"</a>
+    <a href="{{ path('home') }}">
+    <img src="{{ asset('img/fleche_retour.svg') }}" alt="flèche retour" class="fleche">
+</a>
 
 
     
@@ -26,7 +28,7 @@
         </div> 
         <a class="bouton-connexion" href="{{ path('app_login') }}">Postuler</a>
     </div>
-        <div>
+    <div>
         <h2>Description du poste</h2>
         <p>{{ poste.description }}</p>
     </div>  
@@ -47,7 +49,7 @@
     </div>
                     
     <div>    
-    <h3>Détails de l'offre</h3>
+    <h2>Détails de l'offre</h2>
     <p><strong>Type de contrat:</strong> 
     {% for contrat in poste.contratType %}
     {{ contrat.name }}{% if not loop.last %}, {% endif %}
@@ -61,12 +63,14 @@
     <p><strong>
     Salaire:</strong> {{ poste.salaire }} €</p>
     </p>
-    <p><strong>Contact:</strong> {{ poste.contact }}</p>
     </div>
-
+        <div>
+    <h2>Contact</h2>
+    <p>{{ poste.contact }}</p>
+    </div>
     <div>
-    
-    <h4>{{ poste.entreprise.nom }}</h4>
+    <h2>Présentation de l’entreprise</h2>
+    <h3>{{ poste.entreprise.nom }}</h3>
     <p>{{ poste.presentationEntreprise }}</p>
     </div>
     </div>
