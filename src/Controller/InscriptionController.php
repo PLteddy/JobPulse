@@ -62,7 +62,6 @@ public function inscription(
         $gestionnaireEntites->persist($utilisateur);
         $gestionnaireEntites->flush();
 
-        // 🎉 Connexion automatique ici
         return $userAuthenticator->authenticateUser(
             $utilisateur,
             $authenticator,

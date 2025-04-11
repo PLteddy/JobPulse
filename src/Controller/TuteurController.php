@@ -95,7 +95,7 @@ class TuteurController extends AbstractController
         $resultats = [];
         
         if ($searchTerm) {
-            // Rechercher les étudiants par nom, prénom ou email
+
             $resultats = $utilisateurRepository->findBySearchTermAndType(
                 $searchTerm,
                 Type::ETUDIANT
