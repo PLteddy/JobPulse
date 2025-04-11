@@ -1,35 +1,33 @@
 
-
+{% extends 'base.html.twig' %}
 {% block body %}
     <head>
     <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
         <link rel="stylesheet" href="{{ asset('css/profil.css') }}">
         <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     </head>
-    <section class="hero-section">
-        <div class="imgProfil-div">
-            {if app.user.photo_profil is not null}
-                <img 
-                    src="{{ asset('uploads/images/' ~ app.user.photo_profil) }}"
-                    alt="Photo de profil" 
-                    class="img-profil"
-                >
-            {else}
-                <img 
-                    src="{{ asset('img/profil.png') }}"
-                    alt="Photo de profil" 
-                    class="img-profil"
-                >
-            {/if}
-            <img 
-            src="{{ asset('img/profil.png') }}"
-            alt="Photo de profil" 
-            class="img-profil"
-            >
-        </div>
-    
-        <div class="profil-div">
-            {{ app.user.prenom }} {{ app.user.nom }}
+    <section class="hero-section container">
+        <div class="hero-div">
+            <div class="imgProfil-div">
+                {% if app.user.photoProfil is not null %}
+                    <img 
+                        src="{{ asset('uploads/images/' ~ app.user.photoProfil) }}"
+                        alt="Photo de profil" 
+                        class="img-profil"
+                    >
+                {% else %}
+                    <img 
+                        src="{{ asset('img/profil.png') }}"
+                        alt="Photo de profil" 
+                        class="img-profil"
+                    >
+                {% endif %}
+                
+            </div>
+        
+            <div class="profil-div">
+                {{ app.user.prenom }} {{ app.user.nom }}
+            </div>
         </div>
     </section>
     

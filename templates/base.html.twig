@@ -15,8 +15,8 @@
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
     </head>
-    <body>
-        {% include getHeaderTemplate() %}
+    {% include getHeaderTemplate() %}
+    <body>  
         {% block body %}{% endblock %}
     </body>
     {% include getFooterTemplate() %}

@@ -1,5 +1,5 @@
 /* Style général du header */
-header {
+body header {
     padding: 20px 0;
     position: sticky;
     top: 0;
