@@ -186,7 +186,11 @@
 .results-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 80px;
+}
+.job-card-link {
+    width: 939px;
+    margin: 0 auto;
 }
 
 .job-card {
@@ -194,13 +198,55 @@
     box-shadow: 10px 10px 0px #FF6B35;
     border: black solid 1px;
     border-radius: 20px;
-    border: none;
     display: flex;
     width: 939px;
+    height: 256px;
     margin: 0 auto;
 }
 
+.job-card a {
+    display: inline-block; /* Évite que le <a> prenne toute la largeur */
+    text-decoration: none;  /* Enlève la décoration de lien, si nécessaire */
+}
+.job-card:hover {
+    transform: scale(1.02);
+    box-shadow: 10px 10px 0px #FF6B35;
+}
+.image-container {
+    width: 384px;
+    height: 256px;
+    overflow: hidden;
+    position: relative;
+}
+.hidden {
+    display: none;
+}
 
+.image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 20px 0 0 20px;
+    display: block; /* évite les petits espaces blancs en bas des images inline */
+}
+
+.card-body{
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+}
+.debut-carte {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.localisation {
+    display: flex;
+    gap:10px;
+    align-items: center;
+}
 .job-details {
     margin: 15px 0;
 }
@@ -214,7 +260,43 @@
     text-align: center;
     padding: 40px;
 }
+.custom-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.6);
+}
 
+.custom-modal-dialog {
+    margin: 10% auto;
+    width: 90%;
+    max-width: 500px;
+}
+
+.custom-modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.custom-modal-header,
+.custom-modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
 /* Responsive */
 @media (max-width: 768px) {
     .search-bar {

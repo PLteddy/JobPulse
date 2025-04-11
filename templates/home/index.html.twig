@@ -23,7 +23,15 @@
                 <h1>Tu as besoin de trouver une alternance ou un stage ?</h1>
             </div>
         </div>
+        <div class="profils">
+<button type="button" class="bouton-type showtype">
+   <i class="fas fa-sliders-h"></i> Profils
+</button>
 
+<button type="button" class="bouton-type showtype">
+   <i class="fas fa-sliders-h"></i> Offres
+</button>
+        </div>
         {# Barre de recherche et filtres #}
         <div class="search-container card my-4">
             <div class="card-body">
@@ -35,9 +43,15 @@
                                placeholder="Nom du métier, ville, région..." 
                                value="{{ searchTerm }}">
                     </div>
+                    <div class="les-filtres">
                     <button type="button" class="bouton-filtres" id="showFilters">
-                            <i class="fas fa-sliders-h"></i> Filtres
+                            <i class="fas fa-sliders-h"></i> Filtres<img src="{{ asset('img/filtre.svg') }}" alt="filtres" class="filtres">
                     </button>
+                    <button type="button" class="bouton-localisation" id="">
+                            <i class="fas fa-sliders-h"></i><img src="{{ asset('img/localisation.svg') }}" alt="filtres" class="filtres">Localisation<img src="{{ asset('img/triangle.svg') }}" alt="filtres" class="filtres">
+                    </button>
+                    </div>
+                    
             {# LE CSS DES FILTRES EST ENTIEREMENT A REFAIRE #}
                     {# Overlay des filtres #}
                     <div class="filters-overlay" id="filtersOverlay">
@@ -126,33 +140,37 @@
     {% if postes|length > 0 %}
         <div class="results-grid">
             {% for poste in postes %}
+            <a href="{{ path('offre_details', {'id': poste.id}) }}" class="job-card-link">
                 <div class="job-card card">
                     {% if poste.image %}
-                        <div class="card-img-top-container text-center" style="padding: 15px;">
-                            <img src="{{ asset('uploads/images/' ~ poste.image) }}" alt="{{ poste.intitule }}" class="card-img-top" style="max-height: 150px; width: auto; object-fit: contain;">
+                        <div class="image-container">
+                            <img src="{{ asset('uploads/images/' ~ poste.image) }}" alt="{{ poste.intitule }}">
                         </div>
                     {% endif %}
                     <div class="card-body">
-                        <h5 class="card-title">{{ poste.intitule }}</h5>
-                        <h6 class="card-subtitle">{{ poste.entreprise.nom }}</h6>
-                        <p class="card-text">{{ poste.description|slice(0, 150) }}...</p>
-                        <div class="job-details">
-                            <p><strong>Salaire:</strong> {{ poste.salaire }}€</p>
-                            <p><strong>Contrat:</strong> 
-                                {% for contrat in poste.contratType %}
-                                    {{ contrat.name }}{% if not loop.last %}, {% endif %}
-                                {% endfor %}
-                            </p>
-                            <p><strong>Durée:</strong> 
-                                {% for duree in poste.duree %}
-                                    {{ duree.name }}{% if not loop.last %}, {% endif %}
-                                {% endfor %}
-                            </p>
-                            <p><strong>Mode de travail:</strong> {{ poste.presence.name }}</p>
+                    <div class="debut-carte">
+                        <h4 class="card-title">{{ poste.intitule }}</h4>
+
+                        <img src="{{ asset('img/enregistre.png') }}" 
+                        alt="enregistré" 
+                        class="img-un hidden" 
+                        onclick="toggleImage(event, this)">
+
+                        <img src="{{ asset('img/non_enregistre.png') }}" 
+                        alt="non-enregistré" 
+                        class="img-deux" 
+                        onclick="toggleImage(event, this)">
+                    </div>
+
+                        <div class="localisation">
+                            <img src="{{ asset('img/localisation.svg') }}" alt="point de repère" class="mini-icon">
+                            <p>{{ poste.localisation }}</p>
                         </div>
-                        <a href="{{ path('offre_details', {'id': poste.id}) }}" class="btn btn-sm btn-primary">Voir l'offre</a>
+
+                        <p class="card-text">{{ poste.description|slice(0, 150) }}...</p>
                     </div>
                 </div>
+            </a>
             {% endfor %}
         </div>
     {% else %}
@@ -170,11 +188,19 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
+    
     document.addEventListener('DOMContentLoaded', function() {
         const showFilters = document.getElementById('showFilters');
         const hideFilters = document.getElementById('hideFilters');
         const filtersOverlay = document.getElementById('filtersOverlay');
-        
+        const btns = document.querySelectorAll('.showtype');
+
+btns.forEach(btn => {
+    btn.addEventListener('click', function() {
+        btns.forEach(b => b.classList.remove('active')); // on enlève des autres
+        this.classList.add('active'); // on met au bouton cliqué
+    });
+});
         showFilters.addEventListener('click', function() {
             filtersOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -193,5 +219,18 @@
             }
         });
     });
+function toggleImage(event, clickedImg) {
+    event.stopPropagation();  // Arrêter la propagation du clic
+    event.preventDefault();   // Empêcher le comportement par défaut (ouvrir le lien)
+    
+    const parent = clickedImg.parentElement;
+    const img1 = parent.querySelector('.img-un');
+    const img2 = parent.querySelector('.img-deux');
+
+    img1.classList.toggle('hidden');
+    img2.classList.toggle('hidden');
+}
+
+
     </script>
 {% endblock %}
