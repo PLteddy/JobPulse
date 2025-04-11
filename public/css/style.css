@@ -150,3 +150,25 @@ a{
 .bouton-modifier:hover {
     background-color: #1A659E; /* Couleur de fond bleu clair au survol */
 }
+
+
+.bouton-enregistrer {
+    color: #ffffff;
+    background-color: #FF6B35;
+    text-decoration: none;
+    font-weight: 400;
+    font-size: 20px;
+    position: relative;
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    border: 1px solid #FC8756;
+    margin-left: auto; /* Aligne le bouton à droite */
+}
+.bouton-enregistrer:hover {
+    background-color: #FC8756;
+    transition: background-color 0.3s ease;
+}

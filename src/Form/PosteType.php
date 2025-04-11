@@ -14,8 +14,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\FileType; // Ajoutez cette ligne
-use Symfony\Component\Validator\Constraints\File; // Ajoutez cette ligne
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Validator\Constraints\File; 
 
 class PosteType extends AbstractType
 {
@@ -24,19 +24,13 @@ class PosteType extends AbstractType
         $builder
             ->add('intitule', TextType::class)
             ->add('description', TextareaType::class)
-            ->add('contrat_type', ChoiceType::class, [
-                'choices' => Contrat::cases(),
-                'choice_label' => 'value',
-                'multiple' => true,
-                'expanded' => true,
-            ])
             ->add('domaine', TextType::class)
             ->add('localisation', TextType::class)
-            ->add('profil_recherche', TextType::class)
-            ->add('info_supp', TextType::class, ['required' => false])
+            ->add('profil_recherche', TextareaType::class)
+            ->add('info_supp', TextareaType::class, ['required' => false])
             ->add('presentation_entreprise', TextareaType::class)
-            ->add('contact', TextType::class)
-            ->add('salaire', IntegerType::class)
+            ->add('contact', TextareaType::class)
+            ->add('salaire', TextType::class)
             ->add('presence', ChoiceType::class, [
                 'choices' => Type_presence::cases(),
                 'choice_label' => 'value',
@@ -44,9 +38,14 @@ class PosteType extends AbstractType
             ->add('duree', ChoiceType::class, [
                 'choices' => Duree::cases(),
                 'choice_label' => 'value',
-                'multiple' => true,
-                'expanded' => true,
+                'expanded' => false,
             ])
+            ->add('contrat_type', ChoiceType::class, [
+                'choices' => Contrat::cases(),
+                'choice_label' => 'value',
+                'expanded' => false,
+            ])
+            
             ->add('missions', TextareaType::class)
             ->add('imageFile', FileType::class, [
                 'label' => 'Image de l\'offre',

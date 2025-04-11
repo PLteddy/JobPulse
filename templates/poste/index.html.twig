@@ -1,6 +1,15 @@
 {% extends 'base.html.twig' %}
 {% block title %}Mes offres{% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/offre_details.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/formulaire.css') }}">
+{% endblock %}
+
+
 {% block body %}
     <h1>Mes offres d'emploi</h1>
 

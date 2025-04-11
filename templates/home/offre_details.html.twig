@@ -26,7 +26,21 @@
             <h1>{{ poste.intitule }}</h1>
             <p class="text-muted">{{ poste.domaine }} - {{ poste.localisation }}</p>
         </div> 
+        {% if not app.user %}
         <a class="bouton-connexion" href="{{ path('app_login') }}">Postuler</a>
+            {# Ajouter un bouton de partage pour les tuteurs #}
+        {% elseif is_granted('ROLE_TUTEUR') %}
+            <div class="actions-tuteur">                
+                {% if app.user.etudiants is not empty %}
+                    <button type="button" class="bouton-connexion" id="ouvrirModal">
+                    Partager
+                </button>
+                {% endif %}
+            </div>
+        {% else %}
+            {# Faut remplacer avec le lien de postulation quand on pourra candidater #}
+            <a class="bouton-connexion" href="#">Postuler</a>
+        {% endif %}
     </div>
     <div>
         <h2>Description du poste</h2>
@@ -75,5 +89,69 @@
     </div>
     </div>
     
+{% if is_granted('ROLE_TUTEUR') and app.user.etudiants is not empty %}
+    <!-- Modal personnalisé sans Bootstrap -->
+    <div id="partageModal" class="custom-modal">
+        <div class="custom-modal-dialog">
+            <div class="custom-modal-content">
+                <div class="custom-modal-header">
+                    <h5 class="modal-title">Partager cette offre</h5>
+                    <button type="button" class="btn-close" id="fermerModal">&times;</button>
+                </div>
+                <div class="custom-modal-body">
+                    <form method="post" id="partagerForm" action="{{ path('tuteur_partager_multiple', {'posteId': poste.id}) }}">
+                        <label class="form-label">Sélectionner les étudiants</label>
+                        <div class="list-group">
+                            {% for etudiant in app.user.etudiants %}
+                                <div class="list-group-item">
+                                    <input type="checkbox" name="etudiants[]" value="{{ etudiant.id }}" id="etudiant-{{ etudiant.id }}">
+                                    <label for="etudiant-{{ etudiant.id }}">{{ etudiant.nom }} {{ etudiant.prenom }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </form>
+                </div>
+                <div class="custom-modal-footer">
+                    <button type="button" id="fermerModal2">Annuler</button>
+                    <button type="button" onclick="partagerOffre()">Partager</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('partageModal');
+        const ouvrirBtn = document.getElementById('ouvrirModal'); // ce bouton doit exister ailleurs dans ta page
+        const fermerBtns = [
+            document.getElementById('fermerModal'),
+            document.getElementById('fermerModal2')
+        ];
+
+        ouvrirBtn?.addEventListener('click', () => {
+            modal.style.display = 'block';
+        });
+
+        fermerBtns.forEach(btn => {
+            btn?.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        function partagerOffre() {
+            const checkboxes = document.querySelectorAll('input[name="etudiants[]"]:checked');
+            if (checkboxes.length === 0) {
+                alert('Veuillez sélectionner au moins un étudiant');
+                return;
+            }
+            document.getElementById('partagerForm').submit();
+        }
+    </script>
+{% endif %}
 </section>
 {% endblock %}

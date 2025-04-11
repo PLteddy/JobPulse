@@ -2,13 +2,151 @@
 
 {% block title %}{{ (poste.id) ? 'Modifier' : 'Créer' }} une offre{% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/offre_details.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/formulaire.css') }}">
+{% endblock %}
+
 {% block body %}
-    <h1>{{ (poste.id) ? 'Modifier' : 'Créer' }} une offre</h1>
 
-    {{ form_start(form) }}
-        {{ form_widget(form) }}
-        <button class="btn btn-primary">{{ (poste.id) ? 'Mettre à jour' : 'Créer' }}</button>
-    {{ form_end(form) }}
 
-    <a href="{{ path('app_poste_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        {{ form_start(form) }}
+<section class="container">
+    
+
+    <div class="differentes-parties">
+        <div class="form-champ">
+            <h2>Image</h2>
+            <div class="bouton-champ">
+                <!-- Champ d'upload caché -->
+            {{ form_widget(form.imageFile, {'attr': {'class': 'hidden-upload'}}) }}
+            {{ form_errors(form.imageFile) }}
+
+            <!-- Bouton personnalisé -->
+            <button type="button" class="bouton-connexion" id="custom-upload-button">Choisir l'image</button>
+            <span id="file-name" class="file-name">Aucun fichier sélectionné</span>
+            </div>
+        </div>
+        </div>
+
+        <button type="submit" class="bouton-enregistrer">
+             {{ (poste.id) ? 'Mettre à jour' : 'Créer' }}
+            <img src="{{ asset('img/check.png') }}" alt="icone enregistrer" class="icon-enregistrer">
+        </button>
+        
+    <a href="{{ path('app_poste_index') }}">
+        <img src="{{ asset('img/fleche_retour.svg') }}" alt="flèche retour" class="fleche">
+    </a>
+
+    <div class="differentes-parties">
+        <div class="titre-postule">
+        <div class="form-champ-titre">
+            <h2>Intitulé du poste</h2>
+            {{ form_widget(form.intitule, {'attr': {'class': 'input-champ-petit'}}) }}
+            {{ form_errors(form.intitule) }}
+        </div>
+        </div>
+
+
+        <div class="form-champ-sous_titre">
+            <h2>Localisation</h2>
+            {{ form_widget(form.localisation, {'attr': {'class': 'input-champ-petit'}}) }}
+            {{ form_errors(form.localisation) }}
+        </div>
+
+        <div class="form-champ">
+            <h2>Domaine</h2>
+            {{ form_widget(form.domaine, {'attr': {'class': 'input-champ-petit'}}) }}
+            {{ form_errors(form.domaine) }}
+        </div>
+
+        <div class="form-champ">
+            <h2>Description</h2>
+            {{ form_widget(form.description, {'attr': {'class': 'input-champ-grand'}}) }}
+            {{ form_errors(form.description) }}
+        </div>
+
+         <div class="form-champ">
+            <h2>Missions</h2>
+            {{ form_widget(form.missions, {'attr': {'class': 'input-champ-grand'}}) }}
+            {{ form_errors(form.missions) }}
+        </div>       
+
+
+         <div class="form-champ">
+            <h2>Profil recherché</h2>
+            {{ form_widget(form.profil_recherche, {'attr': {'class': 'input-champ-grand'}}) }}
+            {{ form_errors(form.profil_recherche) }}
+        </div>    
+
+         <div class="form-champ">
+            <h2>Informations supplémentaires</h2>
+            {{ form_widget(form.info_supp, {'attr': {'class': 'input-champ-grand'}}) }}
+            {{ form_errors(form.info_supp) }}
+        </div>    
+
+        <div class="form-champ">
+            <h2>Détails de l'offre</h2>
+
+            <div class="champ">
+                {{ form_row(form.contrat_type) }}
+            </div>
+
+            <div class="champ">
+                {{ form_row(form.duree) }}
+            </div>
+
+            <div class="champ">
+                {{ form_row(form.presence) }}
+            </div>
+
+            <div class="champ">
+                {{ form_row(form.salaire) }}
+            </div>
+        </div>
+
+
+         <div class="form-champ">
+            <h2>Présentation de l’entreprise</h2>
+            {{ form_widget(form.presentation_entreprise, {'attr': {'class': 'input-champ-grand'}}) }}
+            {{ form_errors(form.presentation_entreprise) }}
+        </div>  
+
+        <div class="form-champ">
+            <h2>Contact</h2>
+            {{ form_widget(form.contact, {'attr': {'class': 'input-champ-grand'}}) }}
+            {{ form_errors(form.contact) }}
+        </div> 
+        {{ form_end(form) }}
+    </div>
+
+        <button type="submit" class="bouton-enregistrer">
+             {{ (poste.id) ? 'Mettre à jour' : 'Créer' }}
+            <img src="{{ asset('img/check.png') }}" alt="icone enregistrer" class="icon-enregistrer">
+        </button>
+</section>
+
+
+
+<script>document.addEventListener('DOMContentLoaded', function () {
+    const uploadInput = document.querySelector('.hidden-upload');
+    const customButton = document.getElementById('custom-upload-button');
+    const fileNameDisplay = document.getElementById('file-name');
+
+    customButton.addEventListener('click', function () {
+        uploadInput.click(); // Ouvre le champ d'upload caché
+    });
+
+    uploadInput.addEventListener('change', function () {
+        // Affiche le nom du fichier sélectionné
+        if (uploadInput.files.length > 0) {
+            fileNameDisplay.textContent = uploadInput.files[0].name;
+        } else {
+            fileNameDisplay.textContent = 'Aucun fichier sélectionné';
+        }
+    });
+});</script>
 {% endblock %}

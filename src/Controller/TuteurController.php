@@ -183,10 +183,10 @@ class TuteurController extends AbstractController
         ]);
     }
     
-    #[Route('/partager-offre/{posteId}/{etudiantId}', name: 'tuteur_partager_offre')]
-    public function partagerOffre(
+    #[Route('/partager-offre-multiple/{posteId}', name: 'tuteur_partager_multiple')]
+    public function partagerOffreMultiple(
         string $posteId,
-        string $etudiantId,
+        Request $request,
         EntityManagerInterface $entityManager,
         PosteRepository $posteRepository,
         UtilisateurRepository $utilisateurRepository
@@ -195,35 +195,49 @@ class TuteurController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_TUTEUR');
         
         $poste = $posteRepository->find($posteId);
-        $etudiant = $utilisateurRepository->find($etudiantId);
-        
-        if (!$poste || !$etudiant) {
-            $this->addFlash('danger', 'Offre ou étudiant introuvable');
-            return $this->redirectToRoute('tuteur_mes_etudiants');
+        if (!$poste) {
+            $this->addFlash('danger', 'Offre introuvable');
+            return $this->redirectToRoute('tuteur_dashboard');
         }
         
-        // Vérifier que l'étudiant est bien lié au tuteur connecté
+        $etudiantIds = $request->request->all('etudiants');
+        if (empty($etudiantIds)) {
+            $this->addFlash('danger', 'Aucun étudiant sélectionné');
+            return $this->redirectToRoute('offre_details', ['id' => $posteId]);
+        }
+        
         $user = $this->getUser();
-        if (!$user->hasEtudiant($etudiant)) {
-            $this->addFlash('danger', 'Cet étudiant ne fait pas partie de votre liste');
-            return $this->redirectToRoute('tuteur_mes_etudiants');
+        $partagesTotaux = 0;
+        
+        foreach ($etudiantIds as $etudiantId) {
+            $etudiant = $utilisateurRepository->find($etudiantId);
+            
+            if (!$etudiant || !$user->hasEtudiant($etudiant)) {
+                continue; // Ignorer les étudiants invalides ou non liés
+            }
+            
+            // Créer un message pour partager l'offre
+            $message = new \App\Entity\Message();
+            $message->setFromUser($user);
+            $message->setToUser($etudiant);
+            $message->setContenu(
+                "Je vous recommande cette offre : {$poste->getIntitule()} chez {$poste->getEntreprise()->getNom()}. " .
+                "Vous pouvez la consulter à ce lien : /offre/{$poste->getId()}"
+            );
+            
+            $entityManager->persist($message);
+            $partagesTotaux++;
         }
         
-        // Créer un message pour partager l'offre
-        $message = new \App\Entity\Message();
-        $message->setFromUser($user);
-        $message->setToUser($etudiant);
-        //C LA QUIL FAUDRA CHANGER LES LIENS QUAND CE SERA EN LIGNE 
-        $message->setContenu(
-            "Je vous recommande cette offre : {$poste->getIntitule()} chez {$poste->getEntreprise()->getNom()}. " .
-            "Vous pouvez la consulter à ce lien : /offre/{$poste->getId()}"
-        );
-        
-        $entityManager->persist($message);
         $entityManager->flush();
         
-        $this->addFlash('success', 'L\'offre a été partagée avec l\'étudiant');
+        if ($partagesTotaux > 0) {
+            $this->addFlash('success', "L'offre a été partagée avec {$partagesTotaux} étudiant(s)");
+        } else {
+            $this->addFlash('warning', "Aucun partage n'a pu être effectué");
+        }
         
-        return $this->redirectToRoute('tuteur_profil_etudiant', ['id' => $etudiant->getId()]);
+        // Rediriger vers la page de détails de l'offre
+        return $this->redirectToRoute('offre_details', ['id' => $posteId]);
     }
 }
