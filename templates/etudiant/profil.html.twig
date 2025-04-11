@@ -26,9 +26,52 @@
             </div>
         
             <div class="profil-div">
-                {{ app.user.prenom }} {{ app.user.nom }}
+                <h1>{{ app.user.prenom }} {{ app.user.nom }}</h1>
+                <h3>{{ app.user.bio }}</h3>
             </div>
+            
         </div>
+        <div class="profil-actions">
+            <!-- Bouton pour modifier le profil -->
+            <a class="bouton-modifier" href="{{ path('etudiant_profil_edit') }}" >
+                <img 
+                        src="{{ asset('img/modifier-icone.png') }}"
+                        alt="icone crayon pour modifier">
+            </a>
+
+            <!-- Bouton pour télécharger le CV (affiché uniquement si un CV existe) -->
+            {% if app.user.cv is not null %}
+                <a class="bouton-connexion" href="{{ asset('uploads/cv/' ~ app.user.cv) }}" class="btn btn-secondary" download>CV
+                    <img 
+                        src="{{ asset('img/enregistrer-icone.png') }}"
+                        alt="icone de téléchargement">
+                </a>
+            {% endif %}
+        </div>
+    </section>
+    <section class="informations-section container">
+        <div class="informations-div">
+            <h2>{{ 'Description' }}</h2>
+            <h3>{{ app.user.decription }}</h3>
+        </div>
+        <div class="informations-div">
+            <h2>{{ 'Formation' }}</h2>
+            <h3>{{ app.user.formation }}</h3>
+        </div>
+        <div class="informations-div">
+            <h2>{{ 'Expériences' }}</h2>
+            <h3>{{ app.user.experience }}</h3>
+        </div>
+        <div class="informations-div">
+            <h2>{{ 'Contact' }}</h2>
+            <h3>{{ app.user.contact }}</h3>
+        </div>
+        <div class="informations-div">
+            <h2>{{ 'Plus sur moi' }}</h2>
+            <h3>{{ app.user.plusSurMoi }}</h3>
+        </div>
+        
+    
     </section>
     
 {% endblock %}

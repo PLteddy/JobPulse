@@ -1,3 +1,48 @@
+.hero-section{
+    margin-bottom: 100px;
+    
+}
 .hero-div{
+    
+    display: flex;
+    gap: 75px;
+    
+
+    .imgProfil-div{
+        margin-bottom: 10px;
+        img{
+            width: 202px;
+            height: 202px;
+            border-radius: 50%;
+            object-fit: cover;
+            
+        }
+    }
+    .profil-div{
+        display: flex;
+        flex-direction: column;
+        padding: 16px 0;
+        gap: 26px;
+    }
+}
+.profil-actions{
     border-bottom: 1px solid #000;
+    justify-content: flex-end;
+    display: flex;
+    padding-bottom: 26px;
+    gap: 30px;
+
+}
+.informations-section{
+    display: flex;
+    flex-direction: column;
+    gap: 90px;
+    .informations-div{
+        display: flex;
+        flex-direction: column;
+        gap: 52px;
+        h2{
+            color:#004E89;
+        }
+    }
 }

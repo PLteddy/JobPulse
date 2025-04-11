@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <head>
+        <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/profil.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    </head>
+    <section class="hero-section container">
+        <div class="hero-div">
+            <div class="imgProfil-div">
+                
+                {{ form_row(form.photoProfil) }}
+            </div>
+        
+            <div class="profil-div">
+                <h1>{{ form_row(form.prenom) }} {{ form_row(form.nom) }}</h1>
+                <h3>{{ form_row(form.bio) }}</h3>
+            </div>
+        </div>
+    </section>
+    <section class="informations-section container">
+        <div class="informations-div">
+            <h2>Description</h2>
+            {{ form_row(form.decription) }}
+        </div>
+        <div class="informations-div">
+            <h2>Formation</h2>
+            {{ form_row(form.formation) }}
+        </div>
+        <div class="informations-div">
+            <h2>Expériences</h2>
+            {{ form_row(form.experience) }}
+        </div>
+        <div class="informations-div">
+            <h2>Contact</h2>
+            {{ form_row(form.contact) }}
+        </div>
+        <div class="informations-div">
+            <h2>Plus sur moi</h2>
+            {{ form_row(form.plusSurMoi) }}
+        </div>
+    </section>
+    <section class="submit-section container">
+        <button type="submit" class="btn btn-primary bouton-connexion">Enregistrer</button>
+    </section>
+    {{ form_end(form) }}
+{% endblock %}

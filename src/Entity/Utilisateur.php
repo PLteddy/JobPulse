@@ -55,7 +55,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $adresse = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: 'string',length: 500, nullable: true)]
     private ?string $formation = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -74,7 +74,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $cv = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $plus_sur_moi = null;
+    private ?string $plusSurMoi = null;
 
     #[ORM\OneToMany(targetEntity: Poste::class, mappedBy: 'entreprise')]
     private Collection $postes;
@@ -89,6 +89,9 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'etudiants')]
     private Collection $tuteurs;
+
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $bio = null;
 
     public function __construct()
     {
@@ -266,12 +269,12 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->formation;
     }
 
-    public function setFormation(string $formation): static
-    {
-        $this->formation = $formation;
+    public function setFormation(?string $formation): static
+{
+    $this->formation = $formation;
 
-        return $this;
-    }
+    return $this;
+}
 
     public function getEtablissement(): ?string
     {
@@ -365,12 +368,12 @@ public function removePoste(Poste $poste): static
 
     public function getPlusSurMoi(): ?string
     {
-        return $this->plus_sur_moi;
+        return $this->plusSurMoi;
     }
 
-    public function setPlusSurMoi(?string $plus_sur_moi): static
+    public function setPlusSurMoi(?string $plusSurMoi): static
     {
-        $this->plus_sur_moi = $plus_sur_moi;
+        $this->plusSurMoi = $plusSurMoi;
 
         return $this;
     }
@@ -430,5 +433,17 @@ public function removeTuteur(self $tuteur): static
 public function hasEtudiant(self $etudiant): bool
 {
     return $this->etudiants->contains($etudiant);
+}
+
+public function getBio(): ?string
+{
+    return $this->bio;
+}
+
+public function setBio(?string $bio): static
+{
+    $this->bio = $bio;
+
+    return $this;
 }
 }

@@ -43,12 +43,19 @@ p {
     color: #ffffff;
     background-color: #004E89;
     text-decoration: none;
-    font-weight: 600;
-    font-size: 1.1rem;
+    font-weight: 400;
+    font-size: 20px;
     position: relative;
     border-radius: 10px;
     padding: 15px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    border: 1px solid #1A659E;
+    
 }
+
 a{
     text-decoration: none;
     color: #000000;
@@ -65,9 +72,18 @@ a{
 }
 
 .bouton-modifier{
-    background-color:#004E89;
-    width: 55px;
-    height: 55px;
-    border-radius: 50%;
-    border: none;
+    width: 50px;
+    height: 50px;
+    background-color: #004E89; /* Couleur de fond bleu */
+    border-radius: 50%; /* Rend le bouton rond */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none; /* Supprime la bordure */
+    cursor: pointer; /* Change le curseur en pointeur */
+    transition: background-color 0.3s ease; /* Animation pour le hover */
+
+}
+.bouton-modifier:hover {
+    background-color: #1A659E; /* Couleur de fond bleu clair au survol */
 }
