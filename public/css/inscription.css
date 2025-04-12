@@ -37,12 +37,12 @@ form div {
         flex-direction: column;
         label{
             margin-bottom: 16px;
-            font-size: 20px;
+            font-size: 1.25rem;
         }
         input{
             margin-bottom: 22px;
             height: 50px;
-            font-size: 20px;
+            font-size: 1.25rem;
             border-radius: 20px;
             background-color: #EFEFD0;
             padding: 5px 10px;
@@ -50,6 +50,9 @@ form div {
         }
         button{
             align-self: flex-start;
+        }
+        span{
+            margin-top: 5px;
         }
     }
 }
