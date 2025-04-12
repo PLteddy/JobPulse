@@ -26,6 +26,7 @@ class PosteController extends AbstractController
     
         return $this->render('poste/index.html.twig', [
             'postes' => $postes,
+            
         ]);
     }
 
@@ -79,6 +80,7 @@ class PosteController extends AbstractController
         return $this->render('poste/new.html.twig', [
             'form' => $form->createView(),
             'poste' => $poste,
+            'entreprise' => $poste->getEntreprise(),
         ]);
     }
 
@@ -133,6 +135,7 @@ class PosteController extends AbstractController
         return $this->render('poste/edit.html.twig', [
             'form' => $form->createView(),
             'poste' => $poste,
+            'entreprise' => $poste->getEntreprise(),
         ]);
     }
     

@@ -52,10 +52,14 @@
 
 
         <div class="form-champ-sous_titre">
-            <h2>Localisation</h2>
-            {{ form_widget(form.localisation, {'attr': {'class': 'input-champ-petit'}}) }}
-            {{ form_errors(form.localisation) }}
+            <p class="form-champ-entreprise">{{ entreprise.nom }}</p>
+            <div class="form-champ-localisation">
+                <h2>Localisation</h2>
+                {{ form_widget(form.localisation, {'attr': {'class': 'input-champ-petit'}}) }}
+                {{ form_errors(form.localisation) }}
+            </div>
         </div>
+
 
         <div class="form-champ">
             <h2>Domaine</h2>
