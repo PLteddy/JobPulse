@@ -1,6 +1,26 @@
+.inscription-section{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.inscription-div{
+    border: 1px solid #000;
+    background-color: white;
+    border-radius: 12px;
+    padding: 60px 45px;
+    width: 100%;
+    max-width: 1000px;
+    box-shadow: 10px 10px 0px #004080;
+
+    h1{
+        margin-bottom: 45px;
+    }
+}
+
 form {
     display: flex;
     flex-wrap: wrap;
+    flex-direction: column;
     gap: 20px;
 }
 
@@ -9,31 +29,41 @@ form div {
     min-width: 200px; /* Largeur minimale pour éviter que les champs soient trop petits */
 }
 
-form label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-form input {
-    width: 100%;
-    padding: 8px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+.lignes-div{
+    display: flex;
+    gap: 20px;
+    .colonne-div{
+        display: flex;
+        flex-direction: column;
+        label{
+            margin-bottom: 16px;
+            font-size: 20px;
+        }
+        input{
+            margin-bottom: 22px;
+            height: 50px;
+            font-size: 20px;
+            border-radius: 20px;
+            background-color: #EFEFD0;
+            padding: 5px 10px;
+            border: none;
+        }
+        button{
+            align-self: flex-start;
+        }
+    }
 }
 
 button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    width: 95px;
+    
+    align-self: flex-end;
+    display: flex;
 }
 
-button:hover {
-    background-color: #0056b3;
+.cv-filename {
+    margin-left: 10px;
+    font-size: 0.9rem;
+    color: #555;
+    font-style: italic;
 }

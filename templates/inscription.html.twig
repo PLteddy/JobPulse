@@ -1,81 +1,165 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/inscription.css') }}">
+{% endblock %}
+
+{% block body %}
+<section class="inscription-section container">
+    <div class="inscription-div">
+        <h1>Inscription</h1>
+        <form action="{{ path('inscription', { type: type }) }}" method="POST" enctype="multipart/form-data">
+            <!-- Champs spécifiques à l'Entreprise -->
+            {% if type == 'entreprise' %}
+            <div id="entreprise-fields">
+
+                <div class="lignes-div">
+                    <div class="colonne-div">
+                        <label for="nom">Nom*</label>
+                        <input type="text" id="nom" name="nom" required>
+                    </div>
+
+                    <div class="colonne-div">
+                        <label for="siret">N° de SIRET*</label>
+                        <input type="text" id="siret" name="siret" required>
+                    </div>
+                </div>
+
+                <div class="lignes-div">
+                    <div class="colonne-div">
+                        <label for="email">E-mail*</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="colonne-div">
+                        <label for="password">Mot de passe*</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                </div>
+
+                <div class="lignes-div">
+                    <div class="colonne-div">
+                        <label for="adresse">Adresse de l'entreprise*</label>
+                        <input type="text" id="adresse" name="adresse" required>
+                    </div>
+                </div>
 
 
-{% block content %}
-    <head>
-        <link rel="stylesheet" href="{{ asset('css/inscription.css') }}">
-    </head>
 
+                
 
-    <h1>Inscription</h1>
-    <form action="{{ path('inscription', { type: type }) }}" method="POST" enctype="multipart/form-data">
-        
+                
 
-        
+                
 
-        <!-- Champs spécifiques à l'Entreprise -->
-        {% if type == 'entreprise' %}
-        <div id="entreprise-fields">
-            <label for="nom">Nom*</label>
-            <input type="text" id="nom" name="nom" required>
-            
-            <label for="email">E-mail*</label>
-            <input type="email" id="email" name="email" required>
+                
+            </div>
+            {% endif %}
 
-            <label for="password">Mot de passe*</label>
-            <input type="password" id="password" name="password" required>
+            <!-- Champs spécifiques au Candidat -->
+            {% if type == 'etudiant' %}
+            <div id="candidat-fields">
 
-            <label for="siret">N° de SIRET*</label>
-            <input type="text" id="siret" name="siret" required>
+                <div class="lignes-div">
+                    <div class="colonne-div">
+                        <label for="nom">Nom*</label>
+                        <input type="text" id="nom" name="nom" required>
+                    </div>
 
-            <label for="adresse">Adresse de l'entreprise*</label>
-            <input type="text" id="adresse" name="adresse" required>
-        </div>
-        {% endif %}
+                    <div class="colonne-div">
+                        <label for="prenom">Prénom*</label>
+                        <input type="text" id="prenom" name="prenom" required>
+                    </div>
+                </div>
 
-        
-                <!-- Champs spécifiques au Candidat -->
-        {% if type == 'etudiant' %}
-        <div id="candidat-fields">
-            <label for="nom">Nom*</label>
-            <input type="text" id="nom" name="nom" required>
+                <div class="lignes-div">
+                    <div class="colonne-div">
+                        <label for="email">E-mail*</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
 
-            <label for="prenom">Prénom*</label>
-            <input type="text" id="prenom" name="prenom" required>
+                    <div class="colonne-div">
+                        <label for="password">Mot de passe*</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                </div>
 
-            <label for="ville">Ville*</label>
-            <input type="text" id="ville" name="ville">
+                <div class="lignes-div">
+                    <div class="colonne-div">
+                        <label for="ville">Ville*</label>
+                        <input type="text" id="ville" name="ville">
+                    </div>
+                    <div class="colonne-div">
+                        <!-- Champ pour le CV -->
+                        <label for="cv" class="visually-hidden">CV</label>
+                        <input type="file" id="cv" name="cv" accept=".pdf" style="display: none;">
+                        <button type="button" class="bouton-connexion" onclick="document.getElementById('cv').click()">
+                            CV<img 
+                            src="{{ asset('img/enregistrer-icone.png') }}"
+                            alt="icone de téléchargement">
 
-            <label for="email">E-mail*</label>
-            <input type="email" id="email" name="email" required>
+                        </button>
+                        <span id="cv-filename" class="cv-filename">Aucun fichier sélectionné</span>
+                    </div>
+                </div>
+                
+            </div>
+            {% endif %}
 
-            <label for="password">Mot de passe*</label>
-            <input type="password" id="password" name="password" required>
+            <!-- Champs spécifiques au Tuteur -->
+            {% if type == 'tuteur' %}
+            <div id="tuteur-fields">
 
-            <!-- Champ pour le CV -->
-            <label for="cv">Télécharger votre CV*</label>
-            <input type="file" id="cv" name="cv" accept=".pdf">
-        </div>
-        {% endif %}
-        
+                <div class="lignes-div">
+                    <div class="colonne-div">
+                        <label for="nom">Nom*</label>
+                        <input type="text" id="nom" name="nom" required>
+                    </div>
 
-        <!-- Champs spécifiques au Tuteur -->
-        {% if type == 'tuteur' %}
-        <div id="tuteur-fields">
-            <label for="nom">Nom*</label>
-            <input type="text" id="nom" name="nom" required>
-            <label for="prenom">Prénom*</label>
-            <input type="text" id="prenom" name="prenom" required>
-            <label for="etablissement">Établissement*</label>
-            <input type="text" id="etablissement" name="etablissement" required>
-            <label for="email">E-mail*</label>
-            <input type="email" id="email" name="email" required>
+                    <div class="colonne-div">
+                        <label for="prenom">Prénom*</label>
+                        <input type="text" id="prenom" name="prenom" required>
+                    </div>
+                </div>
 
-            <label for="password">Mot de passe*</label>
-            <input type="password" id="password" name="password" required>
+                <div class="lignes-div">
+                    <div class="colonne-div">
+                        <label for="email">E-mail*</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
 
-        </div>
-        {% endif %}
+                    <div class="colonne-div">
+                        <label for="password">Mot de passe*</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                </div>
 
-        <button type="submit">Valider</button>
-    </form>
+                <div class="lignes-div">
+                    <div class="colonne-div">
+                        <label for="etablissement">Établissement*</label>
+                        <input type="text" id="etablissement" name="etablissement" required>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <button type="submit" class="bouton-connexion">Valider</button>
+        </form>
+    </div>
+</section>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const cvInput = document.getElementById('cv');
+        const cvFilename = document.getElementById('cv-filename');
+
+        cvInput.addEventListener('change', function () {
+            if (cvInput.files.length > 0) {
+                cvFilename.textContent = cvInput.files[0].name; // Affiche le nom du fichier
+            } else {
+                cvFilename.textContent = 'Aucun fichier sélectionné'; // Message par défaut
+            }
+        });
+    });
+</script>
 {% endblock %}

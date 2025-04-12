@@ -13,7 +13,7 @@
 {% block body %}
 
     <body>
-    <div class= "container">
+    <section class= "login-section container">
         <div class="login-form-container">
             {% if error %}
                 <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
@@ -32,17 +32,55 @@
                 
                 <div class="button-container">
                     <div class="register-link">
-                        <p>Pas encore de compte ?</p>
-                        <ul>
-                            <li><a href="{{ path('inscription', { type: 'etudiant' }) }}">Étudiant</a></li>
-                            <li><a href="{{ path('inscription', { type: 'entreprise' }) }}">Entreprise</a></li>
-                            <li><a href="{{ path('inscription', { type: 'tuteur' }) }}">Tuteur</a></li>
-                        </ul>
+                        <button id="open-popup" class="popup-button" type="button">
+                            Pas encore de compte? <br>
+                            Créez-en un ici!
+                        </button>
+                        <!-- Popup -->
+                        <div id="popup" class="popup hidden">
+                            <div class="popup-content">
+                                <button id="close-popup" class="popup-close">&times;</button>
+                                <h1>Inscription</h1>
+                                <h2>Je m'inscris en tant que :</h2>
+                                <ul>
+                                    <li><a href="{{ path('inscription', { type: 'etudiant' }) }}">Étudiant</a></li>
+                                    <li><a href="{{ path('inscription', { type: 'tuteur' }) }}">Tuteur</a></li>
+                                    <li><a href="{{ path('inscription', { type: 'entreprise' }) }}">Entreprise</a></li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                     <button class="login-button" type="submit">Connexion</button>
                 </div>
             </form>
         </div>
-    </div>
-    </body>
+    </section>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const openPopupButton = document.getElementById('open-popup');
+            const closePopupButton = document.getElementById('close-popup');
+            const popup = document.getElementById('popup');
+
+            // Ouvrir la popup
+            openPopupButton.addEventListener('click', function () {
+                popup.classList.add('show');
+                popup.classList.remove('hidden');
+            });
+
+            // Fermer la popup
+            closePopupButton.addEventListener('click', function () {
+                popup.classList.remove('show');
+                popup.classList.add('hidden');
+            });
+
+            // Fermer la popup en cliquant en dehors
+            window.addEventListener('click', function (event) {
+                if (event.target === popup) {
+                    popup.classList.remove('show');
+                    popup.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+</body>
 {% endblock %}

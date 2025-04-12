@@ -11,7 +11,11 @@
 }
 
 /* ============ FORMULAIRE ============ */
-
+.login-section{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 .login-form {
     display: flex;
     flex-direction: column;
@@ -42,8 +46,8 @@
 /* ============ BOUTON ============ */
 .button-container {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start; 
+    justify-content: flex-end;
+    
     gap: 1rem;
     margin-top: 1.5rem;
 }
@@ -86,4 +90,100 @@
 .register-link p {
     margin: 0;
     font-weight: 500;
+}
+
+
+.popup-button{
+    color: #004080;
+    text-align: left;
+    border: none;
+    cursor: pointer;
+    background-color: white;
+}
+.popup-button:hover{
+    text-decoration: underline;
+}
+
+/* ============ POP UP ============ */
+
+/* Styles pour la popup */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fond semi-transparent */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 0.3s ease;
+    
+}
+
+.popup.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+.popup-content {
+    background: #f8f5d7; /* Couleur de fond beige */
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    width: 939px;
+    height: 250px;
+    box-shadow: 10px 10px 0px #FF6B35;
+    position: relative;
+
+    h1{
+        text-align: left;
+        margin-bottom: 50px;
+    }
+    h2{
+        margin-bottom: 50px;
+    }
+}
+
+
+
+.popup-content ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.popup-content ul li {
+    margin: 0;
+}
+
+.popup-content ul li a {
+    text-decoration: none;
+    background-color: #004080; /* Couleur bleu foncé */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1.25rem;
+    transition: background-color 0.3s ease;
+}
+
+.popup-content ul li a:hover {
+    background-color: #003060; /* Couleur bleu plus foncé au survol */
+}
+
+.popup-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #222;
+    cursor: pointer;
+    background: none;
+    border: none;
 }

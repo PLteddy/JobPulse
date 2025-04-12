@@ -64,6 +64,7 @@ a{
 .bouton-connexion:hover {
     background-color: #1A659E;
     transition: background-color 0.3s ease;
+    cursor: pointer;
 }
 .bouton-type {
     background: none;
