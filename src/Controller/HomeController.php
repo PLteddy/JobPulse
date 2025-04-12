@@ -18,12 +18,7 @@ class HomeController extends AbstractController
     public function index(Request $request, EntityManagerInterface $em): Response
     {
         $user = $this->getUser();
-        
-        // Si l'utilisateur est connecté, on le redirige en fonction de son rôle
-        if ($user) {
-            return $this->redirectToDashboard($user);
-        }
-        
+                
         // Récupération des paramètres de recherche et filtres
         $searchTerm = $request->query->get('q', '');
         
@@ -78,23 +73,6 @@ class HomeController extends AbstractController
         ]);
     }
     
-    private function redirectToDashboard($user): Response
-    {
-        if (in_array('ROLE_ETUDIANT', $user->getRoles())) {
-            return $this->redirectToRoute('etudiant_dashboard');
-        }
-        
-        if (in_array('ROLE_ENTREPRISE', $user->getRoles())) {
-            return $this->redirectToRoute('entreprise_dashboard');
-        }
-        
-        if (in_array('ROLE_TUTEUR', $user->getRoles())) {
-            return $this->redirectToRoute('tuteur_dashboard');
-        }
-        
-        // Par défaut, on le redirige vers l'accueil si aucun rôle ne correspond
-        return $this->redirectToRoute('home');
-    }
     #[Route('/offre/{id}', name: 'offre_details')]
     public function offreDetails(Poste $poste): Response
     {

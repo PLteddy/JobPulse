@@ -1,22 +1,20 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Mes enregistrements{% endblock %}
+
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
-    
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 {% endblock %}
 
-
 {% block body %}
     <div class="container mt-4">
-        <h1>Mes offres enregistrées</h1>
-                    
+        <h1>Mes enregistrements </h1>
+        
         {% for message in app.flashes('success') %}
             <div class="alert alert-success">
                 {{ message }}
@@ -29,19 +27,33 @@
             <div class="results-container">
                 <div class="results-grid">
                     {% for poste in postesSauvegardes %}
-                        <div class="job-card card">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ poste.intitule }}</h5>
-                                <h6 class="card-subtitle">{{ poste.entreprise.nom }}</h6>
-                                <p class="card-text">{{ poste.description|slice(0, 100) }}{% if poste.description|length > 100 %}...{% endif %}</p>
-                                <div class="d-flex justify-content-between">
-                                    <a href="{{ path('offre_details', {'id': poste.id}) }}" class="btn btn-sm btn-primary">Voir l'offre</a>
-                                    <a href="{{ path('tuteur_sauvegarder_poste', {'id': poste.id}) }}" class="btn btn-sm btn-warning">
-                                        <img src="{{ asset('img/enregistre.png') }}" alt="enregistre">
-                                    </a>
+                        <a href="{{ path('offre_details', {'id': poste.id}) }}" class="job-card-link">
+                            <div class="job-card card">
+                                {% if poste.image %}
+                                    <div class="image-container">
+                                        <img src="{{ asset('uploads/images/' ~ poste.image) }}" alt="{{ poste.intitule }}">
+                                    </div>
+                                {% endif %}
+                                <div class="card-body">
+                                    <div class="debut-carte">
+                                        <h4 class="card-title">{{ poste.intitule }}</h4>
+                                        <img src="{{ asset('img/enregistre.png') }}"
+                                            alt="enregistré"
+                                            class="img-un hidden"
+                                            onclick="toggleImage(event, this)">
+                                        <img src="{{ asset('img/enregistre.png') }}"
+                                            alt="non-enregistré"
+                                            class="img-deux"
+                                            onclick="toggleImage(event, this)">
+                                    </div>
+                                    <div class="localisation">
+                                        <img src="{{ asset('img/localisation.svg') }}" alt="point de repère" class="mini-icon">
+                                        <p>{{ poste.localisation }}</p>
+                                    </div>
+                                    <p class="card-text">{{ poste.description|slice(0, 150) }}...</p>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     {% endfor %}
                 </div>
             </div>

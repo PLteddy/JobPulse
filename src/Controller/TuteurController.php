@@ -70,7 +70,7 @@ class TuteurController extends AbstractController
         
         // Rediriger vers la page précédente ou la page d'accueil
         $referer = $request->headers->get('referer');
-        return $referer ? $this->redirect($referer) : $this->redirectToRoute('tuteur_dashboard');
+        return $referer ? $this->redirect($referer) : $this->redirectToRoute('home');
     }
     
     #[Route('/mes-etudiants', name: 'tuteur_mes_etudiants')]
@@ -197,7 +197,7 @@ class TuteurController extends AbstractController
         $poste = $posteRepository->find($posteId);
         if (!$poste) {
             $this->addFlash('danger', 'Offre introuvable');
-            return $this->redirectToRoute('tuteur_dashboard');
+            return $this->redirectToRoute('home');
         }
         
         $etudiantIds = $request->request->all('etudiants');

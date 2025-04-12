@@ -45,15 +45,15 @@ public function index(AuthenticationUtils $authenticationUtils): Response
     private function redirectToRouteForUser($user): Response
     {
         if (in_array('ROLE_ETUDIANT', $user->getRoles())) {
-            return $this->redirectToRoute('etudiant_dashboard');
+            return $this->redirectToRoute('home');
         } 
         
         if (in_array('ROLE_ENTREPRISE', $user->getRoles())) {
-            return $this->redirectToRoute('entreprise_dashboard');
+            return $this->redirectToRoute('home');
         } 
         
         if (in_array('ROLE_TUTEUR', $user->getRoles())) {
-            return $this->redirectToRoute('tuteur_dashboard');
+            return $this->redirectToRoute('home');
         }
     
         return $this->redirectToRoute('home');

@@ -61,7 +61,7 @@
                     <h5 class="card-title">Partager des offres</h5>
                     {% if app.user.postesSauvegardes is empty %}
                         <p>Vous n'avez pas d'offres enregistrées à partager.</p>
-                        <a href="{{ path('tuteur_dashboard') }}" class="btn btn-primary">
+                        <a href="{{ path('home') }}" class="btn btn-primary">
                             Parcourir les offres
                         </a>
                     {% else %}
