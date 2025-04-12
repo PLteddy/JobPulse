@@ -9,6 +9,8 @@ use App\Entity\Utilisateur;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Form\EtudiantType;
+use App\Entity\Poste;
+
 
 
 class EtudiantController extends AbstractController
@@ -35,9 +37,17 @@ class EtudiantController extends AbstractController
     public function enregistrements(): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ETUDIANT');
-
-        // Logique pour afficher les enregistrements de l'étudiant
-        return $this->render('etudiant/enregistrements.html.twig');
+    
+        // Récupérer l'utilisateur connecté
+        $user = $this->getUser();
+        
+        // Récupérer les postes sauvegardés de l'utilisateur
+        $postesSauvegardes = $user->getPostesSauvegardes();
+    
+        // Passer les postes sauvegardés au template
+        return $this->render('etudiant/enregistrements.html.twig', [
+            'postesSauvegardes' => $postesSauvegardes
+        ]);
     }
 
     #[Route('/etudiant/tuteur', name: 'etudiant_tuteur')]
@@ -48,6 +58,37 @@ class EtudiantController extends AbstractController
         // Logique pour afficher les informations sur le tuteur
         return $this->render('etudiant/tuteur.html.twig');
     }
+
+    #[Route('/sauvegarder-poste/{id}', name: 'etudiant_sauvegarder_poste')]
+    public function sauvegarderPoste(
+        Poste $poste, 
+        EntityManagerInterface $entityManager,
+        Request $request
+    ): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ETUDIANT');
+        
+        $user = $this->getUser();
+        
+        // Vérifier si déjà sauvegardé
+        if ($user->hasPosteSauvegarde($poste)) {
+            // Si oui, on le retire
+            $user->removePosteSauvegarde($poste);
+            $message = 'L\'offre a été retirée de vos enregistrements';
+        } else {
+            // Si non, on l'ajoute
+            $user->addPosteSauvegarde($poste);
+            $message = 'L\'offre a été enregistrée';
+        }
+        
+        $entityManager->flush();
+        $this->addFlash('success', $message);
+        
+        // Rediriger vers la page précédente ou la page d'accueil
+        $referer = $request->headers->get('referer');
+        return $referer ? $this->redirect($referer) : $this->redirectToRoute('home');
+    }
+    
 
     #[Route('/etudiant/profil', name: 'etudiant_profil')]
     public function profil(): Response
@@ -95,4 +136,5 @@ class EtudiantController extends AbstractController
             'form' => $form->createView(),
         ]);
         }
+        
 }

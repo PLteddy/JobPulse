@@ -12,14 +12,8 @@
 {% endblock %}
 
 {% block body %}
-    <div class="container mt-4">
-        <h1>Mes enregistrements </h1>
-        
-        {% for message in app.flashes('success') %}
-            <div class="alert alert-success">
-                {{ message }}
-            </div>
-        {% endfor %}
+    <section class="container mt-4">
+        <h1 class="titre-enregistrements">Mes enregistrements</h1>
         
         {% if postesSauvegardes.empty %}
             <p>Vous n'avez pas encore enregistré d'offres.</p>
@@ -58,5 +52,5 @@
                 </div>
             </div>
         {% endif %}
-    </div>
+    </section>
 {% endblock %}

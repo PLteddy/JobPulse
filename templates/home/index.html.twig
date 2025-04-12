@@ -135,52 +135,61 @@
             </div>
         </div>
 
-        {# Résultats #}
-                <div class="results-container">
-    {% if postes|length > 0 %}
-        <div class="results-grid">
-            {% for poste in postes %}
-            <a href="{{ path('offre_details', {'id': poste.id}) }}" class="job-card-link">
-                <div class="job-card card">
-                    {% if poste.image %}
-                        <div class="image-container">
-                            <img src="{{ asset('uploads/images/' ~ poste.image) }}" alt="{{ poste.intitule }}">
-                        </div>
-                    {% endif %}
-                    <div class="card-body">
-                    <div class="debut-carte">
-                        <h4 class="card-title">{{ poste.intitule }}</h4>
-
-                        <img src="{{ asset('img/enregistre.png') }}" 
-                        alt="enregistré" 
-                        class="img-un hidden" 
-                        onclick="toggleImage(event, this)">
-
-                        <img src="{{ asset('img/non_enregistre.png') }}" 
-                        alt="non-enregistré" 
-                        class="img-deux" 
-                        onclick="toggleImage(event, this)">
-                    </div>
-
-                        <div class="localisation">
-                            <img src="{{ asset('img/localisation.svg') }}" alt="point de repère" class="mini-icon">
-                            <p>{{ poste.localisation }}</p>
-                        </div>
-
-                        <p class="card-text">{{ poste.description|slice(0, 150) }}...</p>
+     {# Résultats #}
+        <div class="results-container">
+            {% if postes|length > 0 %}
+                <div class="results-grid">
+                    {% for poste in postes %}
+                        {% set route_name = 'app_login' %}
+                        {% set is_route_login = true %}
+                        
+                        {% if app.user %}
+                            {% if 'ROLE_TUTEUR' in app.user.roles %}
+                                {% set route_name = 'tuteur_sauvegarder_poste' %}
+                                {% set is_route_login = false %}
+                            {% elseif 'ROLE_ETUDIANT' in app.user.roles %}
+                                {% set route_name = 'etudiant_sauvegarder_poste' %}
+                                {% set is_route_login = false %}
+                            {% endif %}
+                        {% endif %}
+                        
+                        <a href="{{ path('offre_details', {'id': poste.id}) }}" class="job-card-link">
+                            <div class="job-card card">
+                                {% if poste.image %}
+                                    <div class="image-container">
+                                        <img src="{{ asset('uploads/images/' ~ poste.image) }}" alt="{{ poste.intitule }}">
+                                    </div>
+                                {% endif %}
+                                <div class="card-body">
+                                    <div class="debut-carte">
+                                        <h4 class="card-title">{{ poste.intitule }}</h4>
+                                        <div onclick="event.preventDefault(); {% if is_route_login %}window.location.href='{{ path(route_name) }}'{% else %}window.location.href='{{ path(route_name, {'id': poste.id}) }}'{% endif %}">
+                                            {% if app.user and app.user.postesSauvegardes.contains(poste) %}
+                                                <img src="{{ asset('img/enregistre.png') }}" alt="enregistré" class="img-un">
+                                            {% else %}
+                                                <img src="{{ asset('img/non_enregistre.png') }}" alt="non-enregistré" class="img-deux">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="localisation">
+                                        <img src="{{ asset('img/localisation.svg') }}" alt="point de repère" class="mini-icon">
+                                        <p>{{ poste.localisation }}</p>
+                                    </div>
+                                    <p class="card-text">{{ poste.description|slice(0, 150) }}...</p>
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-results">
+                    <div class="alert alert-info">
+                        Aucune offre trouvée. Essayez de modifier vos critères de recherche.
                     </div>
                 </div>
-            </a>
-            {% endfor %}
+            {% endif %}
         </div>
-    {% else %}
-        <div class="no-results">
-            <div class="alert alert-info">
-                Aucune offre trouvée. Essayez de modifier vos critères de recherche.
-            </div>
         </div>
-    {% endif %}
-</div>
         </div>
     </div>
 {% endblock %}
