@@ -24,8 +24,10 @@ class Poste
     #[ORM\Column(length: 1000)]
     private ?string $description = null;
 
-    #[ORM\Column(type: Types::SIMPLE_ARRAY, enumType: Contrat::class)]
-    private array $contrat_type = [];
+
+    #[ORM\Column(enumType: Contrat::class)]
+    private ?Contrat $contrat_type = null;
+
 
     #[ORM\Column(length: 255)]
     private ?string $domaine = null;
@@ -51,10 +53,10 @@ class Poste
     #[ORM\Column(enumType: Type_presence::class)]
     private ?Type_presence $presence = null;
 
-    #[ORM\Column(type: Types::SIMPLE_ARRAY, enumType: Duree::class)]
-    private array $duree = [];
+    #[ORM\Column(enumType: Duree::class)]
+    private ?Duree $duree = null;
 
-    // Ajoutez cette propriété à la classe Poste (avec les autres propriétés)
+
     #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'postes')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Utilisateur $entreprise = null;
@@ -97,15 +99,14 @@ class Poste
     /**
      * @return Contrat[]
      */
-    public function getContratType(): array
+    public function getContratType(): ?Contrat
     {
         return $this->contrat_type;
     }
 
-    public function setContratType(array $contrat_type): static
+    public function setContratType(?Contrat $contrat_type): static
     {
         $this->contrat_type = $contrat_type;
-
         return $this;
     }
 
@@ -208,15 +209,14 @@ class Poste
     /**
      * @return Duree[]
      */
-    public function getDuree(): array
+    public function getDuree(): ?Duree
     {
         return $this->duree;
     }
-
-    public function setDuree(array $duree): static
+    
+    public function setDuree(?Duree $duree): static
     {
         $this->duree = $duree;
-
         return $this;
     }
 
