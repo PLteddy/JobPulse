@@ -1,0 +1,99 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mentions légales{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/offre_details.css') }}">
+
+{% endblock %}
+
+{% block body %}
+<section class="container">
+    <div class="differentes-parties">
+        <a href="{{ path('home') }}">
+            <img src="{{ asset('img/fleche_retour.svg') }}" alt="flèche retour" class="fleche">
+        </a>
+
+        <div class="titre-postule">
+            <h1>Politique de confidentialité</h1>
+        </div>
+
+        <div>
+            <h2>Données collectées</h2>
+            <p>
+                Lors de l’inscription sur le site Job Pulse, les données suivantes peuvent être collectées :
+            </p>
+            <p>
+                - Prénom & Nom<br>
+                - Formation ou parcours scolaire<br>
+                - Adresse email<br>
+                - Numéro de Siret <br>
+            </p>
+            <p>
+                Ces informations sont obligatoires pour accéder aux fonctionnalités du site.
+            </p>
+        </div>
+
+        <div>
+            <h2>Finalité de la collecte</h2>
+            <p>
+                Les données sont utilisées exclusivement dans le cadre du fonctionnement du site Job Pulse, un projet universitaire sans but commercial. <br> Elles permettent notamment :
+            </p>
+            <p>
+                - L’identification des utilisateurs<br>
+                - L’accès personnalisé aux outils du site<br>
+                - La gestion interne du projet<br>
+            </p>
+            <p>
+                Aucune donnée n’est utilisée à des fins publicitaires ou partagée avec des tiers.
+            </p>
+        </div>
+
+        <div>
+            <h2>Base légale</h2>
+            <p>
+                La base légale de ce traitement repose sur l’exécution d’un projet pédagogique et le consentement donné lors de l’inscription
+            </p>
+        </div>
+
+        <div>
+            <h2>Hébergement et sécurité</h2>
+            <p>
+                Les données sont hébergées sur les serveurs sécurisés d’OVH (France). <br> Toutes les mesures techniques sont mises en œuvre pour garantir la sécurité et la confidentialité des informations.
+            </p>
+        </div>
+
+        <div>
+            <h2>Durée de conservation</h2>
+            <p>
+                Les données sont conservées uniquement pour la durée du projet universitaire, puis supprimées définitivement après évaluation ou fin de l’année universitaire.
+            </p>
+        </div>
+
+            <div class="paragraphe">
+            <h2>Droits des utilisateurs</h2>
+            <p>
+                Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez des droits suivants :
+            </p>
+            <p>
+                - Droit d’accès à vos données<br>
+                - Droit de rectification<br>
+                - Droit de suppression<br>
+            </p>
+            <p>
+                Pour exercer ces droits, vous pouvez nous contacter à l’adresse suivante : yussera.sebdaoui@gmail.com
+            </p>
+        </div>
+
+        <div>
+            <h2>Cookies</h2>
+            <p>
+                Le site Job Pulse n’utilise pas de cookies ni de dispositifs de suivi.
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}
