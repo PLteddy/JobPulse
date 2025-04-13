@@ -27,7 +27,7 @@
         
             <div class="profil-div">
                 <h1>{{ app.user.prenom }} {{ app.user.nom }}</h1>
-                <h3>{{ app.user.bio }}</h3>
+                <h3>{{ app.user.bio|nl2br }}</h3>
             </div>
             
         </div>
@@ -52,23 +52,23 @@
     <section class="informations-section container">
         <div class="informations-div">
             <h2>{{ 'Description' }}</h2>
-            <h3>{{ app.user.decription }}</h3>
+            <h3>{{ app.user.decription|nl2br }}</h3>
         </div>
         <div class="informations-div">
             <h2>{{ 'Formation' }}</h2>
-            <h3>{{ app.user.formation }}</h3>
+            <h3>{{ app.user.formation|nl2br }}</h3>
         </div>
         <div class="informations-div">
             <h2>{{ 'Expériences' }}</h2>
-            <h3>{{ app.user.experience }}</h3>
+            <h3>{{ app.user.experience|nl2br }}</h3>
         </div>
         <div class="informations-div">
             <h2>{{ 'Contact' }}</h2>
-            <h3>{{ app.user.contact }}</h3>
+            <h3>{{ app.user.contact|nl2br }}</h3>
         </div>
         <div class="informations-div">
             <h2>{{ 'Plus sur moi' }}</h2>
-            <h3>{{ app.user.plusSurMoi }}</h3>
+            <h3>{{ app.user.plusSurMoi|nl2br }}</h3>
         </div>
         
     

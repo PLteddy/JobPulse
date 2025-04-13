@@ -33,6 +33,9 @@ class EtudiantType extends AbstractType
             ->add('decription', TextareaType::class, [
                 'label' => 'Description',
                 'required' => false,
+                'attr' => [
+                'maxlength' => 500, // Limite la saisie à 500 caractères
+                ],
             ])
             ->add('cv', FileType::class, [
                 'label' => 'CV',
