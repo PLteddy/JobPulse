@@ -178,3 +178,10 @@ a{
 .titre-enregistrements {
     margin-bottom: 50px; 
 }
+textarea{
+    font-family: 'roboto', sans-serif;
+    font-size: 1.25rem;
+}
+input{
+    font-family: 'roboto', sans-serif;
+}

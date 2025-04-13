@@ -21,7 +21,7 @@
     .profil-div{
         display: flex;
         flex-direction: column;
-        padding: 16px 0;
+        padding: 10px 10px;
         gap: 26px;
     }
 }

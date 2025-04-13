@@ -21,25 +21,25 @@ class EtudiantType extends AbstractType
             ->add('prenom', TextType::class, [
                 'label' => 'Prénom',
             ])
-            ->add('bio', TextType::class, [
+            ->add('bio', TextareaType::class, [
                 'label' => 'Bio',
                 'required' => false,
             ])
             ->add('photoProfil', FileType::class, [
-                'label' => 'Télécharger une nouvelle photo de profil',
+                'label' => 'Photo de profil',
                 'mapped' => false, // Non mappé à l'entité
                 'required' => false, // Facultatif
             ])
-            ->add('decription', TextType::class, [
+            ->add('decription', TextareaType::class, [
                 'label' => 'Description',
                 'required' => false,
             ])
             ->add('cv', FileType::class, [
-                'label' => 'Télécharger un nouveau CV',
+                'label' => 'CV',
                 'mapped' => false, // Non mappé à l'entité
                 'required' => false, // Facultatif
             ])
-            ->add('formation', TextType::class, [
+            ->add('formation', TextareaType::class, [
                 'label' => 'Formation',
                 'required' => false,
             ])
@@ -47,7 +47,7 @@ class EtudiantType extends AbstractType
                 'label' => 'Expériences',
                 'required' => false,
             ])
-            ->add('contact', TextType::class, [
+            ->add('contact', TextareaType::class, [
                 'label' => 'Contact',
                 'required' => false,
             ])

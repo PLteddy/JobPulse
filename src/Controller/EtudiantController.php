@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Form\EtudiantType;
 use App\Entity\Poste;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 
 
@@ -99,13 +100,13 @@ class EtudiantController extends AbstractController
         return $this->render('etudiant/profil.html.twig');
     }
     #[Route('/etudiant/profil/edit', name: 'etudiant_profil_edit')]
-    public function editProfil(Request $request, EntityManagerInterface $em): Response
+    public function editProfil(Request $request, EntityManagerInterface $em, SluggerInterface $slugger): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ETUDIANT');
 
         $user = $this->getUser();
 
-        // Créez un formulaire pour modifier les informations du profil
+         // Créez un formulaire pour modifier les informations du profil
         $form = $this->createForm(EtudiantType::class, $user);
         $form->handleRequest($request);
 
@@ -113,18 +114,44 @@ class EtudiantController extends AbstractController
             // Gestion du téléchargement de la photo de profil
             $photoFile = $form->get('photoProfil')->getData();
             if ($photoFile) {
-            $photoFileName = uniqid() . '.' . $photoFile->guessExtension();
-            $photoFile->move($this->getParameter('kernel.project_dir') . '/public/uploads/images', $photoFileName);
-            $user->setPhotoProfil($photoFileName);
-        }
+                $originalFilename = pathinfo($photoFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $photoFileName = $safeFilename . '-' . uniqid() . '.' . $photoFile->guessExtension();
+
+                try {
+                    $photoFile->move(
+                        $this->getParameter('kernel.project_dir') . '/public/uploads/images',
+                        $photoFileName
+                    );
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Une erreur est survenue lors de l\'upload de la photo de profil.');
+                }
+
+                // Met à jour la propriété photoProfil de l'utilisateur
+                $user->setPhotoProfil($photoFileName);
+            }
+
             // Gestion du téléchargement du CV
             $cvFile = $form->get('cv')->getData();
             if ($cvFile) {
-                $cvFileName = uniqid() . '.' . $cvFile->guessExtension();
-                $cvFile->move($this->getParameter('kernel.project_dir') . '/public/uploads/cv', $cvFileName);
+                $originalFilename = pathinfo($cvFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $cvFileName = $safeFilename . '-' . uniqid() . '.' . $cvFile->guessExtension();
+
+                try {
+                    $cvFile->move(
+                        $this->getParameter('kernel.project_dir') . '/public/uploads/cv',
+                        $cvFileName
+                    );
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Une erreur est survenue lors de l\'upload du CV.');
+                }
+
+                // Met à jour la propriété cv de l'utilisateur
                 $user->setCv($cvFileName);
             }
 
+            // Sauvegarde des modifications dans la base de données
             $em->persist($user);
             $em->flush();
 
@@ -134,6 +161,7 @@ class EtudiantController extends AbstractController
 
         return $this->render('etudiant/edit_profil.html.twig', [
             'form' => $form->createView(),
+            'cvFileName' => $user->getCv(), 
         ]);
         }
         
