@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mentions légales{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/offre_details.css') }}">
+
+{% endblock %}
+
+{% block body %}
+<section class="container">
+    <div class="differentes-parties">
+        <a href="{{ path('home') }}">
+            <img src="{{ asset('img/fleche_retour.svg') }}" alt="flèche retour" class="fleche">
+        </a>
+
+        <div class="titre-postule">
+            <h1>Mentions légales</h1>
+        </div>
+
+        <div>
+            <h2>Éditeur du site</h2>
+            <p>
+                Le site Job Pulse est un projet universitaire réalisé dans le cadre d’un travail pédagogique.
+            </p>
+            <p>
+                Responsables des publications :<br>
+                - Bascol Mélina<br>
+                - Ndayishimiye Victor Emmanuel<br>
+                - Sebdaoui Yussera
+            </p>
+            <p>
+                Contact : yussera.sebdaoui@gmail.com
+            </p>
+            <p>
+                Statut : Projet étudiant, sans but lucratif
+            </p>
+        </div>
+
+        <div>
+            <h2>Hébergement</h2>
+            <p>
+                Le site est hébergé par OVH SAS,<br>
+                2 rue Kellermann – 59100 Roubaix – France,<br>
+                Téléphone : 1007
+            </p>
+        </div>
+
+        <div>
+            <h2>Responsabilité</h2>
+            <p>
+                L’éditeur s’efforce de fournir des informations précises. <br> Toutefois, il ne peut être tenu responsable d’erreurs, d’omissions ou d’une absence de mise à jour.
+            </p>
+        </div>
+
+        <div>
+            <h2>Propriété intellectuelle</h2>
+            <p>
+                L’ensemble des contenus (textes, visuels, logos, etc.) présents sur le site Job Pulse sont la propriété de l'équipe projet ou de leurs auteurs respectifs. <br> Toute reproduction, distribution ou utilisation sans autorisation est interdite.
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -72,12 +72,24 @@ class HomeController extends AbstractController
             'presences' => Type_presence::cases(),
         ]);
     }
-    
-    #[Route('/offre/{id}', name: 'offre_details')]
-    public function offreDetails(Poste $poste): Response
-    {
-        return $this->render('home/offre_details.html.twig', [
-            'poste' => $poste
-        ]);
-    }    
+        
+        #[Route('/offre/{id}', name: 'offre_details')]
+        public function offreDetails(Poste $poste): Response
+        {
+            return $this->render('home/offre_details.html.twig', [
+                'poste' => $poste
+            ]);
+        }    
+
+        #[Route('/mentions-legales', name: 'mentions_legales')]
+        public function mentionsLegales(): Response
+        {
+            return $this->render('home/mentions_legales.html.twig');
+        }
+
+        #[Route('/politique-de-confidentialite', name: 'politique_confidentialite')]
+        public function politiqueConfidentialite(): Response
+        {
+            return $this->render('home/politique_confidentialite.html.twig');
+        }
 }
