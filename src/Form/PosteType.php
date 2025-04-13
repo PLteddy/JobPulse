@@ -44,6 +44,7 @@ class PosteType extends AbstractType
                 'choices' => Contrat::cases(),
                 'choice_label' => 'value',
                 'expanded' => false,
+                'multiple' => false,
             ])
             
             ->add('missions', TextareaType::class)

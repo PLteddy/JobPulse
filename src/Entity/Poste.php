@@ -24,7 +24,6 @@ class Poste
     #[ORM\Column(length: 1000)]
     private ?string $description = null;
 
-
     #[ORM\Column(enumType: Contrat::class)]
     private ?Contrat $contrat_type = null;
 
@@ -97,7 +96,7 @@ class Poste
     }
 
     /**
-     * @return Contrat[]
+     * @return Contrat|null
      */
     public function getContratType(): ?Contrat
     {
