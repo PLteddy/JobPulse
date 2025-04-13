@@ -1,6 +1,7 @@
 
 {% extends 'base.html.twig' %}
 
+
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
     
@@ -59,54 +60,58 @@
                             <h3>Filtrer les offres</h3>
                             <button type="button" class="close-filters" id="hideFilters">&times;</button>
                         </div>
-                        
+                        <h5>Type de contrat</h5>
                         <div class="filters-grid">
                             {# Type de contrat #}
                             <div class="filter-group">
-                                <h5>Type de contrat</h5>
+                                
                                 {% for contrat in contratTypes %}
                                     <div class="form-check">
-                                        <input class="form-check-input" 
-                                               type="checkbox" 
-                                               name="contrat[]" 
-                                               value="{{ contrat.value }}"
-                                               id="contrat_{{ contrat.value }}"
-                                               {% if contrat.value in selectedContrat %}checked{% endif %}>
-                                        <label class="form-check-label" for="contrat_{{ contrat.value }}">
-                                            {{ contrat.name }}
-                                        </label>
+<input type="checkbox"
+       name="contrat[]"
+       value="{{ contrat.value }}"
+       id="contrat_{{ contrat.value }}"
+       class="checkbox-hidden"
+       {% if contrat.value in selectedContrat %}checked{% endif %}>
+
+<label for="contrat_{{ contrat.value }}" class="bouton-localisation">
+    {{ contrat.name }}
+</label>
                                     </div>
                                 {% endfor %}
                             </div>
-
+    <h5>Durée</h5> 
                             {# Durée #}
                             <div class="filter-group">
-                                <h5>Durée</h5>
-                                {% for duree in durees %}
-                                    <div class="form-check">
-                                        <input class="form-check-input" 
-                                               type="checkbox" 
-                                               name="duree[]" 
-                                               value="{{ duree.value }}"
-                                               id="duree_{{ duree.value }}"
-                                               {% if duree.value in selectedDuree %}checked{% endif %}>
-                                        <label class="form-check-label" for="duree_{{ duree.value }}">
-                                            {{ duree.name }}
-                                        </label>
-                                    </div>
-                                {% endfor %}
-                            </div>
+                                
+{% for duree in durees %}
+    <input class="checkbox-hidden" 
+           type="checkbox" 
+           name="duree[]" 
+           value="{{ duree.value }}"
+           id="duree_{{ duree.value }}"
+           {% if duree.value in selectedDuree %}checked{% endif %}>
 
+    <label class="bouton-localisation" for="duree_{{ duree.value }}">
+        {{ duree.name }}
+    </label>
+{% endfor %}
+</div>
                             {# Salaire minimum #}
                             <div class="filter-group">
                                 <h5>Salaire minimum</h5>
                                 <div class="salary-input">
-                                    <input type="number" 
-                                           name="salaire_min" 
-                                           class="form-control" 
-                                           placeholder="€" 
-                                           value="{{ selectedSalaireMin }}">
-                                </div>
+    <label for="salaire_min">Salaire minimum</label>
+    <input type="range"
+           id="salaire_min"
+           name="salaire_min"
+           min="0"
+           max="100000"
+           step="1000"
+           value="{{ selectedSalaireMin|default(20000) }}"
+           class="slider">
+    <span id="salaire_valeur">{{ selectedSalaireMin|default(20000) }} €</span>
+</div>
                             </div>
 
                             {# Télétravail #}
@@ -203,6 +208,12 @@
         const hideFilters = document.getElementById('hideFilters');
         const filtersOverlay = document.getElementById('filtersOverlay');
         const btns = document.querySelectorAll('.showtype');
+            const slider = document.getElementById('salaire_min');
+    const valeur = document.getElementById('salaire_valeur');
+
+    slider.addEventListener('input', () => {
+        valeur.textContent = `${slider.value} €`;
+    });
 
 btns.forEach(btn => {
     btn.addEventListener('click', function() {

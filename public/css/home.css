@@ -114,14 +114,74 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 525px;
+    height: 784px;
     background: rgba(255, 255, 255, 0.98);
     z-index: 1000;
     padding: 30px;
     overflow-y: auto;
+    box-shadow: 10px 10px 0px #FF6B35;
+    border-radius: 20px;
+    margin: 0 auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    .checkbox-hidden {
+        display: none;
+    }
+    .checkbox-hidden:checked + .bouton-localisation {
+        background-color: #FF6B35;
+        color: white;
+    }
+}
+.salary-input {
+    margin: 20px 0;
 }
 
+.salary-input label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.slider {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 10px;
+    border-radius: 5px;
+    background: #ddd;
+    outline: none;
+    transition: background 0.3s;
+}
+
+/* Boule */
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #007bff;
+    cursor: pointer;
+    box-shadow: 0 0 2px rgba(0,0,0,0.5);
+    transition: background 0.3s;
+}
+
+.slider::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #007bff;
+    cursor: pointer;
+    box-shadow: 0 0 2px rgba(0,0,0,0.5);
+}
+
+/* Valeur affichée à côté */
+#salaire_valeur {
+    display: inline-block;
+    margin-left: 15px;
+    font-weight: 500;
+}
 .filters-overlay.active {
     display: block;
 }
@@ -149,14 +209,15 @@
 }
 
 .filters-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 30px;
     margin-bottom: 30px;
 }
 
 .filter-group {
     background: white;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap:10px;
     padding: 20px;
     border-radius: 8px;
     box-shadow: var(--shadow);

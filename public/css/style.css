@@ -5,6 +5,7 @@ body {
 
 }
 
+
 .container {
     padding: 0 157px 0 157px;
 }
@@ -128,6 +129,7 @@ a{
 .bouton-localisation:hover{
     background-color: #FF8C5A;
     transition: background-color 0.3s ease;
+    color:white;
 }
 .les-filtres{
     display: flex;
@@ -178,10 +180,41 @@ a{
 .titre-enregistrements {
     margin-bottom: 50px; 
 }
+<<<<<<< Updated upstream
 textarea{
     font-family: 'roboto', sans-serif;
     font-size: 1.25rem;
 }
 input{
     font-family: 'roboto', sans-serif;
+=======
+
+@media screen and (max-width: 768px) {
+    .container {
+        padding: 0 20px; /* Réduit le padding sur mobile */
+    }
+    h1 {
+        font-size: 2rem; /* Réduit la taille de la police sur mobile */
+    }
+    h2 {
+        font-size: 1.5rem; /* Réduit la taille de la police sur mobile */
+    }
+    h3 {
+        font-size: 1.25rem; /* Réduit la taille de la police sur mobile */
+    }
+    h4 {
+        font-size: 1rem; /* Réduit la taille de la police sur mobile */
+    }
+    p {
+        font-size: 0.875rem; /* Réduit la taille de la police sur mobile */
+    }
+    a{
+        font-size: 0.75rem; /* Réduit la taille de la police sur mobile */
+    }
+    .bouton-connexion {
+        font-size: 1rem; /* Réduit la taille de la police sur mobile */
+        padding: 10px; /* Réduit le padding sur mobile */
+    }
+    
+>>>>>>> Stashed changes
 }

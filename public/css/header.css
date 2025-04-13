@@ -29,13 +29,14 @@ body header {
     display: flex;
     gap: 60px;
     align-items: center;
-    div{
-        display: flex;
-        align-items: center;
-        gap: 20px;
-    }
+
 }
 
+.header-nav div {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
 .image-header{
     width: 44px;
     height: 44px;
@@ -44,14 +45,29 @@ body header {
 
 /* Version mobile (optionnel) */
 @media (max-width: 768px) {
-    .header-container {
-        max-width: 100%;
-        padding: 0 20px;
-        flex-direction: column;
-        gap: 15px;
+    body header {
+        padding: 10px 0;
+        margin-bottom: 50px; /* Ajuster la marge inférieure pour le mobile */
     }
-    
+    .header-section {
+        display: flex;
+        align-items: center;
+        max-width: 1200px;
+        justify-content: space-between;
+        gap: 15px;
+        margin: 0 20px; /* moins de marge sur mobile */
+    }
+
     .header-nav {
         gap: 20px;
+        flex-wrap: wrap;
+    }
+    .header-logo {
+        width: 134px; /* Ajuster la taille du logo sur mobile */
+        height: auto;
+    }
+    .image-header {
+        width: 36px;
+        height: 36px;
     }
 }
