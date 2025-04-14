@@ -180,14 +180,14 @@ a{
 .titre-enregistrements {
     margin-bottom: 50px; 
 }
-<<<<<<< Updated upstream
+
 textarea{
     font-family: 'roboto', sans-serif;
     font-size: 1.25rem;
 }
 input{
     font-family: 'roboto', sans-serif;
-=======
+}
 
 @media screen and (max-width: 768px) {
     .container {
@@ -216,5 +216,3 @@ input{
         padding: 10px; /* Réduit le padding sur mobile */
     }
     
->>>>>>> Stashed changes
-}
