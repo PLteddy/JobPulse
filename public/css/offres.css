@@ -1,0 +1,79 @@
+.titre-creation-offres {
+    display: flex; 
+    align-items: center; 
+    gap: 20px; 
+    padding: 20px;
+    margin-bottom: 20px;
+}
+.bouton-ajouter {
+    color: #ffffff;
+    background-color: #FF6B35;
+    text-decoration: none;
+    font-weight: 400;
+    font-size: 20px;
+    position: relative;
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    border: 1px solid #FC8756;
+}
+.bouton-ajouter:hover {
+    background-color: #FC8756;
+    transition: background-color 0.3s ease;
+}
+
+.bouton-supprimer {
+    color: #FC8756;
+    background-color: transparent;
+    text-decoration: none;
+    font-weight: 400;
+    font-size: 20px;
+    position: relative;
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    border: 1px solid #FC8756;
+}
+.bouton-supprimer:hover {
+    background-color: #f7f7f7;
+    transition: background-color 0.3s ease;
+}
+
+
+.card-wrapper {
+    margin-bottom: 20px;
+
+}
+
+.actions-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding-right: 140px; /* Je l'ai fait un peu à la brute ici parce que je savais pas comment arranger ça d'une autre manière */
+}
+
+.btn-action {
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+}
+
+.btn-edit {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-delete {
+    background-color: #dc3545;
+    color: white;
+}

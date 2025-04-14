@@ -5,53 +5,67 @@
     <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/offre_details.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/formulaire.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/offres.css') }}">
+
 {% endblock %}
 
-
 {% block body %}
-    <h1>Mes offres d'emploi</h1>
 
-    <a href="{{ path('app_poste_new') }}" class="btn btn-primary">Créer une nouvelle offre</a>
+<section class="container mt-4">
+    <div class="titre-creation-offres">
+        <h1>Mes offres</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Image</th>
-                <th>Intitulé</th>
-                <th>Domaine</th>
-                <th>Localisation</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for poste in postes %}
-            <tr>
-                <td>
-                    {% if poste.image %}
-                        <img src="{{ asset('uploads/images/' ~ poste.image) }}" alt="{{ poste.intitule }}" width="80" height="60" class="img-thumbnail">
-                    {% else %}
-                        <span class="text-muted">Aucune image</span>
-                    {% endif %}
-                </td>
-                <td>{{ poste.intitule }}</td>
-                <td>{{ poste.domaine }}</td>
-                <td>{{ poste.localisation }}</td>
-                <td>
-                    <a href="{{ path('app_poste_edit', {'id': poste.id}) }}" class="btn btn-secondary">Modifier</a>
-                    <form method="post" action="{{ path('app_poste_delete', {'id': poste.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette offre?');" style="display: inline-block;">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ poste.id) }}">
-                        <button class="btn btn-danger">Supprimer</button>
-                    </form>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">Aucune offre trouvée</td> {# Mise à jour du colspan à 5 #}
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    <a href="{{ path('home') }}" class="btn btn-secondary">Retour en arrière</a>
+        <button onclick="window.location.href='{{ path('app_poste_new') }}'" class="bouton-ajouter">
+            Ajouter
+            <img src="{{ asset('img/Plus.png') }}" alt="icone ajouter">
+        </button>
+    </div>
+    {% if postes|length > 0 %}
+        <div class="results-container">
+            <div class="results-grid">
+                {% for poste in postes %}
+                    <div class="card-wrapper">
+                        <div class="actions-container">
+                            <button onclick="window.location.href='{{ path('app_poste_edit', {'id': poste.id}) }}'" class="bouton-ajouter">
+                                Modifier
+                                <img src="{{ asset('img/modifier-icone.png') }}" alt="icone modifié">
+                            </button>
+                            <form method="post" action="{{ path('app_poste_delete', {'id': poste.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette offre?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ poste.id) }}">
+                                <button class="bouton-supprimer">Supprimer
+                                <img src="{{ asset('img/Croix.png') }}" alt="icone modifié">
+                                </button>
+                            </form>
+                        </div>
+                        <div class="job-card card">
+                            <div class="image-container">
+                                {% if poste.image %}
+                                    <img src="{{ asset('uploads/images/' ~ poste.image) }}" alt="{{ poste.intitule }}">
+                                {% else %}
+                                    <span class="text-muted">Aucune image</span>
+                                {% endif %}
+                            </div>
+                            <div class="card-body">
+                                <div class="debut-carte">
+                                    <h4 class="card-title">{{ poste.intitule }}</h4>
+                                </div>
+                                <div class="localisation">
+                                    <img src="{{ asset('img/localisation.svg') }}" alt="point de repère" class="mini-icon">
+                                    <p>{{ poste.localisation }}</p>
+                                </div>
+                                <p class="domaine-text">{{ poste.domaine }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="no-results">
+                        <p>Aucune offre trouvée</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <p>Aucune offre disponible.</p>
+    {% endif %}
+</section>
 {% endblock %}
