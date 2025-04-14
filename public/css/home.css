@@ -471,3 +471,32 @@
 
 
 
+.filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.filter-button {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.filter-button:hover {
+    background-color: #e0e0e0;
+}
+
+.filter-button.active {
+    background-color: #4CAF50;
+    color: white;
+    border-color: #4CAF50;
+}
+
+.filter-button.active:hover {
+    background-color: #45a049;
+}
