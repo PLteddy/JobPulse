@@ -44,7 +44,7 @@ body header {
 
 
 /* Version mobile (optionnel) */
-@media (max-width: 768px) {
+@media only screen and (max-width:420px){
     body header {
         padding: 10px 0;
         margin-bottom: 50px; /* Ajuster la marge inférieure pour le mobile */
