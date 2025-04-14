@@ -91,8 +91,11 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'etudiants')]
     private Collection $tuteurs;
 
-    #[ORM\Column(length: 500, nullable: true)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $bio = null;
+
+    #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: Candidature::class)]
+    private Collection $candidatures;
 
     public function __construct()
     {

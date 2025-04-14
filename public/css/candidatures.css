@@ -1,0 +1,46 @@
+.candidatures-section{
+    display: flex;
+    flex-direction: column;
+    
+    h1{
+        margin-bottom: 24px;
+    }
+    .filtres{
+        display: flex;
+        gap: 11px;
+        margin-bottom: 45px;
+        .filtre.active{
+            box-shadow: 0 2px 0 #000;
+            font-weight: bold;
+
+        }
+        .filtre:hover{
+            box-shadow: 0 2px 0 #000;
+
+        }
+    }
+    .erreur-h4{
+        text-align: center;
+        margin-bottom: 100px;
+        margin-top: 100px;
+    }
+}
+.etat-message {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.875em;
+    color: #6c757d; /* Couleur grise pour le texte */
+}
+.results-grid{
+    gap: 10px;
+    
+}
+.etat-candidature{
+    
+    display: flex;
+    margin-left: 400px;
+    span{
+        color: #000;
+    }
+    
+}

@@ -26,6 +26,14 @@ class Candidature
     #[ORM\Column(type: 'string', length: 255)]
     private ?string $cvCandidature = null;
 
+    #[ORM\ManyToOne(inversedBy: 'candidatures')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Utilisateur $utilisateur = null;
+
+    #[ORM\ManyToOne(targetEntity: Poste::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Poste $poste = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -36,13 +44,16 @@ class Candidature
         return $this->etat;
     }
 
-    public function setEtat(Etat $etat): static
+    public function setEtat(Etat $etat): self
     {
         $this->etat = $etat;
 
         return $this;
     }
-
+    public function getEtatAsString(): string
+    {
+        return $this->etat?->toString() ?? '';
+    }
     
 
     public function getMotivation(): ?string
@@ -76,7 +87,6 @@ class Candidature
     public function setUtilisateur(Utilisateur $utilisateur): static
     {
         $this->utilisateur = $utilisateur;
-
         return $this;
     }
     
@@ -84,7 +94,7 @@ class Candidature
     
     
     
-    private ?Poste $poste = null;
+    
 
     public function getPoste(): ?Poste
     {

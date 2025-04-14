@@ -25,14 +25,35 @@ class EtudiantController extends AbstractController
         return $this->render('etudiant/index.html.twig');
     }
 
-    #[Route('/etudiant/candidatures', name: 'etudiant_candidatures')]
-    public function candidatures(): Response
-    {
-        $this->denyAccessUnlessGranted('ROLE_ETUDIANT');
+    #[Route('/etudiant/candidatures/{filter}', name: 'etudiant_candidatures', defaults: ['filter' => 'tout'])]
+public function candidatures(string $filter, EntityManagerInterface $em): Response
+{
+    $this->denyAccessUnlessGranted('ROLE_ETUDIANT');
 
-        // Logique pour afficher les candidatures de l'étudiant
-        return $this->render('etudiant/candidatures.html.twig');
-    }
+    // Récupérer l'utilisateur connecté
+    $user = $this->getUser();
+
+    // Construire la requête en fonction du filtre
+    $queryBuilder = $em->getRepository(\App\Entity\Candidature::class)->createQueryBuilder('c')
+        ->where('c.utilisateur = :user')
+        ->setParameter('user', $user);
+
+        if ($filter === 'En attente') {
+            $queryBuilder->andWhere('c.etat = :etat')->setParameter('etat', 'En attente');
+        } elseif ($filter === 'Accepte') {
+            $queryBuilder->andWhere('c.etat = :etat')->setParameter('etat', 'Accepte');
+        } elseif ($filter === 'Refuse') {
+            $queryBuilder->andWhere('c.etat = :etat')->setParameter('etat', 'Refuse');
+        }
+
+    $candidatures = $queryBuilder->getQuery()->getResult();
+
+    // Passer les candidatures et le filtre au template
+    return $this->render('etudiant/candidatures.html.twig', [
+        'candidatures' => $candidatures,
+        'filter' => $filter,
+    ]);
+}
 
     #[Route('/etudiant/enregistrements', name: 'etudiant_enregistrements')]
     public function enregistrements(): Response

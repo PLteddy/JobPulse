@@ -1,1 +1,68 @@
-<link rel="stylesheet" href="{{ asset('css/reset.css') }}">
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Candidatures{% endblock %}
+
+{% block body %}
+    <head>
+        <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/candidatures.css') }}">
+    </head>
+    <section class="candidatures-section container">
+        <h1>Mes Candidatures</h1>
+        <div class="filtres">
+            <a href="{{ path('etudiant_candidatures', { filter: 'tout' }) }}" class="filtre {% if filter == 'tout' %}active{% endif %}">Tout</a>
+            <a href="{{ path('etudiant_candidatures', { filter: 'En attente' }) }}" class="filtre  {% if filter == 'En attente' %}active{% endif %}">En cours</a>
+            <a href="{{ path('etudiant_candidatures', { filter: 'Accepte' }) }}" class="filtre {% if filter == 'Accepte' %}active{% endif %}">Accepté</a>
+            <a href="{{ path('etudiant_candidatures', { filter: 'Refuse' }) }}" class="filtre  {% if filter == 'Refuse' %}active{% endif %}">Refusé</a>
+            
+        </div>
+
+        {% if candidatures is not empty %}
+            <div class="row">
+                {% for candidature in candidatures %}
+                <div class="results-container">
+                    <div class="results-grid">
+                        {% for candidature in candidatures %}
+                            <a href="{{ path('offre_details', {'id': candidature.poste.id}) }}" class="job-card-link">
+                                <div class="job-card card">
+                                    {% if candidature.poste.image %}
+                                        <div class="image-container">
+                                            <img src="{{ asset('uploads/images/' ~ candidature.poste.image) }}" alt="{{ candidature.poste.intitule }}">
+                                        </div>
+                                    {% endif %}
+                                    <div class="card-body">
+                                        <div class="debut-carte">
+                                            <h4 class="card-title">{{ candidature.poste.intitule }}</h4>
+                                        </div>
+                                        <div class="localisation">
+                                            <img src="{{ asset('img/localisation.svg') }}" alt="point de repère" class="mini-icon">
+                                            <p>{{ candidature.poste.localisation }}</p>
+                                        </div>
+                                        <p class="card-text">{{ candidature.poste.description|slice(0, 150) }}...</p>
+                                    </div>
+                                </div>
+                            </a>
+                            <!-- Affichage de l'état de la candidature -->
+                            <p class="etat-candidature">
+                                {% if candidature.etatAsString == 'En attente' %}
+                                    <span class="etat-message">En cours, l'entreprise n'a pas encore vu ta candidature.</span>
+                                {% elseif candidature.etatAsString == 'Accepte' %}
+                                    <span class="badge badge-success">Accepté</span>
+                                {% elseif candidature.etatAsString == 'Refuse' %}
+                                    <span class="badge badge-danger">Refusé</span>
+                                {% endif %}
+                            </p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% endfor %}
+            </div>
+        {% else %}
+
+            <h4 class="erreur-h4">Vous n'avez pas encore d'offres qui correspondent.</h4>
+        {% endif %}
+        </section>
+{% endblock %}

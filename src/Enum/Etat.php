@@ -8,5 +8,9 @@ enum Etat : string
     case EN_ATTENTE = 'En attente';
     case REFUSE = 'Refuse';
 
+    public function toString(): string
+    {
+        return $this->value;
+    }
 }
 ?>
