@@ -25,13 +25,15 @@
             </div>
         </div>
         <div class="profils">
-<button type="button" class="bouton-type showtype">
-   <i class="fas fa-sliders-h"></i> Profils
-</button>
+<div class="profils">
+    <button type="button" class="bouton-type showtype" data-type="profils">
+        <i class="fas fa-sliders-h"></i> Profils
+    </button>
 
-<button type="button" class="bouton-type showtype">
-   <i class="fas fa-sliders-h"></i> Offres
-</button>
+    <button type="button" class="bouton-type showtype" data-type="offres">
+        <i class="fas fa-sliders-h"></i> Offres
+    </button>
+</div>
         </div>
         {# Barre de recherche et filtres #}
         <div class="search-container card my-4">
@@ -67,52 +69,52 @@
                                 
                                 {% for contrat in contratTypes %}
                                     <div class="form-check">
-<input type="checkbox"
-       name="contrat[]"
-       value="{{ contrat.value }}"
-       id="contrat_{{ contrat.value }}"
-       class="checkbox-hidden"
-       {% if contrat.value in selectedContrat %}checked{% endif %}>
+                        <input type="checkbox"
+                            name="contrat[]"
+                            value="{{ contrat.value }}"
+                            id="contrat_{{ contrat.value }}"
+                            class="checkbox-hidden"
+                            {% if contrat.value in selectedContrat %}checked{% endif %}>
 
-<label for="contrat_{{ contrat.value }}" class="bouton-localisation">
-    {{ contrat.name }}
-</label>
-                                    </div>
-                                {% endfor %}
-                            </div>
-    <h5>Durée</h5> 
+                        <label for="contrat_{{ contrat.value }}" class="bouton-localisation">
+                            {{ contrat.name }}
+                        </label>
+                        </div>
+                            {% endfor %}
+                        </div>
+                        <h5>Durée</h5> 
                             {# Durée #}
                             <div class="filter-group">
                                 
-{% for duree in durees %}
-    <input class="checkbox-hidden" 
-           type="checkbox" 
-           name="duree[]" 
-           value="{{ duree.value }}"
-           id="duree_{{ duree.value }}"
-           {% if duree.value in selectedDuree %}checked{% endif %}>
+                        {% for duree in durees %}
+                            <input class="checkbox-hidden" 
+                                type="checkbox" 
+                                name="duree[]" 
+                                value="{{ duree.value }}"
+                                id="duree_{{ duree.value }}"
+                                {% if duree.value in selectedDuree %}checked{% endif %}>
 
-    <label class="bouton-localisation" for="duree_{{ duree.value }}">
-        {{ duree.name }}
-    </label>
-{% endfor %}
-</div>
-                            {# Salaire minimum #}
-                            <div class="filter-group">
-                                <h5>Salaire minimum</h5>
-                                <div class="salary-input">
-    <label for="salaire_min">Salaire minimum</label>
-    <input type="range"
-           id="salaire_min"
-           name="salaire_min"
-           min="0"
-           max="100000"
-           step="1000"
-           value="{{ selectedSalaireMin|default(20000) }}"
-           class="slider">
-    <span id="salaire_valeur">{{ selectedSalaireMin|default(20000) }} €</span>
-</div>
-                            </div>
+                            <label class="bouton-localisation" for="duree_{{ duree.value }}">
+                                {{ duree.name }}
+                            </label>
+                        {% endfor %}
+                        </div>
+                                                    {# Salaire minimum #}
+                                                    <div class="filter-group">
+                                                        <h5>Salaire minimum</h5>
+                                                        <div class="salary-input">
+                            <label for="salaire_min">Salaire minimum</label>
+                            <input type="range"
+                                id="salaire_min"
+                                name="salaire_min"
+                                min="0"
+                                max="100000"
+                                step="1000"
+                                value="{{ selectedSalaireMin|default(20000) }}"
+                                class="slider">
+                            <span id="salaire_valeur">{{ selectedSalaireMin|default(20000) }} €</span>
+                        </div>
+                        </div>
 
                             {# Télétravail #}
                             <div class="filter-group">
@@ -141,6 +143,7 @@
         </div>
 
      {# Résultats #}
+     <div id="offres-container">
         <div class="results-container">
             {% if postes|length > 0 %}
                 <div class="results-grid">
@@ -194,6 +197,58 @@
                 </div>
             {% endif %}
         </div>
+    </div>
+
+
+{# Profils #}
+<div id="profils-container">
+    <div class="results-container">
+        {% if profils|length > 0 %}
+            <div class="results-grid">
+                {% for profil in profils %}
+                    {% set route_name = 'app_login' %}
+                    {% set is_route_login = true %}
+                    {% if app.user %}
+                    {% endif %}
+                    <a href="{{ path('profil_details', {'id': profil.id}) }}" class="job-card-link">
+                        <div class="profil-card-container">
+                            {% if profil.photoProfil %}
+                                <div class="profil-image-container">
+                                    <img src="{{ asset('uploads/images/' ~ profil.photoProfil) }}" alt="{{ profil.nom }} {{ profil.prenom }}" class="profil-image">
+                                </div>
+                            {% else %}
+                                <div class="profil-image-container">
+                                    <div class="profil-placeholder"></div>
+                                </div>
+                            {% endif %}
+                            <div class="profile-job-card card">
+                                <div class="profile-card-body">
+                                    <div class="debut-carte">
+                                        <h4 class="card-title">{{ profil.prenom }} {{ profil.nom }}</h4>
+                                        <div onclick="event.preventDefault(); {% if is_route_login %}window.location.href='{{ path(route_name) }}'{% else %}window.location.href='{{ path(route_name, {'id': profil.id}) }}'{% endif %}">
+                                            <img src="{{ asset('img/non_enregistre.png') }}" alt="non-enregistré" class="img-deux">
+                                        </div>
+                                    </div>
+                                    <div class="localisation">
+                                        <img src="{{ asset('img/localisation.svg') }}" alt="point de repère" class="mini-icon">
+                                        <p>{{ profil.adresse }}</p>
+                                    </div>
+                                    <p class="card-text">{{ profil.decription|slice(0, 150)|default('Aucune description disponible') }}...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-results">
+                <div class="alert alert-info">
+                    Aucun profil trouvé. Essayez de modifier vos critères de recherche.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
         </div>
         </div>
     </div>
@@ -203,42 +258,62 @@
     {{ parent() }}
     <script>
     
-    document.addEventListener('DOMContentLoaded', function() {
-        const showFilters = document.getElementById('showFilters');
-        const hideFilters = document.getElementById('hideFilters');
-        const filtersOverlay = document.getElementById('filtersOverlay');
-        const btns = document.querySelectorAll('.showtype');
-            const slider = document.getElementById('salaire_min');
+document.addEventListener('DOMContentLoaded', function() {
+    const showFilters = document.getElementById('showFilters');
+    const hideFilters = document.getElementById('hideFilters');
+    const filtersOverlay = document.getElementById('filtersOverlay');
+    const btns = document.querySelectorAll('.showtype');
+    const slider = document.getElementById('salaire_min');
     const valeur = document.getElementById('salaire_valeur');
+    
+    // Conteneurs pour profils et offres
+    const profilsContainer = document.getElementById('profils-container');
+    const offresContainer = document.getElementById('offres-container');
 
     slider.addEventListener('input', () => {
         valeur.textContent = `${slider.value} €`;
     });
 
-btns.forEach(btn => {
-    btn.addEventListener('click', function() {
-        btns.forEach(b => b.classList.remove('active')); // on enlève des autres
-        this.classList.add('active'); // on met au bouton cliqué
-    });
-});
-        showFilters.addEventListener('click', function() {
-            filtersOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        });
-        
-        hideFilters.addEventListener('click', function() {
-            filtersOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-        
-        // Fermer l'overlay en cliquant à l'extérieur
-        filtersOverlay.addEventListener('click', function(e) {
-            if (e.target === filtersOverlay) {
-                filtersOverlay.classList.remove('active');
-                document.body.style.overflow = '';
+    btns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Gérer l'apparence des boutons
+            btns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Afficher le contenu correspondant
+            const type = this.getAttribute('data-type');
+            if (type === 'profils') {
+                profilsContainer.style.display = 'block';
+                offresContainer.style.display = 'none';
+            } else if (type === 'offres') {
+                profilsContainer.style.display = 'none';
+                offresContainer.style.display = 'block';
             }
         });
     });
+    profilsContainer.style.display = 'none';
+    offresContainer.style.display = 'block';
+    document.querySelector('[data-type="offres"]').classList.add('active');
+
+    showFilters.addEventListener('click', function() {
+        filtersOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+    
+    hideFilters.addEventListener('click', function() {
+        filtersOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+    
+    // Fermer l'overlay en cliquant à l'extérieur
+    filtersOverlay.addEventListener('click', function(e) {
+        if (e.target === filtersOverlay) {
+            filtersOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+});
+
 function toggleImage(event, clickedImg) {
     event.stopPropagation();  // Arrêter la propagation du clic
     event.preventDefault();   // Empêcher le comportement par défaut (ouvrir le lien)
@@ -250,7 +325,6 @@ function toggleImage(event, clickedImg) {
     img1.classList.toggle('hidden');
     img2.classList.toggle('hidden');
 }
-
 
     </script>
 {% endblock %}

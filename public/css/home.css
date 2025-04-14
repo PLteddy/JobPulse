@@ -360,6 +360,82 @@
 }
 
 
+
+.profil-card-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    width: 100%;
+    margin-bottom: 40px;
+}
+
+/* Conteneur image — dans le flux */
+.profil-image-container {
+    flex-shrink: 0; /* L'image ne rétrécit pas */
+}
+
+/* Image profil */
+.profil-image,
+.profil-placeholder {
+    width: 232px;
+    height: 232px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #F7C59F;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: white;
+}
+
+/* Carte de profil */
+.profile-job-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 939px;
+    height: 256px;
+    border: 1px solid black;
+    border-radius: 20px;
+    box-shadow: 10px 10px 0px #FF6B35;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.profile-job-card:hover {
+    transform: scale(1.02);
+}
+
+/* Corps de la carte */
+.profile-card-body {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+
+/* Ajustement pour les cartes de profil sur mobile */
+@media (max-width: 768px) {
+    .profil-card-container {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .profil-image-container {
+        position: static;
+        margin-bottom: 20px;
+    }
+    
+    .profil-card-container .job-card {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+
+
+
+
 /* Responsive */
 @media (max-width: 768px) {
     .search-bar {

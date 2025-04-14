@@ -9,7 +9,7 @@
            data-partner-id="{{ partner.id }}">
             <div class="avatar">
                 {% if partner.photoProfil %}
-                    <img src="{{ asset('uploads/profile/' ~ partner.photoProfil) }}" alt="{{ partner.prenom }}">
+                    <img src="{{ asset('uploads/images/' ~ partner.photoProfil) }}" alt="{{ partner.prenom }}">
                 {% else %}
                     <div class="avatar-placeholder">{{ partner.prenom|first|upper }}</div>
                 {% endif %}
