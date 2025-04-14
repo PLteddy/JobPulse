@@ -114,19 +114,21 @@
             <div class="custom-modal-content">
                 <div class="custom-modal-header">
                     <h5 class="modal-title">Partager cette offre</h5>
-                    <button type="button" class="btn-close" id="fermerModal">&times;</button>
+<button type="button" class="btn-close" id="fermerModal">
+    <img src="{{ asset('img/close.svg') }}" alt="Fermer le menu">
+</button>
                 </div>
                 <div class="custom-modal-body">
                     <form method="post" id="partagerForm" action="{{ path('tuteur_partager_multiple', {'posteId': poste.id}) }}">
                         <label class="form-label">Sélectionner les étudiants</label>
 <div class="list-group">
     <div class="list-group-item">
-        <input type="checkbox" id="select-all" onclick="toggleSelectAll()">
+        <input type="checkbox" id="select-all" class="checkbox-orange" onclick="toggleSelectAll()">
         <label for="select-all">Sélectionner tous les étudiants</label>
     </div>
     {% for etudiant in app.user.etudiants %}
         <div class="list-group-item">
-            <input type="checkbox" name="etudiants[]" value="{{ etudiant.id }}" id="etudiant-{{ etudiant.id }}">
+            <input type="checkbox" name="etudiants[]" value="{{ etudiant.id }}" id="etudiant-{{ etudiant.id }}" class="checkbox-orange">
             <label for="etudiant-{{ etudiant.id }}">{{ etudiant.nom }} {{ etudiant.prenom }}</label>
         </div>
     {% endfor %}
@@ -135,8 +137,8 @@
                     </form>
                 </div>
                 <div class="custom-modal-footer">
-                    <button type="button" class="bouton-connexion" id="fermerModal2">Annuler</button>
-                    <button type="button" class="bouton-connexion" onclick="partagerOffre()">Partager</button>
+                    <button type="button" class="bouton-connexion" onclick="partagerOffre()">Partager<img src="{{ asset('img/share.svg') }}" alt="Valider"></button>
+                    <button type="button" class="bouton-localisation" id="fermerModal2">Annuler<img src="{{ asset('img/close.svg') }}" alt="Fermer"></button>
                 </div>
             </div>
         </div>

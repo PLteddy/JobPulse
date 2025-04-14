@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Poste;
 use App\Entity\Utilisateur;
 use App\Enum\Type;
+use App\Form\EtudiantType;
 use App\Repository\PosteRepository;
 use App\Repository\UtilisateurRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/tuteur')]
 class TuteurController extends AbstractController
@@ -240,4 +242,58 @@ class TuteurController extends AbstractController
         // Rediriger vers la page de détails de l'offre
         return $this->redirectToRoute('offre_details', ['id' => $posteId]);
     }
+
+
+    #[Route('/tuteur/profil', name: 'tuteur_profil')]
+    public function profil(): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_TUTEUR');
+
+        // Logique pour afficher les informations sur le tuteur
+        return $this->render('tuteur/profil.html.twig');
+    }
+    #[Route('/tuteur/profil/edit', name: 'tuteur_profil_edit')]
+    public function editProfil(Request $request, EntityManagerInterface $em, SluggerInterface $slugger): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_TUTEUR');
+
+        $user = $this->getUser();
+
+
+        $form = $this->createForm(EtudiantType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Gestion du téléchargement de la photo de profil
+            $photoFile = $form->get('photoProfil')->getData();
+            if ($photoFile) {
+                $originalFilename = pathinfo($photoFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $photoFileName = $safeFilename . '-' . uniqid() . '.' . $photoFile->guessExtension();
+
+                try {
+                    $photoFile->move(
+                        $this->getParameter('kernel.project_dir') . '/public/uploads/images',
+                        $photoFileName
+                    );
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Une erreur est survenue lors de l\'upload de la photo de profil.');
+                }
+
+                // Met à jour la propriété photoProfil de l'utilisateur
+                $user->setPhotoProfil($photoFileName);
+            }
+
+            // Sauvegarde des modifications dans la base de données
+            $em->persist($user);
+            $em->flush();
+
+            $this->addFlash('success', 'Profil mis à jour avec succès.');
+            return $this->redirectToRoute('etudiant_profil');
+        }
+
+        return $this->render('tuteur/edit_profil.html.twig', [
+            'form' => $form->createView(),
+        ]);
+        }
 }

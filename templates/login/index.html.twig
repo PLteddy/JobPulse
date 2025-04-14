@@ -5,6 +5,7 @@
         <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
         <link rel="stylesheet" href="{{ asset('css/style.css') }}">
         <link rel="stylesheet" href="{{ asset('css/connexion.css') }}">
+                <link rel="stylesheet" href="{{ asset('css/home.css') }}">
 
 {% endblock %}
 
@@ -40,8 +41,12 @@
                         <!-- Popup -->
                         <div id="popup" class="popup hidden">
                             <div class="popup-content">
-                                <button id="close-popup" class="popup-close">&times;</button>
-                                <h1>Inscription</h1>
+                                <div class="popup-header">
+                                <h1 class="inscription">Inscription</h1>
+                                <button type="button" class="btn-close" id="close-popup">
+                                <img src="{{ asset('img/close.svg') }}" alt="Fermer le menu">
+                                </button>
+                                </div>
                                 <h2>Je m'inscris en tant que :</h2>
                                 <ul>
                                     <li><a href="{{ path('inscription', { type: 'etudiant' }) }}">Étudiant</a></li>

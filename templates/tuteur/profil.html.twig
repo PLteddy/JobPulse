@@ -1,0 +1,77 @@
+
+{% extends 'base.html.twig' %}
+{% block body %}
+    <head>
+    <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/profil.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    </head>
+    <section class="hero-section container">
+        <div class="hero-div">
+            <div class="imgProfil-div">
+                {% if app.user.photoProfil is not null %}
+                    <img 
+                        src="{{ asset('uploads/images/' ~ app.user.photoProfil) }}"
+                        alt="Photo de profil" 
+                        class="img-profil"
+                    >
+                {% else %}
+                    <img 
+                        src="{{ asset('img/profil.png') }}"
+                        alt="Photo de profil" 
+                        class="img-profil"
+                    >
+                {% endif %}
+                
+            </div>
+        
+            <div class="profil-div">
+                <h1>{{ app.user.prenom }} {{ app.user.nom }}</h1>
+                <h3>{{ app.user.bio|nl2br }}</h3>
+            </div>
+            
+        </div>
+        <div class="profil-actions">
+            <!-- Bouton pour modifier le profil -->
+            <a class="bouton-modifier" href="{{ path('tuteur_profil_edit') }}" >
+                <img 
+                        src="{{ asset('img/modifier-icone.png') }}"
+                        alt="icone crayon pour modifier">
+            </a>
+
+            <!-- Bouton pour télécharger le CV (affiché uniquement si un CV existe) -->
+            {% if app.user.cv is not null %}
+                <a class="bouton-connexion" href="{{ asset('uploads/cv/' ~ app.user.cv) }}" class="btn btn-secondary" download>CV
+                    <img 
+                        src="{{ asset('img/enregistrer-icone.png') }}"
+                        alt="icone de téléchargement">
+                </a>
+            {% endif %}
+        </div>
+    </section>
+    <section class="informations-section container">
+        <div class="informations-div">
+            <h2>{{ 'Description' }}</h2>
+            <h3>{{ app.user.decription|nl2br }}</h3>
+        </div>
+        <div class="informations-div">
+            <h2>{{ 'Formation' }}</h2>
+            <h3>{{ app.user.formation|nl2br }}</h3>
+        </div>
+        <div class="informations-div">
+            <h2>{{ 'Expériences' }}</h2>
+            <h3>{{ app.user.experience|nl2br }}</h3>
+        </div>
+        <div class="informations-div">
+            <h2>{{ 'Contact' }}</h2>
+            <h3>{{ app.user.contact|nl2br }}</h3>
+        </div>
+        <div class="informations-div">
+            <h2>{{ 'Plus sur moi' }}</h2>
+            <h3>{{ app.user.plusSurMoi|nl2br }}</h3>
+        </div>
+        
+    
+    </section>
+    
+{% endblock %}

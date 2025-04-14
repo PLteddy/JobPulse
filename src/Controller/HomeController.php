@@ -29,20 +29,10 @@ class HomeController extends AbstractController
         
         // Utiliser all() pour récupérer un tableau ou getAlnum() pour les tableaux de paramètres
         $contratType = $request->query->all('contrat');
-        $duree = $request->query->all('duree');
         
         $salaireMin = $request->query->get('salaire_min');
         $presence = $request->query->get('presence');
         
-        // Définition des groupes de durées pour le filtrage
-        $dureesGrouped = [
-            'moins_dun_mois' => ['UN_MOIS'],
-            '1_3_mois' => ['UN_MOIS', 'DEUX_MOIS', 'TROIS_MOIS'],
-            '3_6_mois' => ['QUATRE_MOIS', 'CINQ_MOIS', 'SIX_MOIS'],
-            '6_mois_1_an' => ['SEPT_MOIS', 'HUIT_MOIS', 'NEUF_MOIS', 'DIX_MOIS', 'ONZE_MOIS', 'DOUZE_MOIS'],
-            'plus_dun_an' => ['PLUS_DUN_AN']
-        ];
-
         // Construction de la requête pour les postes
         $qb = $em->getRepository(Poste::class)->createQueryBuilder('p');
         
@@ -56,9 +46,24 @@ class HomeController extends AbstractController
                ->setParameter('contratType', $contratType);
         }
         
-        if (!empty($duree)) {
-            $qb->andWhere('p.duree IN (:duree)')
-               ->setParameter('duree', $duree);
+        // Modification du tableau $dureesGrouped dans HomeController.php
+        $dureesGrouped = [
+            'moins_dun_mois' => [Duree::UN_MOIS->value], // Utilisez ->value pour obtenir la valeur '1 MOIS'
+            '1_3_mois' => [Duree::UN_MOIS->value, Duree::DEUX_MOIS->value, Duree::TROIS_MOIS->value],
+            '3_6_mois' => [Duree::QUATRE_MOIS->value, Duree::CINQ_MOIS->value, Duree::SIX_MOIS->value],
+            '6_mois_1_an' => [Duree::SEPT_MOIS->value, Duree::HUIT_MOIS->value, Duree::NEUF_MOIS->value, 
+                            Duree::DIX_MOIS->value, Duree::ONZE_MOIS->value, Duree::DOUZE_MOIS->value],
+            'plus_dun_an' => [Duree::PLUS_DUN_AN->value]
+        ];
+        
+        // Récupération du paramètre durée
+        $duree = $request->query->get('duree');
+        
+        // Si une durée est sélectionnée et qu'elle est valide, appliquez le filtre
+        if ($duree && $duree !== 'toutes' && isset($dureesGrouped[$duree])) {
+            $dureeValues = $dureesGrouped[$duree];
+            $qb->andWhere('p.duree IN (:dureeValues)')
+               ->setParameter('dureeValues', $dureeValues);
         }
         
         if ($salaireMin) {
@@ -83,7 +88,6 @@ class HomeController extends AbstractController
             $qbProfils->andWhere('u.nom LIKE :searchTerm OR u.prenom LIKE :searchTerm OR u.decription LIKE :searchTerm')
                      ->setParameter('searchTerm', '%'.$searchTerm.'%');
         }
-        
         $profils = $qbProfils->getQuery()->getResult();
         
         // Sinon, on affiche la page d'accueil classique
@@ -99,6 +103,7 @@ class HomeController extends AbstractController
             'durees' => Duree::cases(),
             'presences' => Type_presence::cases(),
             'dureesGrouped' => $dureesGrouped,
+            
         ]);
     }
         
