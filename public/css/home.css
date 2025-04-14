@@ -342,9 +342,10 @@
 }
 
 .custom-modal-content {
-    background-color: #fff;
+    background-color: #EFEFD0;
     padding: 20px;
     border-radius: 8px;
+    box-shadow: 10px 10px 0px #FF6B35;
 }
 
 .custom-modal-header,
@@ -352,6 +353,17 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+.custom-modal-body{
+    padding: 20px 0;
+    color: var(--dark);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    .form-label {
+        display: block; /* Assure-toi que le label est un bloc */
+        margin-bottom: 10px; /* Espace de 10px sous le label */
+    }
 }
 
 .btn-close {

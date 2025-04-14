@@ -104,19 +104,24 @@
                 <div class="custom-modal-body">
                     <form method="post" id="partagerForm" action="{{ path('tuteur_partager_multiple', {'posteId': poste.id}) }}">
                         <label class="form-label">Sélectionner les étudiants</label>
-                        <div class="list-group">
-                            {% for etudiant in app.user.etudiants %}
-                                <div class="list-group-item">
-                                    <input type="checkbox" name="etudiants[]" value="{{ etudiant.id }}" id="etudiant-{{ etudiant.id }}">
-                                    <label for="etudiant-{{ etudiant.id }}">{{ etudiant.nom }} {{ etudiant.prenom }}</label>
-                                </div>
-                            {% endfor %}
-                        </div>
+<div class="list-group">
+    <div class="list-group-item">
+        <input type="checkbox" id="select-all" onclick="toggleSelectAll()">
+        <label for="select-all">Sélectionner tous les étudiants</label>
+    </div>
+    {% for etudiant in app.user.etudiants %}
+        <div class="list-group-item">
+            <input type="checkbox" name="etudiants[]" value="{{ etudiant.id }}" id="etudiant-{{ etudiant.id }}">
+            <label for="etudiant-{{ etudiant.id }}">{{ etudiant.nom }} {{ etudiant.prenom }}</label>
+        </div>
+    {% endfor %}
+</div>
+
                     </form>
                 </div>
                 <div class="custom-modal-footer">
-                    <button type="button" id="fermerModal2">Annuler</button>
-                    <button type="button" onclick="partagerOffre()">Partager</button>
+                    <button type="button" class="bouton-connexion" id="fermerModal2">Annuler</button>
+                    <button type="button" class="bouton-connexion" onclick="partagerOffre()">Partager</button>
                 </div>
             </div>
         </div>
@@ -129,7 +134,18 @@
             document.getElementById('fermerModal'),
             document.getElementById('fermerModal2')
         ];
+        function toggleSelectAll() {
+    // Récupérer l'état du checkbox "Sélectionner tous les étudiants"
+    var isChecked = document.getElementById('select-all').checked;
 
+    // Sélectionner tous les checkboxes d'étudiants
+    var checkboxes = document.querySelectorAll('input[name="etudiants[]"]');
+
+    // Parcourir tous les checkboxes et les cocher ou décocher
+    checkboxes.forEach(function(checkbox) {
+        checkbox.checked = isChecked;
+    });
+}
         ouvrirBtn?.addEventListener('click', () => {
             modal.style.display = 'block';
         });
