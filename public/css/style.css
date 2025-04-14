@@ -181,6 +181,7 @@ a{
     margin-bottom: 50px; 
 }
 
+<<<<<<< Updated upstream
 textarea{
     font-family: 'roboto', sans-serif;
     font-size: 1.25rem;
@@ -189,6 +190,8 @@ input{
     font-family: 'roboto', sans-serif;
 }
 
+=======
+>>>>>>> Stashed changes
 @media screen and (max-width: 768px) {
     .container {
         padding: 0 20px; /* Réduit le padding sur mobile */
@@ -216,3 +219,7 @@ input{
         padding: 10px; /* Réduit le padding sur mobile */
     }
     
+<<<<<<< Updated upstream
+=======
+}
+>>>>>>> Stashed changes
