@@ -348,11 +348,50 @@
     box-shadow: 10px 10px 0px #FF6B35;
 }
 
-.custom-modal-header,
-.custom-modal-footer {
+/* Cache la checkbox native */
+.checkbox-orange {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #FF6B35;
+    border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+/* Quand cochée */
+.checkbox-orange:checked {
+    background-color: #FF6B35;
+    border-color: #FF6B35;
+}
+
+/* Coche blanche */
+.checkbox-orange:checked::after {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 4px;
+    width: 4px;
+    height: 9px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.custom-modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+.custom-modal-footer {
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    gap: 10px;
+
 }
 .custom-modal-body{
     padding: 20px 0;
@@ -478,25 +517,32 @@
 }
 
 .filter-button {
-    padding: 5px 10px;
-    border: 1px solid #ccc;
-    background-color: #f0f0f0;
-    border-radius: 3px;
+    background:none;
+    color: #FF6B35;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #FF6B35;
+    gap: 10px;
+    font-size: 1rem;
+    font-weight: 500;
     cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s;
+    transition: background-color 0.3s ease;
 }
 
 .filter-button:hover {
-    background-color: #e0e0e0;
+    background-color: #FF8C5A;
+    transition: background-color 0.3s ease;
+    color:white;
 }
 
 .filter-button.active {
-    background-color: #4CAF50;
+    background-color: #FF6B35;
     color: white;
-    border-color: #4CAF50;
 }
 
 .filter-button.active:hover {
-    background-color: #45a049;
+    background-color: #FF8C5A;
 }
