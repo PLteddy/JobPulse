@@ -90,17 +90,9 @@
                     
     <div>    
     <h2>Détails de l'offre</h2>
-    <p><strong>Type de contrat:</strong> 
-    {% for contrat in poste.contratType %}
-    {{ contrat.name|nl2br }}{% if not loop.last %}, {% endif %}
-    {% endfor %}
-    </p>
-    <p><strong>Durée:</strong> 
-        {% for d in poste.duree %}
-            {{ d.name|nl2br }}{% if not loop.last %}, {% endif %}
-        {% endfor %}    
-        <p><strong>Présence:</strong> {{ poste.presence.name|nl2br }}</p>
-    <p><strong>
+    <p><strong>Type de contrat:</strong> {{ poste.contratType.value }}</p>
+    <p><strong>Durée:</strong> {{ poste.duree.value }}</p>
+    <p><strong>Présence:</strong> {{ poste.presence.value }}</p>
     Salaire:</strong> {{ poste.salaire|nl2br }} €</p>
     </p>
     </div>

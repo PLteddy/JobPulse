@@ -34,6 +34,15 @@ class HomeController extends AbstractController
         $salaireMin = $request->query->get('salaire_min');
         $presence = $request->query->get('presence');
         
+        // Définition des groupes de durées pour le filtrage
+        $dureesGrouped = [
+            'moins_dun_mois' => ['UN_MOIS'],
+            '1_3_mois' => ['UN_MOIS', 'DEUX_MOIS', 'TROIS_MOIS'],
+            '3_6_mois' => ['QUATRE_MOIS', 'CINQ_MOIS', 'SIX_MOIS'],
+            '6_mois_1_an' => ['SEPT_MOIS', 'HUIT_MOIS', 'NEUF_MOIS', 'DIX_MOIS', 'ONZE_MOIS', 'DOUZE_MOIS'],
+            'plus_dun_an' => ['PLUS_DUN_AN']
+        ];
+
         // Construction de la requête pour les postes
         $qb = $em->getRepository(Poste::class)->createQueryBuilder('p');
         
@@ -89,6 +98,7 @@ class HomeController extends AbstractController
             'contratTypes' => Contrat::cases(),
             'durees' => Duree::cases(),
             'presences' => Type_presence::cases(),
+            'dureesGrouped' => $dureesGrouped,
         ]);
     }
         

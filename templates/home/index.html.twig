@@ -80,34 +80,38 @@
                         </div>
                             {% endfor %}
                         </div>
-                        <h5>Durée</h5> 
-                            {# Durée #}
-<div class="filter-buttons">
-    <button class="filter-button" data-filter="toutes">Toutes</button>
-    <button class="filter-button" data-filter="moins_dun_mois">Moins d'un mois</button>
-    <button class="filter-button" data-filter="1_3_mois">1 à 3 mois</button>
-    <button class="filter-button" data-filter="3_6_mois">3 à 6 mois</button>
-    <button class="filter-button" data-filter="6_mois_1_an">6 mois à 1 an</button>
-    <button class="filter-button" data-filter="plus_dun_an">Plus d'un an</button>
-</div>
+                        <h5>Durée</h5>
+                        <div class="filter-buttons">
+                            <button type="button" class="filter-button active" data-filter="toutes">Toutes</button>
+                            <button type="button" class="filter-button" data-filter="moins_dun_mois">Moins d'un mois</button>
+                            <button type="button" class="filter-button" data-filter="1_3_mois">1 à 3 mois</button>
+                            <button type="button" class="filter-button" data-filter="3_6_mois">3 à 6 mois</button>
+                            <button type="button" class="filter-button" data-filter="6_mois_1_an">6 mois à 1 an</button>
+                            <button type="button" class="filter-button" data-filter="plus_dun_an">Plus d'un an</button>
+                        </div>
 
-<div class="duree-options">
-    {% for duree in durees %}
-        <div class="duree-item" data-duration="{{ duree.value }}">
-            <input class="checkbox-hidden" 
-                   type="checkbox" 
-                   name="duree[]" 
-                   value="{{ duree.value }}" 
-                   id="duree_{{ duree.value }}"
-                   {% if duree.value in selectedDuree %}checked{% endif %}>
-            <label class="bouton-localisation" for="duree_{{ duree.value }}">
-                {{ duree.name }}
-            </label>
-        </div>
-    {% endfor %}
-</div>
-
-                                                    {# Salaire minimum #}
+                        <div class="duree-options" style="display: none;">
+                            {% for duree in durees %}
+                                <div class="duree-item" data-duration="{{ duree.value }}" 
+                                    {% if duree.value == 'UN_MOIS' %}data-group="moins_dun_mois 1_3_mois"
+                                    {% elseif duree.value == 'DEUX_MOIS' or duree.value == 'TROIS_MOIS' %}data-group="1_3_mois"
+                                    {% elseif duree.value == 'QUATRE_MOIS' or duree.value == 'CINQ_MOIS' or duree.value == 'SIX_MOIS' %}data-group="3_6_mois"
+                                    {% elseif duree.value == 'SEPT_MOIS' or duree.value == 'HUIT_MOIS' or duree.value == 'NEUF_MOIS' or duree.value == 'DIX_MOIS' or duree.value == 'ONZE_MOIS' or duree.value == 'DOUZE_MOIS' %}data-group="6_mois_1_an"
+                                    {% elseif duree.value == 'PLUS_DUN_AN' %}data-group="plus_dun_an"
+                                    {% endif %}>
+                                    <input class="checkbox-hidden" 
+                                        type="checkbox" 
+                                        name="duree[]" 
+                                        value="{{ duree.value }}" 
+                                        id="duree_{{ duree.value }}"
+                                        {% if duree.value in selectedDuree %}checked{% endif %}>
+                                    <label class="bouton-localisation" for="duree_{{ duree.value }}">
+                                        {{ duree.name }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                                                  {# Salaire minimum #}
                                                     <div class="filter-group">
                                                         <h5>Salaire minimum</h5>
                                                         <div class="salary-input">
@@ -151,34 +155,38 @@
         </div>
 
      {# Résultats #}
-     <div id="offres-container">
-        <div class="results-container">
-            {% if postes|length > 0 %}
-                <div class="results-grid">
-                    {% for poste in postes %}
-                        {% set route_name = 'app_login' %}
-                        {% set is_route_login = true %}
-                        
-                        {% if app.user %}
-                            {% if 'ROLE_TUTEUR' in app.user.roles %}
-                                {% set route_name = 'tuteur_sauvegarder_poste' %}
-                                {% set is_route_login = false %}
-                            {% elseif 'ROLE_ETUDIANT' in app.user.roles %}
-                                {% set route_name = 'etudiant_sauvegarder_poste' %}
-                                {% set is_route_login = false %}
-                            {% endif %}
+<div id="offres-container">
+    <div class="results-container">
+        {% if postes|length > 0 %}
+            <div class="results-grid">
+                {% for poste in postes %}
+                    {% set route_name = 'app_login' %}
+                    {% set is_route_login = true %}
+                    {% set show_save_icon = true %}
+                    
+                    {% if app.user %}
+                        {% if 'ROLE_TUTEUR' in app.user.roles %}
+                            {% set route_name = 'tuteur_sauvegarder_poste' %}
+                            {% set is_route_login = false %}
+                        {% elseif 'ROLE_ETUDIANT' in app.user.roles %}
+                            {% set route_name = 'etudiant_sauvegarder_poste' %}
+                            {% set is_route_login = false %}
+                        {% elseif 'ROLE_ENTREPRISE' in app.user.roles %}
+                            {% set show_save_icon = false %}
                         {% endif %}
-                        
-                        <a href="{{ path('offre_details', {'id': poste.id}) }}" class="job-card-link">
-                            <div class="job-card card">
-                                {% if poste.image %}
-                                    <div class="image-container">
-                                        <img src="{{ asset('uploads/images/' ~ poste.image) }}" alt="{{ poste.intitule }}">
-                                    </div>
-                                {% endif %}
-                                <div class="card-body">
-                                    <div class="debut-carte">
-                                        <h4 class="card-title">{{ poste.intitule }}</h4>
+                    {% endif %}
+                    
+                    <a href="{{ path('offre_details', {'id': poste.id}) }}" class="job-card-link">
+                        <div class="job-card card">
+                            {% if poste.image %}
+                                <div class="image-container">
+                                    <img src="{{ asset('uploads/images/' ~ poste.image) }}" alt="{{ poste.intitule }}">
+                                </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <div class="debut-carte">
+                                    <h4 class="card-title">{{ poste.intitule }}</h4>
+                                    {% if show_save_icon %}
                                         <div onclick="event.preventDefault(); {% if is_route_login %}window.location.href='{{ path(route_name) }}'{% else %}window.location.href='{{ path(route_name, {'id': poste.id}) }}'{% endif %}">
                                             {% if app.user and app.user.postesSauvegardes.contains(poste) %}
                                                 <img src="{{ asset('img/enregistre.png') }}" alt="enregistré" class="img-un">
@@ -186,16 +194,17 @@
                                                 <img src="{{ asset('img/non_enregistre.png') }}" alt="non-enregistré" class="img-deux">
                                             {% endif %}
                                         </div>
-                                    </div>
-                                    <div class="localisation">
-                                        <img src="{{ asset('img/localisation.svg') }}" alt="point de repère" class="mini-icon">
-                                        <p>{{ poste.localisation }}</p>
-                                    </div>
-                                    <p class="card-text">{{ poste.description|slice(0, 150) }}...</p>
+                                    {% endif %}
                                 </div>
+                                <div class="localisation">
+                                    <img src="{{ asset('img/localisation.svg') }}" alt="point de repère" class="mini-icon">
+                                    <p>{{ poste.localisation }}</p>
+                                </div>
+                                <p class="card-text">{{ poste.description|slice(0, 150) }}...</p>
                             </div>
-                        </a>
-                    {% endfor %}
+                        </div>
+                    </a>
+                {% endfor %}
                 </div>
             {% else %}
                 <div class="no-results">
@@ -357,6 +366,50 @@ function toggleImage(event, clickedImg) {
     img1.classList.toggle('hidden');
     img2.classList.toggle('hidden');
 }
+
+
+const filterButtons = document.querySelectorAll('.filter-button');
+    const dureeItems = document.querySelectorAll('.duree-item');
+    
+    // Fonction pour mettre à jour les cases à cocher en fonction du filtre
+    function updateDureeCheckboxes(filter) {
+        dureeItems.forEach(item => {
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            
+            if (filter === 'toutes') {
+                // Ne rien faire, cela permet de conserver la sélection manuelle
+                return;
+            }
+            
+            // Vérifie si l'élément appartient au groupe de filtre actif
+            const belongsToGroup = item.dataset.group && item.dataset.group.includes(filter);
+            
+            // Si l'élément appartient au groupe, cocher la case
+            // Sinon, décocher la case
+            checkbox.checked = belongsToGroup;
+        });
+    }
+    
+    // Ajouter des écouteurs d'événements aux boutons de filtre
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Supprimer la classe active de tous les boutons
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Ajouter la classe active au bouton cliqué
+            this.classList.add('active');
+            
+            // Mettre à jour les cases à cocher en fonction du filtre
+            const filter = this.dataset.filter;
+            updateDureeCheckboxes(filter);
+        });
+    });
+    
+    // Déclencher le filtre "toutes" par défaut
+    const defaultFilter = document.querySelector('.filter-button[data-filter="toutes"]');
+    if (defaultFilter) {
+        defaultFilter.classList.add('active');
+    }
 
     </script>
 {% endblock %}
