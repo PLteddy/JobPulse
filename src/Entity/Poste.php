@@ -21,7 +21,7 @@ class Poste
     #[ORM\Column(length: 255)]
     private ?string $intitule = null;
 
-    #[ORM\Column(length: 1000)]
+    #[ORM\Column(type: Types::TEXT)]
     private ?string $description = null;
 
     #[ORM\Column(enumType: Contrat::class)]
@@ -34,13 +34,13 @@ class Poste
     #[ORM\Column(length: 255)]
     private ?string $localisation = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: Types::TEXT)]
     private ?string $profil_recherche = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $info_supp = null;
 
-    #[ORM\Column(length: 500)]
+    #[ORM\Column(type: Types::TEXT)]
     private ?string $presentation_entreprise = null;
 
     #[ORM\Column(length: 255)]
@@ -60,7 +60,7 @@ class Poste
     #[ORM\JoinColumn(nullable: false)]
     private ?Utilisateur $entreprise = null;
 
-    #[ORM\Column(length: 500)]
+    #[ORM\Column(type: Types::TEXT)]
     private ?string $missions = null;
 
     #[ORM\Column(length: 255, nullable: true)]

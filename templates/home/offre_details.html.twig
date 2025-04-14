@@ -28,6 +28,18 @@
         </div> 
         {% if not app.user %}
         <a class="bouton-connexion" href="{{ path('app_login') }}">Postuler</a>
+
+        <div id="popupPostuler" class="popup-container">
+            <div class="popup-content">
+                <button class="popup-close" id="fermerPopup">&times;</button>
+                <h2>Postuler à cette offre</h2>
+                {{ form_start(form) }}
+                    {{ form_row(form.cv) }}
+                    {{ form_row(form.message) }}
+                    <button type="submit" class="btn btn-primary">Valider</button>
+                {{ form_end(form) }}
+            </div>
+        </div>
             {# Ajouter un bouton de partage pour les tuteurs #}
         {% elseif is_granted('ROLE_TUTEUR') %}
             <div class="actions-tuteur">                
@@ -41,8 +53,19 @@
                 {# L'utilisateur est une entreprise on affiche rien #}
 
         {% else %}
-            {# Faut remplacer avec le lien de postulation quand on pourra candidater #}
-            <a class="bouton-connexion" href="#">Postuler</a>
+            <a class="bouton-connexion" href="javascript:void(0);" id="ouvrirPopup">Postuler</a>
+
+            <div id="popupPostuler" class="popup-container">
+                <div class="popup-content">
+                    <button class="popup-close" id="fermerPopup">&times;</button>
+                    <h2>Postuler à cette offre</h2>
+                    {{ form_start(form, { 'attr': { 'enctype': 'multipart/form-data' } }) }}
+                        {{ form_row(form.cvCandidature) }}
+                        {{ form_row(form.motivation) }}
+                        <button type="submit" class="btn btn-primary">Valider</button>
+                    {{ form_end(form) }}
+                </div>
+            </div>
         {% endif %}
     </div>
     <div>
@@ -171,6 +194,55 @@
             document.getElementById('partagerForm').submit();
         }
     </script>
+    
+    
 {% endif %}
 </section>
+<script>
+        
+        
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('Script chargé : DOMContentLoaded');
+        const ouvrirPopup = document.getElementById('ouvrirPopup');
+        const fermerPopup = document.getElementById('fermerPopup');
+        const popup = document.getElementById('popupPostuler');
+        
+        // Vérifiez si les éléments existent
+        if (!ouvrirPopup) {
+            console.error('Élément avec l\'ID "ouvrirPopup" introuvable.');
+        } else {
+            console.log('Élément "ouvrirPopup" trouvé.');
+        }
+
+        if (!fermerPopup) {
+            console.error('Élément avec l\'ID "fermerPopup" introuvable.');
+        } else {
+            console.log('Élément "fermerPopup" trouvé.');
+        }
+
+        if (!popup) {
+            console.error('Élément avec l\'ID "popupPostuler" introuvable.');
+        } else {
+            console.log('Élément "popupPostuler" trouvé.');
+        }
+        // Ouvrir la pop-up
+        ouvrirPopup.addEventListener('click', () => {
+            popup.style.display = 'flex';
+        });
+    
+        // Fermer la pop-up
+        fermerPopup.addEventListener('click', () => {
+            popup.style.display = 'none';
+        });
+    
+        // Fermer la pop-up en cliquant à l'extérieur
+        window.addEventListener('click', (e) => {
+            if (e.target === popup) {
+                popup.style.display = 'none';
+            }
+        });
+    });
+    
+    
+</script>
 {% endblock %}
