@@ -36,7 +36,10 @@
                     Partager
                 </button>
                 {% endif %}
-            </div>
+                            </div>
+            {% elseif is_granted('ROLE_ENTREPRISE') %}
+                {# L'utilisateur est une entreprise on affiche rien #}
+
         {% else %}
             {# Faut remplacer avec le lien de postulation quand on pourra candidater #}
             <a class="bouton-connexion" href="#">Postuler</a>
