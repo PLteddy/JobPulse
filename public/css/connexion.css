@@ -129,7 +129,16 @@
     transition: visibility 0s, opacity 0.3s ease;
     
 }
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 50px;
+}
 
+.popup-header .inscription {
+    margin-bottom: 0;
+}
 .popup.show {
     visibility: visible;
     opacity: 1;
