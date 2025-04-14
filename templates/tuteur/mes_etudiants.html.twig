@@ -1,81 +1,75 @@
-{# templates/tuteur/mes_etudiants.html.twig #}
 {% extends 'base.html.twig' %}
+
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
+    
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+{% endblock %}
 
 {% block title %}Mes Étudiants{% endblock %}
 
 {% block body %}
 <div class="container mt-4">
-    <h1>Mes Étudiants</h1>
+    <h1 class="titre-enregistrements">Mes Étudiants</h1>
     
-    <div class="mb-4">
-        <p>Connecté en tant que {{ app.user.prenom }} {{ app.user.nom }}</p>
-        <div class="d-flex gap-2 mb-3">
-            <a href="{{ path('home') }}" class="btn btn-secondary">Retour au tableau de bord</a>
-            <a href="{{ path('tuteur_rechercher_etudiants') }}" class="btn btn-primary">Rechercher des étudiants</a>
-        </div>
-    </div>
-    
-    {% for message in app.flashes('success') %}
-        <div class="alert alert-success">
-            {{ message }}
-        </div>
-    {% endfor %}
-    
-    {% for message in app.flashes('danger') %}
-        <div class="alert alert-danger">
-            {{ message }}
-        </div>
-    {% endfor %}
-    
-    {% for message in app.flashes('info') %}
-        <div class="alert alert-info">
-            {{ message }}
-        </div>
-    {% endfor %}
-    
-    <h2>Mes étudiants</h2>
-    
-    {% if etudiants is empty %}
-        <p>Vous n'avez pas encore d'étudiants dans votre liste.</p>
-        <p>
-            <a href="{{ path('tuteur_rechercher_etudiants') }}" class="btn btn-primary">
-                Rechercher des étudiants à ajouter
-            </a>
-        </p>
-    {% else %}
-        <div class="row">
-            {% for etudiant in etudiants %}
-                <div class="col-md-4 mb-4">
-                    <div class="card">
-                        {% if etudiant.photoProfil %}
-                            <img src="{{ asset('uploads/images/' ~ etudiant.photoProfil) }}" class="card-img-top" alt="Photo de profil">
-                        {% else %}
-                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 150px;">
-                                <i class="fas fa-user fa-3x text-secondary"></i>
+{% if etudiants is empty %}
+    <p>Vous n'avez pas encore d'étudiants dans votre liste.</p>
+    <p>
+        <a href="{{ path('tuteur_rechercher_etudiants') }}" class="btn btn-primary">
+            Rechercher des étudiants à ajouter
+        </a>
+    </p>
+{% else %}
+    <div class="results-grid">
+        {% for etudiant in etudiants %}
+            <a href="{{ path('tuteur_profil_etudiant', {'id': etudiant.id}) }}" class="profil-card-link">
+                <div class="profil-card-container">
+                    {% if etudiant.photoProfil %}
+                        <div class="profil-image-container">
+                            <img src="{{ asset('uploads/images/' ~ etudiant.photoProfil) }}" alt="{{ etudiant.nom }} {{ etudiant.prenom }}" class="profil-image">
+                        </div>
+                    {% else %}
+                        <div class="profil-image-container">
+                            <div class="profil-placeholder"></div>
+                        </div>
+                    {% endif %}
+                    <div class="profile-job-card card">
+                        <div class="profile-card-body">
+                            <div class="debut-carte">
+                                <h4 class="card-title">{{ etudiant.prenom }} {{ etudiant.nom }}</h4>
                             </div>
-                        {% endif %}
-                        <div class="card-body">
-                            <h5 class="card-title">{{ etudiant.prenom }} {{ etudiant.nom }}</h5>
                             {% if etudiant.formation %}
                                 <p class="card-text"><strong>Formation :</strong> {{ etudiant.formation }}</p>
                             {% endif %}
                             {% if etudiant.etablissement %}
                                 <p class="card-text"><strong>Établissement :</strong> {{ etudiant.etablissement }}</p>
                             {% endif %}
-                            <div class="d-flex justify-content-between">
-                                <a href="{{ path('tuteur_profil_etudiant', {'id': etudiant.id}) }}" class="btn btn-sm btn-primary">
-                                    Voir le profil
-                                </a>
-                                <a href="{{ path('tuteur_retirer_etudiant', {'id': etudiant.id}) }}" class="btn btn-sm btn-danger" 
-                                   onclick="return confirm('Êtes-vous sûr de vouloir retirer cet étudiant de votre liste ?')">
-                                    Retirer
-                                </a>
+                            <div class="localisation">
+                                <img src="{{ asset('img/localisation.svg') }}" alt="point de repère" class="mini-icon">
+                                <p>{{ etudiant.adresse|default('Adresse non renseignée') }}</p>
+                            </div>
+                            <div class="d-flex justify-content-between mt-3">
+                                <form method="post" action="{{ path('tuteur_retirer_etudiant', {'id': etudiant.id}) }}" 
+                                    onsubmit="return confirm('Êtes-vous sûr de vouloir retirer cet étudiant de votre liste ?');"
+                                    onclick="event.stopPropagation();" style="display: inline;">
+                                    <button type="submit" class="bouton-enregistrer">
+                                        Retirer
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+            </a>
+        {% endfor %}
+    </div>
+{% endif %}
+    </div> 
 </div>
 {% endblock %}

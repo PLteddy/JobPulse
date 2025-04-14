@@ -1,154 +1,59 @@
-{# templates/tuteur/profil_etudiant.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Profil de {{ etudiant.prenom }} {{ etudiant.nom }}{% endblock %}
-
 {% block body %}
-<div class="container mt-4">
-    <h1>Profil de {{ etudiant.prenom }} {{ etudiant.nom }}</h1>
-    
-    <div class="mb-4">
-        <div class="d-flex gap-2 mb-3">
-            <a href="{{ path('tuteur_mes_etudiants') }}" class="btn btn-secondary">Retour à mes étudiants</a>
-        </div>
-    </div>
-    
-    {% for message in app.flashes('success') %}
-        <div class="alert alert-success">
-            {{ message }}
-        </div>
-    {% endfor %}
-    
-    {% for message in app.flashes('danger') %}
-        <div class="alert alert-danger">
-            {{ message }}
-        </div>
-    {% endfor %}
-    
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                {% if etudiant.photoProfil %}
-                    <img src="{{ asset('uploads/images/' ~ etudiant.photoProfil) }}" class="card-img-top" alt="Photo de profil">
-                {% else %}
-                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                        <i class="fas fa-user fa-5x text-secondary"></i>
-                    </div>
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title">{{ etudiant.prenom }} {{ etudiant.nom }}</h5>
-                    <p class="card-text"><i class="fas fa-envelope"></i> {{ etudiant.email }}</p>
-                    {% if etudiant.contact %}
-                        <p class="card-text"><i class="fas fa-phone"></i> {{ etudiant.contact }}</p>
-                    {% endif %}
-                    <p class="card-text"><i class="fas fa-map-marker-alt"></i> {{ etudiant.adresse }}</p>
-                </div>
-            </div>
-            
-            {% if etudiant.cv %}
-                <div class="card mt-3">
-                    <div class="card-body">
-                        <h5 class="card-title">CV</h5>
-                        <a href="{{ asset('uploads/cv/' ~ etudiant.cv) }}" class="btn btn-primary" target="_blank">
-                            <i class="fas fa-file-pdf"></i> Voir le CV
-                        </a>
-                    </div>
-                </div>
-            {% endif %}
-            
-            <div class="card mt-3">
-                <div class="card-body">
-                    <h5 class="card-title">Partager des offres</h5>
-                    {% if app.user.postesSauvegardes is empty %}
-                        <p>Vous n'avez pas d'offres enregistrées à partager.</p>
-                        <a href="{{ path('home') }}" class="btn btn-primary">
-                            Parcourir les offres
-                        </a>
-                    {% else %}
-                        <form method="post" action="{{ path('tuteur_partager_offre', {'etudiantId': etudiant.id, 'posteId': 0}) }}" id="partagerOffreForm">
-                            <div class="mb-3">
-                                <label for="posteSelect" class="form-label">Sélectionner une offre</label>
-                                <select class="form-select" id="posteSelect" onchange="updateShareUrl(this.value)">
-                                    <option value="">Choisir une offre...</option>
-                                    {% for poste in app.user.postesSauvegardes %}
-                                        <option value="{{ poste.id }}">{{ poste.intitule }} - {{ poste.entreprise.nom }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <button type="button" class="btn btn-primary" onclick="partagerOffre()" disabled id="partagerBtn">
-                                Partager cette offre
-                            </button>
-                        </form>
-                        
-                        <script>
-                            function updateShareUrl(posteId) {
-                                const form = document.getElementById('partagerOffreForm');
-                                const btn = document.getElementById('partagerBtn');
-                                
-                                if (posteId) {
-                                    const newAction = form.action.replace('/0', '/' + posteId);
-                                    form.action = newAction;
-                                    btn.disabled = false;
-                                } else {
-                                    btn.disabled = true;
-                                }
-                            }
-                            
-                            function partagerOffre() {
-                                document.getElementById('partagerOffreForm').submit();
-                            }
-                        </script>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-8">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Formation</h5>
-                    {% if etudiant.formation and etudiant.etablissement %}
-                        <p class="card-text">
-                            <strong>Formation :</strong> {{ etudiant.formation }}<br>
-                            <strong>Établissement :</strong> {{ etudiant.etablissement }}
-                        </p>
-                    {% else %}
-                        <p class="card-text text-muted">Information non renseignée</p>
-                    {% endif %}
-                </div>
-            </div>
-            
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Description</h5>
-                    {% if etudiant.decription %}
-                        <p class="card-text">{{ etudiant.decription }}</p>
-                    {% else %}
-                        <p class="card-text text-muted">Aucune description renseignée</p>
-                    {% endif %}
-                </div>
-            </div>
-            
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Expérience</h5>
-                    {% if etudiant.experience %}
-                        <p class="card-text">{{ etudiant.experience }}</p>
-                    {% else %}
-                        <p class="card-text text-muted">Aucune expérience renseignée</p>
-                    {% endif %}
-                </div>
-            </div>
-            
-            {% if etudiant.plusSurMoi %}
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Plus sur moi</h5>
-                        <p class="card-text">{{ etudiant.plusSurMoi }}</p>
-                    </div>
-                </div>
+<head>
+    <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/profil.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+</head>
+
+<section class="hero-section container">
+    <div class="hero-div">
+        <div class="imgProfil-div">
+            {% if etudiant.photoProfil is not null %}
+                <img 
+                    src="{{ asset('uploads/images/' ~ etudiant.photoProfil) }}"
+                    alt="Photo de profil" 
+                    class="img-profil"
+                >
+            {% else %}
+                <img 
+                    src="{{ asset('img/profil.png') }}"
+                    alt="Photo de profil" 
+                    class="img-profil"
+                >
             {% endif %}
         </div>
+
+        <div class="profil-div">
+            <h1>{{ etudiant.prenom }} {{ etudiant.nom }}</h1>
+            <h3>{{ etudiant.bio|nl2br }}</h3>
+        </div>
     </div>
-</div>
+
+    {# Pas de bouton pour modifier ou télécharger le CV ici, car c’est le tuteur qui regarde le profil #}
+</section>
+
+<section class="informations-section container">
+    <div class="informations-div">
+        <h2>Description</h2>
+        <h3>{{ etudiant.decription|nl2br }}</h3>
+    </div>
+    <div class="informations-div">
+        <h2>Formation</h2>
+        <h3>{{ etudiant.formation|nl2br }}</h3>
+    </div>
+    <div class="informations-div">
+        <h2>Expériences</h2>
+        <h3>{{ etudiant.experience|nl2br }}</h3>
+    </div>
+    <div class="informations-div">
+        <h2>Contact</h2>
+        <h3>{{ etudiant.contact|nl2br }}</h3>
+    </div>
+    <div class="informations-div">
+        <h2>Plus sur moi</h2>
+        <h3>{{ etudiant.plusSurMoi|nl2br }}</h3>
+    </div>
+</section>
 {% endblock %}

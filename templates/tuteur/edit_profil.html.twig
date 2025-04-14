@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <head>
+        <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/profil.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/edit_profil.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/formulaire.css') }}">
+    </head>
+    <section class="hero-section container">
+        {{ form_start(form) }}
+        <div class="hero-div">
+            <div class="imgProfil-div">
+                <label for="etudiant_photoProfil" class="img-label">
+                    {% if app.user.photoProfil is not null %}
+                        <img 
+                            src="{{ asset('uploads/images/' ~ app.user.photoProfil) }}"
+                            alt="Photo de profil" 
+                            class="img-profil"
+                        >
+                    {% else %}
+                        <img 
+                            src="{{ asset('img/profil.png') }}"
+                            alt="Photo de profil par défaut" 
+                            class="img-profil"
+                        >
+                    {% endif %}
+                    <span class="modifier-overlay">
+                        <img src="{{ asset('img/modifier.png') }}" alt="Modifier" class="modifier-icon">
+                    </span>
+                </label>
+                {{ form_row(form.photoProfil, { 'label': false, 'attr': { 'id': 'form_photoProfil', 'style': 'display: none;' } }) }}
+            </div>
+        
+            <div class="profil-div">
+                <h1>{{ form_row(form.prenom, { 'label': false }) }} 
+                    {{ form_row(form.nom, { 'label': false }) }}</h1>
+                <h3>{{ form_row(form.bio, { 'label': false, 'attr': { 'class': 'input-champ-grand' } }) }}</h3>
+            </div>
+            
+        </div>
+        <div class="profil-actions">
+            </label>
+        </div>
+    </section>
+    <section class="submit-haut-section container">
+        <button type="submit" class="btn btn-primary bouton-connexion">Enregistrer</button>
+    </section>
+    <section class="informations-section container">
+        <div class="form-champ">
+            <h2>Description</h2>
+            {{ form_row(form.decription, { 'label': false, 'attr': { 'class': 'input-champ-grand' } }) }}
+        </div>
+        <div class="form-champ">
+            <h2>Formation</h2>
+            {{ form_row(form.formation, { 'label': false, 'attr': { 'class': 'input-champ-grand' } }) }}
+        </div>
+        <div class="form-champ">
+            <h2>Expériences</h2>
+            {{ form_row(form.experience, { 'label': false, 'attr': { 'class': 'input-champ-grand' } }) }}
+        </div>
+        <div class="form-champ">
+            <h2>Contact</h2>
+            {{ form_row(form.contact, { 'label': false, 'attr': { 'class': 'input-champ-grand' } }) }}
+        </div>
+        <div class="form-champ">
+            <h2>Plus sur moi</h2>
+            {{ form_row(form.plusSurMoi, { 'label': false, 'attr': { 'class': 'input-champ-grand' } }) }}
+        </div>
+    </section>
+    <section class="submit-section container">
+        <button type="submit" class="btn btn-primary bouton-connexion">Enregistrer</button>
+    </section>
+    {{ form_end(form) }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const photoInput = document.getElementById('etudiant_photoProfil'); // ID correct du champ input
+            const photoPreview = document.querySelector('.img-profil'); // Sélecteur de l'image
+    
+            // Vérifiez si le champ existe
+            if (photoInput && photoPreview) {
+                photoInput.addEventListener('change', function (event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            photoPreview.src = e.target.result; // Met à jour l'image avec la nouvelle photo
+                        };
+                        reader.readAsDataURL(file); // Lit le fichier sélectionné
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}
