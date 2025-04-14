@@ -20,6 +20,12 @@ class Candidature
     #[ORM\Column]
     private ?bool $enregistre = null;
 
+    #[ORM\Column(length: 1000, nullable: true)]
+    private ?string $message = null;
+
+    #[ORM\Column(length: 500)]
+    private ?string $cv = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -45,6 +51,30 @@ class Candidature
     public function setEnregistre(bool $enregistre): static
     {
         $this->enregistre = $enregistre;
+
+        return $this;
+    }
+
+    public function getMessage(): ?string
+    {
+        return $this->message;
+    }
+
+    public function setMessage(?string $message): static
+    {
+        $this->message = $message;
+
+        return $this;
+    }
+
+    public function getCv(): ?string
+    {
+        return $this->cv;
+    }
+
+    public function setCv(string $cv): static
+    {
+        $this->cv = $cv;
 
         return $this;
     }
