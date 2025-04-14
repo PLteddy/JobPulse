@@ -69,12 +69,12 @@
 }
 
 .conversation-item.active {
-    background-color: #e8f5fe;
+    background-color: #fadcc5;
 }
 
 .conversation-item.unread {
     font-weight: bold;
-    background-color: #f0f9ff;
+    background-color: #fadcc5;
 }
 
 .avatar {
@@ -163,12 +163,12 @@
 }
 
 .new-message-btn {
-    background-color: #0095f6;
+    background-color: #FC8756;
     color: white;
 }
 
 .new-message-btn:hover {
-    background-color: #0074cc;
+    background-color: #F7C59F;
     color: white;
 }
 .delete-conversation-btn {
@@ -255,6 +255,12 @@
     object-fit: cover;
 }
 
+.user-avatar img {
+    max-width: 50px; 
+    max-height: 50px; 
+    border-radius: 50%; 
+    object-fit: cover;
+}
 .conversation-user h2 {
     margin: 0;
     font-size: 18px;
@@ -289,7 +295,7 @@
 }
 
 .sent .message-bubble {
-    background-color: #0095f6;
+    background-color: #FC8756;
     color: white;
     border-bottom-right-radius: 5px;
 }
@@ -337,7 +343,7 @@
 
 .send-button {
     margin-left: 10px;
-    background-color: #0095f6;
+    background-color: #FC8756;
     color: white;
     border: none;
     border-radius: 24px;
@@ -348,7 +354,7 @@
 }
 
 .send-button:hover {
-    background-color: #0074cc;
+    background-color: #F7C59F;
 }
 
 .welcome-message {
@@ -481,26 +487,26 @@
 
 .btn-primary {
     color: #fff;
-    background-color: #0095f6;
-    border-color: #0095f6;
+    background-color: #FC8756;;
+    border-color: #FC8756;;
 }
 
 .btn-primary:hover {
     color: #fff;
-    background-color: #0074cc;
-    border-color: #0074cc;
+    background-color: #F7C59F;
+    border-color: #F7C59F;
 }
 
 .btn-outline-primary {
-    color: #0095f6;
-    border-color: #0095f6;
+    color: #FC8756;
+    border-color: #FC8756;
     background-color: transparent;
 }
 
 .btn-outline-primary:hover {
     color: #fff;
-    background-color: #0095f6;
-    border-color: #0095f6;
+    background-color: #F7C59F;
+    border-color: #F7C59F;
 }
 
 .alert {

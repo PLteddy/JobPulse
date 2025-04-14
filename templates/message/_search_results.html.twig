@@ -5,7 +5,7 @@
                 {% if user != app.user %}
                     <div class="list-group-item user-result">
                         <div class="d-flex align-items-center">
-                            <div class="user-avatar-small">
+                            <div class="user-avatar">
                                 {% if user.photoProfil %}
                                     <img src="{{ asset('uploads/images/' ~ user.photoProfil) }}" alt="{{ user.prenom }}">
                                 {% else %}
