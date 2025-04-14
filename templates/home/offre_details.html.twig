@@ -23,8 +23,8 @@
     <div class="differentes-parties">
         <div class="titre-postule">
         <div class="info-debut">
-            <h1>{{ poste.intitule }}</h1>
-            <p class="text-muted">{{ poste.domaine }} - {{ poste.localisation }}</p>
+            <h1>{{ poste.intitule|nl2br }}</h1>
+            <p class="text-muted">{{ poste.domaine|nl2br }} - {{ poste.localisation|nl2br }}</p>
         </div> 
         {% if not app.user %}
         <a class="bouton-connexion" href="{{ path('app_login') }}">Postuler</a>
@@ -44,21 +44,21 @@
     </div>
     <div>
         <h2>Description du poste</h2>
-        <p>{{ poste.description }}</p>
+        <p>{{ poste.description|nl2br }}</p>
     </div>  
     <div>
         <h2>Missions</h2>
-        <p>{{ poste.missions }}</p>
+        <p>{{ poste.missions|nl2br }}</p>
     </div>             
     <div>
     <h2>Profil recherché</h2>
-    <p>{{ poste.profilRecherche }}</p>
+    <p>{{ poste.profilRecherche|nl2br }}</p>
     </div>
                     
     <div>    
     {% if poste.infoSupp %}
     <h2>Informations supplémentaires</h2>
-    <p>{{ poste.infoSupp }}</p>
+    <p>{{ poste.infoSupp|nl2br }}</p>
     {% endif %}
     </div>
                     
@@ -66,26 +66,26 @@
     <h2>Détails de l'offre</h2>
     <p><strong>Type de contrat:</strong> 
     {% for contrat in poste.contratType %}
-    {{ contrat.name }}{% if not loop.last %}, {% endif %}
+    {{ contrat.name|nl2br }}{% if not loop.last %}, {% endif %}
     {% endfor %}
     </p>
     <p><strong>Durée:</strong> 
         {% for d in poste.duree %}
-            {{ d.name }}{% if not loop.last %}, {% endif %}
+            {{ d.name|nl2br }}{% if not loop.last %}, {% endif %}
         {% endfor %}    
-        <p><strong>Présence:</strong> {{ poste.presence.name }}</p>
+        <p><strong>Présence:</strong> {{ poste.presence.name|nl2br }}</p>
     <p><strong>
-    Salaire:</strong> {{ poste.salaire }} €</p>
+    Salaire:</strong> {{ poste.salaire|nl2br }} €</p>
     </p>
     </div>
         <div>
     <h2>Contact</h2>
-    <p>{{ poste.contact }}</p>
+    <p>{{ poste.contact|nl2br }}</p>
     </div>
     <div>
     <h2>Présentation de l’entreprise</h2>
-    <h3>{{ poste.entreprise.nom }}</h3>
-    <p>{{ poste.presentationEntreprise }}</p>
+    <h3>{{ poste.entreprise.nom|nl2br}}</h3>
+    <p>{{ poste.presentationEntreprise|nl2br }}</p>
     </div>
     </div>
     
