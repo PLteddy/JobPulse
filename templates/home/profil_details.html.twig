@@ -1,0 +1,136 @@
+{% extends 'base.html.twig' %}
+{% block title %}Profil de {{ profil.prenom }} {{ profil.nom }}{% endblock %}
+{% block body %}
+    <head>
+        <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/profil.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    </head>
+    <section class="hero-section container">
+        <div class="hero-div">
+            <div class="imgProfil-div">
+                {% if profil.photoProfil %}
+                    <img 
+                        src="{{ asset('uploads/images/' ~ profil.photoProfil) }}"
+                        alt="Photo de profil" 
+                        class="img-profil"
+                    >
+                {% else %}
+                    <img 
+                        src="{{ asset('img/profil.png') }}"
+                        alt="Photo de profil" 
+                        class="img-profil"
+                    >
+                {% endif %}
+            </div>
+        
+            <div class="profil-div">
+                <h1>{{ profil.prenom }} {{ profil.nom }}</h1>
+                <h3>{{ profil.bio|nl2br }}</h3>
+            </div>
+        </div>
+        
+ <div class="profil-actions">
+    {% if app.user and app.user.id == profil.id %}
+        {# Si l'utilisateur connecté est sur son propre profil #}
+
+        {% if is_granted('ROLE_ETUDIANT') %}
+            {# Étudiant peut modifier son profil et télécharger son CV #}
+            <a class="bouton-modifier" href="{{ path('etudiant_profil_edit') }}">
+                <img src="{{ asset('img/modifier-icone.png') }}" alt="icone crayon pour modifier">
+            </a>
+
+            {% if app.user.cv is not null %}
+                <a class="bouton-connexion" href="{{ asset('uploads/cv/' ~ app.user.cv) }}" download>
+                    CV
+                    <img src="{{ asset('img/enregistrer-icone.png') }}" alt="icone de téléchargement">
+                </a>
+            {% endif %}
+
+        {% elseif is_granted('ROLE_ENTREPRISE') %}
+            {# Entreprise : on affiche rien ou un message d'information, à toi de voir #}
+
+        {% elseif is_granted('ROLE_TUTEUR') %}
+            {# Tuteur : afficher le bouton de partage si des étudiants sont associés #}
+            {% if app.user.etudiants is not empty %}
+                <button type="button" class="bouton-connexion" id="ouvrirModal">
+                    Partager
+                </button>
+            {% endif %}
+        {% endif %}
+
+    {% elseif app.user %}
+        {# Si un utilisateur connecté visite un profil qui n'est PAS le sien #}
+
+        {% if is_granted('ROLE_TUTEUR') %}
+            {# Le tuteur peut ajouter un étudiant à sa liste #}
+            {% if not app.user.etudiants.contains(profil) %}
+                <a href="{{ path('tuteur_ajouter_etudiant', {'id': profil.id}) }}"class="bouton-connexion">
+                    Ajouter à ma liste
+                </a>
+            {% else %}
+                <button class="btn btn-sm btn-success" disabled>
+                    <i class="fas fa-check"></i> Déjà ajouté
+                </button>
+            {% endif %}
+
+    {% elseif is_granted('ROLE_ENTREPRISE') %}
+        {# L'entreprise peut envoyer un message à l'étudiant #}
+        <a href="{{ path('app_message_conversation', {'id': profil.id}) }}" class="bouton-connexion">
+            Envoyer un message
+        </a>
+    {% endif %}
+    {% else %}
+        {# Utilisateur non connecté : rediriger vers login pour postuler #}
+        <a class="bouton-connexion" href="{{ path('app_login') }}">Postuler</a>
+    {% endif %}
+</div>
+
+
+    </section>
+    
+    <section class="informations-section container">
+        {% if profil.decription %}
+            <div class="informations-div">
+                <h2>Description</h2>
+                <h3>{{ profil.decription|nl2br }}</h3>
+            </div>
+        {% endif %}
+        
+        {% if profil.formation %}
+            <div class="informations-div">
+                <h2>Formation</h2>
+                <h3>{{ profil.formation|nl2br }}</h3>
+            </div>
+        {% endif %}
+        
+        {% if profil.etablissement %}
+            <div class="informations-div">
+                <h2>Établissement</h2>
+                <h3>{{ profil.etablissement|nl2br }}</h3>
+            </div>
+        {% endif %}
+        
+        {% if profil.experience %}
+            <div class="informations-div">
+                <h2>Expériences</h2>
+                <h3>{{ profil.experience|nl2br }}</h3>
+            </div>
+        {% endif %}
+        
+        {% if app.user and profil.contact %}
+            <div class="informations-div">
+                <h2>Contact</h2>
+                <h3>{{ profil.contact|nl2br }}</h3>
+            </div>
+        {% endif %}
+        
+        {% if profil.plusSurMoi %}
+            <div class="informations-div">
+                <h2>Plus sur moi</h2>
+                <h3>{{ profil.plusSurMoi|nl2br }}</h3>
+            </div>
+        {% endif %}
+    </section>
+    
+{% endblock %}

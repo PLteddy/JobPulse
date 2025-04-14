@@ -115,4 +115,6 @@ class HomeController extends AbstractController
     {
         return $this->render('home/politique_confidentialite.html.twig');
     }
+
+
 }

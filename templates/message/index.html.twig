@@ -30,7 +30,7 @@
                 data-partner-id="{{ partner.id }}">
                     <div class="avatar">
                         {% if partner.photoProfil %}
-                            <img src="{{ asset('uploads/profile/' ~ partner.photoProfil) }}" alt="{{ partner.prenom }}">
+                            <img src="{{ asset('uploads/images/' ~ partner.photoProfil) }}" alt="{{ partner.prenom }}">
                         {% else %}
                             <div class="avatar-placeholder">{{ partner.prenom|first|upper }}</div>
                         {% endif %}
@@ -66,7 +66,7 @@
             <div class="conversation-header-panel">
                 <div class="conversation-user">
                     {% if activeConversation.partner.photoProfil %}
-                        <img src="{{ asset('uploads/profile/' ~ activeConversation.partner.photoProfil) }}" alt="{{ activeConversation.partner.prenom }}" class="user-avatar">
+                        <img src="{{ asset('uploads/images/' ~ activeConversation.partner.photoProfil) }}" alt="{{ activeConversation.partner.prenom }}" class="user-avatar">
                     {% else %}
                         <div class="avatar-placeholder">{{ activeConversation.partner.prenom|first|upper }}</div>
                     {% endif %}

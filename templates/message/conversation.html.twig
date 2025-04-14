@@ -1,7 +1,7 @@
 <div class="conversation-header-panel">
     <div class="conversation-user">
         {% if partner.photoProfil %}
-            <img src="{{ asset('uploads/profile/' ~ partner.photoProfil) }}" alt="{{ partner.prenom }}" class="user-avatar">
+            <img src="{{ asset('uploads/images/' ~ partner.photoProfil) }}" alt="{{ partner.prenom }}" class="user-avatar">
         {% else %}
             <div class="avatar-placeholder">{{ partner.prenom|first|upper }}</div>
         {% endif %}

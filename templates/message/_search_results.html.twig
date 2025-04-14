@@ -7,7 +7,7 @@
                         <div class="d-flex align-items-center">
                             <div class="user-avatar-small">
                                 {% if user.photoProfil %}
-                                    <img src="{{ asset('uploads/profile/' ~ user.photoProfil) }}" alt="{{ user.prenom }}">
+                                    <img src="{{ asset('uploads/images/' ~ user.photoProfil) }}" alt="{{ user.prenom }}">
                                 {% else %}
                                     <div class="avatar-placeholder-small">{{ user.prenom|first|upper }}</div>
                                 {% endif %}
