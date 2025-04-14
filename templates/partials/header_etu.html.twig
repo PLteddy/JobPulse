@@ -10,26 +10,60 @@
 {% endblock %}
 
 <header>
-   
-            <section class="header-section">
-                <a href="{{ path('home') }}">
-                    <img src="{{ asset('img/logo.png') }}" alt="Job Pulse" class="header-logo">
-                </a>
-                
-                <nav class="header-nav">
-                    
-                    <a href="{{ path('etudiant_candidatures') }}">Mes candidatures</a>
-                    <a href="{{ path('etudiant_enregistrements') }}">Mes enregistrements</a>
-                    <a href="{{ path('etudiant_tuteur') }}">Tuteur</a>
-                    <div>
-                        <a  href="{{ path('app_message_index') }}">
-                            <img class="image-header" src="{{ asset('img/messagerie-icone.png') }}" alt="photo de profil">
-                        </a>
-                        <a  href="{{ path('etudiant_profil') }}">
-                            <img class="image-header" src="{{ asset('img/profil.png') }}" alt="photo de profil">
-                        </a>
-                        <a class="bouton-connexion" href="{{ path('app_logout') }}">Déconnexion</a>
-                    </div>
-                </nav>
-            </section>
+    <section class="header-section">
+        <!-- Logo -->
+        <a href="{{ path('home') }}">
+            <img src="{{ asset('img/logo.png') }}" alt="Job Pulse" class="header-logo">
+        </a>
+
+        <!-- Icônes et burger -->
+        <div class="header-icons">
+            <!-- Icônes visibles avant le burger sur mobile et PC -->
+            <a href="{{ path('app_message_index') }}" class="header-icon mobile">
+                <img class="image-header" src="{{ asset('img/messagerie-icone.png') }}" alt="Messagerie">
+            </a>
+            <a href="{{ path('etudiant_profil') }}" class="header-icon mobile">
+                <img class="image-header" src="{{ asset('img/profil.png') }}" alt="Profil">
+            </a>
+            <!-- Bouton burger (visible sur mobile) -->
+            <button class="burger-button" id="burger-button">
+                <img src="{{ asset('img/bouton_burger.svg') }}" alt="Menu burger">
+            </button>
+        </div>
+
+        <!-- Menu -->
+        <nav class="header-nav" id="header-nav">
+            <button class="close-button" id="close-button">
+                <img src="{{ asset('img/close.svg') }}" alt="Fermer le menu">
+            </button>
+
+            <a class="option" href="{{ path('etudiant_enregistrements') }}">Mes enregistrements</a>
+            <a class ="option" href="{{ path('etudiant_enregistrements') }}">Mes candidatures</a>
+            <a class ="option" href="{{ path('etudiant_enregistrements') }}">Tuteur</a>
+            <!-- Ces icônes seront dans le menu burger seulement sur mobile -->
+            <a  href="{{ path('app_message_index') }}" class="hide-when-menu-open">
+                <img class="image-header" src="{{ asset('img/messagerie-icone.png') }}" alt="Messagerie">
+            </a>
+            <a href="{{ path('etudiant_profil') }}" class="hide-when-menu-open">
+                <img class="image-header" src="{{ asset('img/profil.png') }}" alt="Profil">
+            </a>
+            <a class="bouton-connexion" href="{{ path('app_logout') }}">Déconnexion</a>
+        </nav>
+    </section>
 </header>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const burger = document.getElementById('burger-button');
+        const nav = document.getElementById('header-nav');
+        const closeBtn = document.getElementById('close-button');
+
+        burger.addEventListener('click', () => {
+            nav.classList.add('active');
+        });
+
+        closeBtn.addEventListener('click', () => {
+            nav.classList.remove('active');
+        });
+    });
+</script>
