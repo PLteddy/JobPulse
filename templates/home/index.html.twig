@@ -82,21 +82,31 @@
                         </div>
                         <h5>Durée</h5> 
                             {# Durée #}
-                            <div class="filter-group">
-                                
-                        {% for duree in durees %}
-                            <input class="checkbox-hidden" 
-                                type="checkbox" 
-                                name="duree[]" 
-                                value="{{ duree.value }}"
-                                id="duree_{{ duree.value }}"
-                                {% if duree.value in selectedDuree %}checked{% endif %}>
+<div class="filter-buttons">
+    <button class="filter-button" data-filter="toutes">Toutes</button>
+    <button class="filter-button" data-filter="moins_dun_mois">Moins d'un mois</button>
+    <button class="filter-button" data-filter="1_3_mois">1 à 3 mois</button>
+    <button class="filter-button" data-filter="3_6_mois">3 à 6 mois</button>
+    <button class="filter-button" data-filter="6_mois_1_an">6 mois à 1 an</button>
+    <button class="filter-button" data-filter="plus_dun_an">Plus d'un an</button>
+</div>
 
-                            <label class="bouton-localisation" for="duree_{{ duree.value }}">
-                                {{ duree.name }}
-                            </label>
-                        {% endfor %}
-                        </div>
+<div class="duree-options">
+    {% for duree in durees %}
+        <div class="duree-item" data-duration="{{ duree.value }}">
+            <input class="checkbox-hidden" 
+                   type="checkbox" 
+                   name="duree[]" 
+                   value="{{ duree.value }}" 
+                   id="duree_{{ duree.value }}"
+                   {% if duree.value in selectedDuree %}checked{% endif %}>
+            <label class="bouton-localisation" for="duree_{{ duree.value }}">
+                {{ duree.name }}
+            </label>
+        </div>
+    {% endfor %}
+</div>
+
                                                     {# Salaire minimum #}
                                                     <div class="filter-group">
                                                         <h5>Salaire minimum</h5>
@@ -263,7 +273,31 @@ document.addEventListener('DOMContentLoaded', function() {
     const btns = document.querySelectorAll('.showtype');
     const slider = document.getElementById('salaire_min');
     const valeur = document.getElementById('salaire_valeur');
-    
+    document.addEventListener('DOMContentLoaded', function() {
+    const buttons = document.querySelectorAll('.filter-button');
+    const items = document.querySelectorAll('.duree-item');
+
+    // Afficher tous les éléments de base
+    items.forEach(item => item.style.display = 'block'); 
+
+    buttons.forEach(button => {
+        button.addEventListener('click', function() {
+            const filter = button.getAttribute('data-filter');
+
+            items.forEach(item => {
+                const duration = item.getAttribute('data-duration');
+
+                // Afficher les éléments qui correspondent à la catégorie du bouton sélectionné
+                if (filter === 'toutes' || duration === filter) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+});
+
     // Conteneurs pour profils et offres
     const profilsContainer = document.getElementById('profils-container');
     const offresContainer = document.getElementById('offres-container');
