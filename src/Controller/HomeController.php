@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Entity\Poste;
+use App\Entity\Utilisateur; // Correction de l'entité
 use App\Enum\Contrat;
 use App\Enum\Duree;
 use App\Enum\Type_presence;
@@ -29,7 +30,7 @@ class HomeController extends AbstractController
         $salaireMin = $request->query->get('salaire_min');
         $presence = $request->query->get('presence');
         
-        // Construction de la requête
+        // Construction de la requête pour les postes
         $qb = $em->getRepository(Poste::class)->createQueryBuilder('p');
         
         if ($searchTerm) {
@@ -59,9 +60,23 @@ class HomeController extends AbstractController
         
         $postes = $qb->getQuery()->getResult();
         
+        // Récupération des profils utilisateurs (en supposant que les étudiants ont le rôle ROLE_ETUDIANT)
+        $qbProfils = $em->getRepository(Utilisateur::class)->createQueryBuilder('u')
+        ->where('u.type = :type')
+        ->setParameter('type', 'ETUDIANT');
+            
+        // Vous pouvez ajouter des filtres supplémentaires pour les profils si nécessaire
+        if ($searchTerm) {
+            $qbProfils->andWhere('u.nom LIKE :searchTerm OR u.prenom LIKE :searchTerm OR u.decription LIKE :searchTerm')
+                     ->setParameter('searchTerm', '%'.$searchTerm.'%');
+        }
+        
+        $profils = $qbProfils->getQuery()->getResult();
+        
         // Sinon, on affiche la page d'accueil classique
         return $this->render('home/index.html.twig', [
             'postes' => $postes,
+            'profils' => $profils, // Ajout des profils à la vue
             'searchTerm' => $searchTerm,
             'selectedContrat' => $contratType,
             'selectedDuree' => $duree,
@@ -73,23 +88,31 @@ class HomeController extends AbstractController
         ]);
     }
         
-        #[Route('/offre/{id}', name: 'offre_details')]
-        public function offreDetails(Poste $poste): Response
-        {
-            return $this->render('home/offre_details.html.twig', [
-                'poste' => $poste
-            ]);
-        }    
+    #[Route('/offre/{id}', name: 'offre_details')]
+    public function offreDetails(Poste $poste): Response
+    {
+        return $this->render('home/offre_details.html.twig', [
+            'poste' => $poste
+        ]);
+    }
+    
+    #[Route('/profil/{id}', name: 'profil_details')]
+    public function profilDetails(Utilisateur $utilisateur): Response
+    {
+        return $this->render('home/profil_details.html.twig', [
+            'profil' => $utilisateur
+        ]);
+    }
 
-        #[Route('/mentions-legales', name: 'mentions_legales')]
-        public function mentionsLegales(): Response
-        {
-            return $this->render('home/mentions_legales.html.twig');
-        }
+    #[Route('/mentions-legales', name: 'mentions_legales')]
+    public function mentionsLegales(): Response
+    {
+        return $this->render('home/mentions_legales.html.twig');
+    }
 
-        #[Route('/politique-de-confidentialite', name: 'politique_confidentialite')]
-        public function politiqueConfidentialite(): Response
-        {
-            return $this->render('home/politique_confidentialite.html.twig');
-        }
+    #[Route('/politique-de-confidentialite', name: 'politique_confidentialite')]
+    public function politiqueConfidentialite(): Response
+    {
+        return $this->render('home/politique_confidentialite.html.twig');
+    }
 }
