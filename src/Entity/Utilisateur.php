@@ -10,6 +10,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use App\Entity\Poste;
+use Doctrine\DBAL\Types\Types;
 
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
@@ -61,10 +62,10 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $etablissement = null;
 
-    #[ORM\Column(length: 500, nullable: true)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $decription = null;
 
-    #[ORM\Column(length: 500, nullable: true)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $experience = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -73,7 +74,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $cv = null;
 
-    #[ORM\Column(length: 500, nullable: true)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $plusSurMoi = null;
 
     #[ORM\OneToMany(targetEntity: Poste::class, mappedBy: 'entreprise')]

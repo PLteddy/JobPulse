@@ -4,9 +4,9 @@ namespace App\Enum;
 
 enum Etat : string 
 {
-    case ACCEPTED = 'ACCEPTED';
-    case WAITING = 'WAITING';
-    case REFUSED = 'REFUSED';
+    case ACCEPTE = 'Accepte';
+    case EN_ATTENTE = 'En attente';
+    case REFUSE = 'Refuse';
 
 }
 ?>

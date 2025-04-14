@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Enum\Etat;
 use App\Repository\CandidatureRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Utilisateur; 
+use Doctrine\DBAL\Types\Types;
 
 #[ORM\Entity(repositoryClass: CandidatureRepository::class)]
 class Candidature
@@ -17,14 +19,12 @@ class Candidature
     #[ORM\Column(enumType: Etat::class)]
     private ?Etat $etat = null;
 
-    #[ORM\Column]
-    private ?bool $enregistre = null;
 
-    #[ORM\Column(length: 1000, nullable: true)]
-    private ?string $message = null;
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $motivation = null;
 
-    #[ORM\Column(length: 500)]
-    private ?string $cv = null;
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $cvCandidature = null;
 
     public function getId(): ?int
     {
@@ -43,39 +43,57 @@ class Candidature
         return $this;
     }
 
-    public function isEnregistre(): ?bool
+    
+
+    public function getMotivation(): ?string
     {
-        return $this->enregistre;
+        return $this->motivation ;
     }
 
-    public function setEnregistre(bool $enregistre): static
+    public function setMotivation (?string $motivation): static
     {
-        $this->enregistre = $enregistre;
+        $this->motivation = $motivation ;
 
         return $this;
     }
 
-    public function getMessage(): ?string
+    public function getCvCandidature(): ?string
     {
-        return $this->message;
+        return $this->cvCandidature;
     }
 
-    public function setMessage(?string $message): static
+    public function setCvCandidature(string $cvCandidature): static
     {
-        $this->message = $message;
+        $this->cvCandidature = $cvCandidature;
 
         return $this;
     }
-
-    public function getCv(): ?string
+    public function getUtilisateur(): ?Utilisateur
     {
-        return $this->cv;
+        return $this->utilisateur;
     }
 
-    public function setCv(string $cv): static
+    public function setUtilisateur(Utilisateur $utilisateur): static
     {
-        $this->cv = $cv;
+        $this->utilisateur = $utilisateur;
 
+        return $this;
+    }
+    
+    
+    
+    
+    
+    private ?Poste $poste = null;
+
+    public function getPoste(): ?Poste
+    {
+        return $this->poste;
+    }
+
+    public function setPoste(?Poste $poste): self
+    {
+        $this->poste = $poste;
         return $this;
     }
 }
