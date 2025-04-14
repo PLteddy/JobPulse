@@ -24,8 +24,10 @@
                 <h1>Tu as besoin de trouver une alternance ou un stage ?</h1>
             </div>
         </div>
-        <div class="profils">
-<div class="profils">
+        {# Barre de recherche et filtres #}
+        <div class="search-container card my-4">
+            <div class="card-body">
+            <div class="profils">
     <button type="button" class="bouton-type showtype" data-type="profils">
         <i class="fas fa-sliders-h"></i> Profils
     </button>
@@ -34,10 +36,6 @@
         <i class="fas fa-sliders-h"></i> Offres
     </button>
 </div>
-        </div>
-        {# Barre de recherche et filtres #}
-        <div class="search-container card my-4">
-            <div class="card-body">
                 <form method="get" action="{{ path('home') }}">
                     <div class="search-bar">
                         <input type="text" 

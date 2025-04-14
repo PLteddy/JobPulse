@@ -52,6 +52,8 @@ footer {
             align-items: center;
             text-align: center;
             gap: 20px;
+
+
         }
         .footer-nav{
             align-items: center;
@@ -61,6 +63,14 @@ footer {
             align-items: center;
             justify-content: center;
             gap: 0px;
+        }
+        .footer-other .instit-logo{
+            gap: 40px;
+        }
+        .footer-other .instit-logo img{
+            width: 100%;
+            max-width: 60px;
+            height: auto;
         }
     }
     

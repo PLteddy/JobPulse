@@ -38,7 +38,9 @@
     }
 }
 
-
+.profils{
+    margin-bottom: 20px;
+}
 
 /* En-tête */
 .user-info, .auth-actions {
