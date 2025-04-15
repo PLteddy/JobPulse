@@ -63,8 +63,21 @@
                                 <h5>Candidatures reçues :</h5>
                                 <ul>
                                     {% for candidature in poste.candidatures %}
-                                        <li>
-                                            <a href="{{ path('etudiant_profil_utilisateur', { id: candidature.utilisateur.id }) }}">
+                                        
+                                            <a href="{{ path('etudiant_profil_utilisateur', { id: candidature.utilisateur.id }) }}" class="profil-link">
+                                                {% if candidature.utilisateur.photoProfil %}
+                                                    <img 
+                                                        src="{{ asset('uploads/images/' ~ candidature.utilisateur.photoProfil) }}" 
+                                                        alt="Photo de {{ candidature.utilisateur.nom }}" 
+                                                        class="profil-photo"
+                                                    >
+                                                {% else %}
+                                                    <img 
+                                                        src="{{ asset('img/profil.png') }}" 
+                                                        alt="Photo par défaut" 
+                                                        class="profil-photo"
+                                                    >
+                                                {% endif %}
                                                 {{ candidature.utilisateur.nom }} {{ candidature.utilisateur.prenom }}
                                             </a>
                                             
@@ -76,7 +89,7 @@
                                             <form method="post" action="{{ path('candidature_refuser', { id: candidature.id }) }}">
                                                 <button type="submit" class="btn btn-danger">Refuser</button>
                                             </form>
-                                        </li>
+                                        
                                     {% endfor %}
                                 </ul>
                             {% else %}
