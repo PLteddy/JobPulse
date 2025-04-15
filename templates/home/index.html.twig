@@ -228,9 +228,6 @@
                                 <div class="profile-card-body">
                                     <div class="debut-carte">
                                         <h4 class="card-title">{{ profil.prenom }} {{ profil.nom }}</h4>
-                                        <div onclick="event.preventDefault(); {% if is_route_login %}window.location.href='{{ path(route_name) }}'{% else %}window.location.href='{{ path(route_name, {'id': profil.id}) }}'{% endif %}">
-                                            <img src="{{ asset('img/non_enregistre.png') }}" alt="non-enregistré" class="img-deux">
-                                        </div>
                                     </div>
                                     <div class="localisation">
                                         <img src="{{ asset('img/localisation.svg') }}" alt="point de repère" class="mini-icon">

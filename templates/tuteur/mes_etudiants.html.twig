@@ -1,6 +1,5 @@
 {% extends 'base.html.twig' %}
 
-
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
     
@@ -12,27 +11,27 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 {% endblock %}
 
-{% block title %}Mes Étudiants{% endblock %}
+{% block title %}Mes Tuteurs{% endblock %}
 
 {% block body %}
 <div class="container mt-4">
-    <h1 class="titre-enregistrements">Mes Étudiants</h1>
+    <h1 class="titre-enregistrements">Mes Tuteurs</h1>
     
-{% if etudiants is empty %}
-    <p>Vous n'avez pas encore d'étudiants dans votre liste.</p>
+{% if tuteurs is empty %}
+    <p>Vous n'avez pas encore de tuteurs dans votre liste.</p>
     <p>
-        <a href="{{ path('tuteur_rechercher_etudiants') }}" class="btn btn-primary">
-            Rechercher des étudiants à ajouter
+        <a href="{{ path('etudiant_dashboard') }}" class="btn btn-primary">
+            Retour au tableau de bord
         </a>
     </p>
 {% else %}
     <div class="results-grid">
-        {% for etudiant in etudiants %}
-            <a href="{{ path('tuteur_profil_etudiant', {'id': etudiant.id}) }}" class="profil-card-link">
+        {% for tuteur in tuteurs %}
+            <a href="{{ path('etudiant_profil_tuteur', {'id': tuteur.id}) }}" class="profil-card-link">
                 <div class="profil-card-container">
-                    {% if etudiant.photoProfil %}
+                    {% if tuteur.photoProfil %}
                         <div class="profil-image-container">
-                            <img src="{{ asset('uploads/images/' ~ etudiant.photoProfil) }}" alt="{{ etudiant.nom }} {{ etudiant.prenom }}" class="profil-image">
+                            <img src="{{ asset('uploads/images/' ~ tuteur.photoProfil) }}" alt="{{ tuteur.nom }} {{ tuteur.prenom }}" class="profil-image">
                         </div>
                     {% else %}
                         <div class="profil-image-container">
@@ -42,21 +41,20 @@
                     <div class="profile-job-card card">
                         <div class="profile-card-body">
                             <div class="debut-carte">
-                                <h4 class="card-title">{{ etudiant.prenom }} {{ etudiant.nom }}</h4>
+                                <h4 class="card-title">{{ tuteur.prenom }} {{ tuteur.nom }}</h4>
                             </div>
-                            {% if etudiant.formation %}
-                                <p class="card-text"><strong>Formation :</strong> {{ etudiant.formation }}</p>
-                            {% endif %}
-                            {% if etudiant.etablissement %}
-                                <p class="card-text"><strong>Établissement :</strong> {{ etudiant.etablissement }}</p>
+                            {% if tuteur.type and tuteur.type.name == 'ENTREPRISE' %}
+                                <p class="card-text"><strong>Entreprise</strong></p>
+                            {% else %}
+                                <p class="card-text"><strong>Tuteur Professionnel</strong></p>
                             {% endif %}
                             <div class="localisation">
                                 <img src="{{ asset('img/localisation.svg') }}" alt="point de repère" class="mini-icon">
-                                <p>{{ etudiant.adresse|default('Adresse non renseignée') }}</p>
+                                <p>{{ tuteur.adresse|default('Adresse non renseignée') }}</p>
                             </div>
                             <div class="d-flex justify-content-between mt-3">
-                                <form method="post" action="{{ path('tuteur_retirer_etudiant', {'id': etudiant.id}) }}" 
-                                    onsubmit="return confirm('Êtes-vous sûr de vouloir retirer cet étudiant de votre liste ?');"
+                                <form method="post" action="{{ path('etudiant_retirer_tuteur', {'id': tuteur.id}) }}" 
+                                    onsubmit="return confirm('Êtes-vous sûr de vouloir retirer ce tuteur de votre liste ?');"
                                     onclick="event.stopPropagation();" style="display: inline;">
                                     <button type="submit" class="bouton-enregistrer">
                                         Retirer

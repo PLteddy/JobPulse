@@ -1,1 +1,91 @@
-<link rel="stylesheet" href="{{ asset('css/reset.css') }}">
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block title %}Mes Tuteurs{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1 class="titre-enregistrements">Mes Tuteurs</h1>
+    
+    {% if tuteurs is empty %}
+        <p>Vous n'avez pas encore de tuteur assigné.</p>
+        <p>
+            <a href="{{ path('etudiant_dashboard') }}" class="btn btn-primary">
+                Retour au tableau de bord
+            </a>
+        </p>
+    {% else %}
+        <div class="results-grid">
+            {% for tuteur in tuteurs %}
+                <div class="profil-card-container">
+                    {% if tuteur.photoProfil %}
+                        <div class="profil-image-container">
+                            <img src="{{ asset('uploads/images/' ~ tuteur.photoProfil) }}" alt="{{ tuteur.nom }} {{ tuteur.prenom }}" class="profil-image">
+                        </div>
+                    {% else %}
+                        <div class="profil-image-container">
+                            <div class="profil-placeholder"></div>
+                        </div>
+                    {% endif %}
+                    <div class="profile-job-card card">
+                        <div class="profile-card-body">
+                            <div class="debut-carte">
+                                <h4 class="card-title">{{ tuteur.prenom }} {{ tuteur.nom }}</h4>
+                            </div>
+                            
+                            {% if tuteur.type and tuteur.type.name == 'ENTREPRISE' %}
+                                <p class="card-text"><strong>Entreprise</strong></p>
+                                {% if tuteur.siret %}
+                                    <p class="card-text"><strong>SIRET :</strong> {{ tuteur.siret }}</p>
+                                {% endif %}
+                            {% else %}
+                                <p class="card-text"><strong>Tuteur Professionnel</strong></p>
+                            {% endif %}
+                            
+                            <div class="localisation">
+                                <img src="{{ asset('img/localisation.svg') }}" alt="point de repère" class="mini-icon">
+                                <p>{{ tuteur.adresse|default('Adresse non renseignée') }}</p>
+                            </div>
+
+                            <div class="contact-info mt-3">
+                                <p><strong>Email :</strong> {{ tuteur.email }}</p>
+                                {% if tuteur.contact %}
+                                    <p><strong>Téléphone :</strong> {{ tuteur.contact }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            {% if tuteur.bio %}
+                                <div class="mt-3">
+                                    <h5>À propos</h5>
+                                    <p>{{ tuteur.bio }}</p>
+                                </div>
+                            {% elseif tuteur.decription %}
+                                <div class="mt-3">
+                                    <h5>À propos</h5>
+                                    <p>{{ tuteur.decription }}</p>
+                                </div>
+                            {% endif %}
+                            
+                            {% if tuteur.experience %}
+                                <div class="mt-3">
+                                    <h5>Expérience</h5>
+                                    <p>{{ tuteur.experience }}</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

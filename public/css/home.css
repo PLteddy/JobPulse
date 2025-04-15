@@ -434,10 +434,11 @@
     width: 232px;
     height: 232px;
     border-radius: 50%;
-    object-fit: cover;
-    background-color: white;
+    background-image: url('/img/profil.png'); 
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat; 
 }
-
 /* Carte de profil */
 .profile-job-card {
     display: flex;

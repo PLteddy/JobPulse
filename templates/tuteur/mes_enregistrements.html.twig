@@ -31,14 +31,15 @@
                                 <div class="card-body">
                                     <div class="debut-carte">
                                         <h4 class="card-title">{{ poste.intitule }}</h4>
-                                        <img src="{{ asset('img/enregistre.png') }}"
-                                            alt="enregistré"
-                                            class="img-un hidden"
-                                            onclick="toggleImage(event, this)">
-                                        <img src="{{ asset('img/enregistre.png') }}"
-                                            alt="non-enregistré"
-                                            class="img-deux"
-                                            onclick="toggleImage(event, this)">
+                                        {% if app.user %}
+                                            {% set route_name = 'tuteur_sauvegarder_poste' %}
+                                            {% if 'ROLE_ETUDIANT' in app.user.roles %}
+                                                {% set route_name = 'etudiant_sauvegarder_poste' %}
+                                            {% endif %}
+                                            <div onclick="event.preventDefault(); window.location.href='{{ path(route_name, {'id': poste.id}) }}'">
+                                                <img src="{{ asset('img/enregistre.png') }}" alt="enregistré" class="img-un">
+                                            </div>
+                                        {% endif %}
                                     </div>
                                     <div class="localisation">
                                         <img src="{{ asset('img/localisation.svg') }}" alt="point de repère" class="mini-icon">
