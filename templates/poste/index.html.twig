@@ -6,11 +6,9 @@
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
     <link rel="stylesheet" href="{{ asset('css/offres.css') }}">
-
 {% endblock %}
 
 {% block body %}
-
 <section class="container mt-4">
     <div class="titre-creation-offres">
         <h1>Mes offres</h1>
@@ -57,41 +55,69 @@
                             </div>
                         </div>
 
-                        <!-- Section des candidatures -->
                         <div class="candidatures-section">
                             {% if poste.candidatures|length > 0 %}
                                 <h5>Candidatures reçues :</h5>
-                                <ul>
-                                    {% for candidature in poste.candidatures %}
-                                        
-                                            <a href="{{ path('etudiant_profil_utilisateur', { id: candidature.utilisateur.id }) }}" class="profil-link">
-                                                {% if candidature.utilisateur.photoProfil %}
-                                                    <img 
-                                                        src="{{ asset('uploads/images/' ~ candidature.utilisateur.photoProfil) }}" 
-                                                        alt="Photo de {{ candidature.utilisateur.nom }}" 
-                                                        class="profil-photo"
-                                                    >
-                                                {% else %}
-                                                    <img 
-                                                        src="{{ asset('img/profil.png') }}" 
-                                                        alt="Photo par défaut" 
-                                                        class="profil-photo"
-                                                    >
-                                                {% endif %}
-                                                {{ candidature.utilisateur.nom }} {{ candidature.utilisateur.prenom }}
-                                            </a>
-                                            
-                                            <a href="{{ path('app_messagemessagerie', { id: candidature.utilisateur.id }) }}" class="btn btn-primary">Envoyer un message</a>
-                                            <a href="{{ asset('uploads/cv/' ~ candidature.cvCandidature) }}" class="btn btn-secondary" download>Télécharger le CV</a>
-                                            <form method="post" action="{{ path('candidature_accepter', { id: candidature.id }) }}">
-                                                <button type="submit" class="btn btn-success">Accepter</button>
-                                            </form>
-                                            <form method="post" action="{{ path('candidature_refuser', { id: candidature.id }) }}">
-                                                <button type="submit" class="btn btn-danger">Refuser</button>
-                                            </form>
-                                        
-                                    {% endfor %}
-                                </ul>
+                                <div class="candidatures-dropdown">
+                                    <button class="dropdown-toggle">Voir les candidatures ({{ poste.candidatures|length }})</button>
+                                    <div class="dropdown-content">
+                                        {% for candidature in poste.candidatures %}
+                                            <div class="candidature-item">
+                                                <a href="{{ path('etudiant_profil_utilisateur', { id: candidature.utilisateur.id }) }}" class="profil-link">
+                                                    {% if candidature.utilisateur.photoProfil %}
+                                                        <img 
+                                                            src="{{ asset('uploads/images/' ~ candidature.utilisateur.photoProfil) }}" 
+                                                            alt="Photo de {{ candidature.utilisateur.nom }}" 
+                                                            class="profil-photo"
+                                                        >
+                                                    {% else %}
+                                                        <img 
+                                                            src="{{ asset('img/profil.png') }}" 
+                                                            alt="Photo par défaut" 
+                                                            class="profil-photo"
+                                                        >
+                                                    {% endif %}
+                                                    <div class="nom-candidat">{{ candidature.utilisateur.nom }} {{ candidature.utilisateur.prenom }}</div>
+                                                </a>
+                                                
+                                                <div class="candidature-actions">
+                                                    <!-- Affichage de l'état de la candidature -->
+                                                    <div class="etat-candidature" style="margin-bottom: 10px;">
+                                                        {% if candidature.etatAsString == 'Accepte' %}
+                                                            <span class="badge badge-success">Accepté</span>
+                                                        {% elseif candidature.etatAsString == 'Refuse' %}
+                                                            <span class="badge badge-danger">Refusé</span>
+                                                        {% else %}
+                                                            <span class="badge badge-secondary">En attente</span>
+                                                        {% endif %}
+                                                    </div>
+                                                    
+                                                    <a href="{{ path('app_messagemessagerie', { id: candidature.utilisateur.id }) }}" class="btn btn-primary">
+                                                        <img src="{{ asset('img/messagerie-icone.png') }}" alt="icone messagerie">
+                                                    </a>
+                                                
+                                                    <form method="post" action="{{ path('candidature_accepter', { id: candidature.id }) }}">
+                                                        <button type="submit" class="bouton-ajouter">Accepter
+                                                            <img src="{{ asset('img/check.png') }}" alt="icone modifié">
+                                                        </button>
+                                                    </form>
+                                                
+                                                    <form method="post" action="{{ path('candidature_refuser', { id: candidature.id }) }}">
+                                                        <button type="submit" class="bouton-supprimer">Refuser
+                                                            <img src="{{ asset('img/Croix.png') }}" alt="icone supprimé">
+                                                        </button>
+                                                    </form>
+                                                
+                                                    <a class="bouton-connexion" href="{{ asset('uploads/cv/' ~ candidature.cvCandidature) }}" download>CV
+                                                        <img 
+                                                            src="{{ asset('img/enregistrer-icone.png') }}"
+                                                            alt="icone de téléchargement">
+                                                    </a>
+                                                </div>                                                
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
                             {% else %}
                                 <p>Cette offre n'a pas encore de réponse.</p>
                             {% endif %}
@@ -104,4 +130,42 @@
         <p>Aucune offre disponible.</p>
     {% endif %}
 </section>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Sélectionnez tous les boutons dropdown-toggle
+        const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+        
+        // Ajoutez un gestionnaire d'événements pour chaque bouton
+        dropdownToggles.forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                // Trouvez le dropdown-content associé à ce toggle
+                const dropdownContent = this.nextElementSibling;
+                
+                // Toggle l'affichage
+                if (dropdownContent.style.display === 'block') {
+                    dropdownContent.style.display = 'none';
+                    this.querySelector('::after').textContent = '▼';
+                } else {
+                    dropdownContent.style.display = 'block';
+                    this.querySelector('::after').textContent = '▲';
+                }
+            });
+        });
+        
+        // Fermer les dropdowns quand on clique ailleurs
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.candidatures-dropdown')) {
+                document.querySelectorAll('.dropdown-content').forEach(content => {
+                    content.style.display = 'none';
+                });
+                document.querySelectorAll('.dropdown-toggle::after').forEach(arrow => {
+                    arrow.textContent = '▼';
+                });
+            }
+        });
+    });
+</script>
 {% endblock %}

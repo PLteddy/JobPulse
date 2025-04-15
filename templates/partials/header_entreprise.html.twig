@@ -22,9 +22,6 @@
             <a href="{{ path('app_message_index') }}" class="header-icon mobile">
                 <img class="image-header" src="{{ asset('img/messagerie-icone.png') }}" alt="Messagerie">
             </a>
-            <a href="{{ path('etudiant_profil') }}" class="header-icon mobile">
-                <img class="image-header" src="{{ asset('img/profil.png') }}" alt="Profil">
-            </a>
             <!-- Bouton burger (visible sur mobile) -->
             <button class="burger-button" id="burger-button">
                 <img src="{{ asset('img/bouton_burger.svg') }}" alt="Menu burger">
@@ -41,9 +38,6 @@
             <!-- Ces icônes seront dans le menu burger seulement sur mobile -->
             <a href="{{ path('app_message_index') }}" class="hide-when-menu-open">
                 <img class="image-header" src="{{ asset('img/messagerie-icone.png') }}" alt="Messagerie">
-            </a>
-            <a href="{{ path('etudiant_profil') }}" class="hide-when-menu-open">
-                <img class="image-header" src="{{ asset('img/profil.png') }}" alt="Profil">
             </a>
             <a class="bouton-connexion" href="{{ path('app_logout') }}">Déconnexion</a>
         </nav>

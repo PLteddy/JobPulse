@@ -7,6 +7,7 @@
 }
 .bouton-ajouter {
     color: #ffffff;
+    cursor: pointer;
     background-color: #FF6B35;
     text-decoration: none;
     font-weight: 400;
@@ -27,6 +28,7 @@
 
 .bouton-supprimer {
     color: #FC8756;
+    cursor: pointer;
     background-color: transparent;
     text-decoration: none;
     font-weight: 400;
@@ -78,17 +80,61 @@
     color: white;
 }
 
+
+
+.nom-candidat {
+    text-decoration: underline;
+}
+
+.candidatures-section {
+    padding: 54px 0 0 300px;
+}
+
+.candidatures-section h5 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+}
+
+/* Nouveau style pour la liste déroulante */
+.candidatures-dropdown {
+    position: relative;
+    width: 100%;
+}
+
+.dropdown-toggle {
+    color: #333;
+}
+
+.dropdown-toggle:after {
+    content: '▼';
+    margin-left: 10px;
+    font-size: 0.8rem;
+}
+
+.dropdown-content {
+    display: none;
+}
+
+.candidatures-dropdown:hover .dropdown-content {
+    display: block;
+}
+
 /*Style pour afficher les étudiants qui ont postuler*/
 .profil-photo {
     width: 78px;
     height: 78px;
-    border-radius: 50%; /* Rend l'image ronde */
-    object-fit: cover; /* Ajuste l'image pour qu'elle remplisse le cadre */
-    border: 2px solid #ddd; /* Optionnel : ajoute une bordure */
+    border-radius: 50%; 
+    object-fit: cover;
 }
+
+.nom-candidat {
+    text-decoration: underline;
+}
+
 .candidatures-section{
-    padding: 54px 0;
+    padding: 54px 0 0 300px;
     h5{
+        font-size: 2rem;
         margin-bottom: 30px;
     }
     ul{
@@ -106,4 +152,108 @@
             text-decoration: underline;
         }
     }
+}
+.nom-candidat {
+    text-decoration: underline;
+    padding: 20px;
+}
+
+.candidatures-section {
+    padding: 54px 0 0 300px;
+}
+
+.candidatures-section h5 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+}
+
+.candidatures-dropdown {
+    position: relative;
+    width: 100%;
+}
+
+.dropdown-toggle {
+    border-color: transparent;
+    background-color: #FF6B35;
+    color: #ffffff;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    text-align: left;
+    width: 60%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dropdown-toggle:after {
+    content: '▼';
+    margin-left: 10px;
+    font-size: 0.8rem;
+}
+
+.dropdown-content {
+    padding: 20px;
+    display: none;
+    min-width: 80%;
+    border-radius: 0 0 4px 4px;
+    z-index: 1;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.candidature-item {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+}
+
+.candidature-item:last-child {
+    border-bottom: none;
+
+}
+
+.profil-photo {
+    width: 78px;
+    height: 78px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+.profil-link {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    min-width: 200px;
+}
+
+.profil-link:hover {
+    text-decoration: underline;
+}
+
+.candidature-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    font-size: 0.85em;
+    border-radius: 12px;
+    font-weight: bold;
+    color: white;
+}
+.badge-success {
+    background-color: #28a745;
+}
+.badge-danger {
+    background-color: #dc3545;
+}
+.badge-secondary {
+    background-color: #6c757d;
 }
