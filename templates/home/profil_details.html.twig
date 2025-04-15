@@ -30,16 +30,14 @@
             </div>
         </div>
         
- <div class="profil-actions">
+<div class="profil-actions">
     {% if app.user and app.user.id == profil.id %}
         {# Si l'utilisateur connecté est sur son propre profil #}
-
         {% if is_granted('ROLE_ETUDIANT') %}
-            {# Étudiant peut modifier son profil et télécharger son CV #}
+            {# Étudiant modifie son profil et télécharge son CV #}
             <a class="bouton-modifier" href="{{ path('etudiant_profil_edit') }}">
                 <img src="{{ asset('img/modifier-icone.png') }}" alt="icone crayon pour modifier">
             </a>
-
             {% if app.user.cv is not null %}
                 <a class="bouton-connexion" href="{{ asset('uploads/cv/' ~ app.user.cv) }}" download>
                     CV
@@ -47,41 +45,62 @@
                 </a>
             {% endif %}
 
-        {% elseif is_granted('ROLE_ENTREPRISE') %}
-            {# Entreprise : on affiche rien ou un message d'information, à toi de voir #}
-
         {% elseif is_granted('ROLE_TUTEUR') %}
-            {# Tuteur : afficher le bouton de partage si des étudiants sont associés #}
+            {# Tuteur modifie son propre profil et partage si étudiants associés #}
+            <a class="bouton-modifier" href="{{ path('tuteur_profil_edit') }}">
+                <img src="{{ asset('img/modifier-icone.png') }}" alt="icone crayon pour modifier">
+            </a>
             {% if app.user.etudiants is not empty %}
+            {#  J'ai enlevé ça mais je le laisse en commentaire au cas où
                 <button type="button" class="bouton-connexion" id="ouvrirModal">
                     Partager
-                </button>
+                </button>#}
             {% endif %}
+
+        {% elseif is_granted('ROLE_ENTREPRISE') %}
+            {# On affiche rien ici #}
         {% endif %}
 
     {% elseif app.user %}
-        {# Si un utilisateur connecté visite un profil qui n'est PAS le sien #}
+        {# Utilisateur connecté qui visite un autre profil #}
 
-        {% if is_granted('ROLE_TUTEUR') %}
-            {# Le tuteur peut ajouter un étudiant à sa liste #}
-            {% if not app.user.etudiants.contains(profil) %}
-                <a href="{{ path('tuteur_ajouter_etudiant', {'id': profil.id}) }}"class="bouton-connexion">
-                    Ajouter à ma liste
+        {% if profil.roles is defined and 'ROLE_ETUDIANT' in profil.roles %}
+            {% if is_granted('ROLE_TUTEUR') %}
+                {# Tuteur ajoute étudiant ou le voit déjà ajouté #}
+                {% if not app.user.etudiants.contains(profil) %}
+                    <a href="{{ path('tuteur_ajouter_etudiant', {'id': profil.id}) }}" class="bouton-connexion">
+                        Ajouter à ma liste
+                    </a>
+                {% else %}
+                    <button class="btn btn-sm btn-success" disabled>
+                        <i class="fas fa-check"></i> Déjà ajouté
+                    </button>
+                {% endif %}
+                {# Peut aussi envoyer un message #}
+                <a href="{{ path('app_message_conversation', {'id': profil.id}) }}" class="bouton-connexion">
+                    Envoyer un message
                 </a>
-            {% else %}
-                <button class="btn btn-sm btn-success" disabled>
-                    <i class="fas fa-check"></i> Déjà ajouté
-                </button>
+            {% elseif is_granted('ROLE_ENTREPRISE') %}
+                {# L'entreprise peut envoyer un message à un étudiant #}
+                <a href="{{ path('app_message_conversation', {'id': profil.id}) }}" class="bouton-connexion">
+                    Envoyer un message
+                </a>
+            {% elseif is_granted('ROLE_ETUDIANT') %}
+                {# Étudiant peut envoyer un message à un autre étudiant #}
+                <a href="{{ path('app_message_conversation', {'id': profil.id}) }}" class="bouton-connexion">
+                    Envoyer un message
+                </a>
             {% endif %}
 
-    {% elseif is_granted('ROLE_ENTREPRISE') %}
-        {# L'entreprise peut envoyer un message à l'étudiant #}
-        <a href="{{ path('app_message_conversation', {'id': profil.id}) }}" class="bouton-connexion">
-            Envoyer un message
-        </a>
-    {% endif %}
+        {% elseif profil.roles is defined and 'ROLE_TUTEUR' in profil.roles %}
+            {# Si c'est un profil de tuteur, tout le monde peut envoyer un message #}
+            <a href="{{ path('app_message_conversation', {'id': profil.id}) }}" class="bouton-connexion">
+                Envoyer un message
+            </a>
+        {% endif %}
+
     {% else %}
-        {# Utilisateur non connecté : rediriger vers login pour postuler #}
+        {# Utilisateur non connecté : rediriger vers login #}
         <a class="bouton-connexion" href="{{ path('app_login') }}">Postuler</a>
     {% endif %}
 </div>

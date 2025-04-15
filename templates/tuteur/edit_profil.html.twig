@@ -72,7 +72,8 @@
     <section class="submit-section container">
         <button type="submit" class="btn btn-primary bouton-connexion">Enregistrer</button>
     </section>
-    {{ form_end(form) }}
+    {{ form_row(form._token) }}
+    {{ form_end(form, {render_rest: false}) }}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const photoInput = document.getElementById('etudiant_photoProfil'); // ID correct du champ input

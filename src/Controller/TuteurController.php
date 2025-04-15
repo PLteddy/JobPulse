@@ -261,6 +261,7 @@ class TuteurController extends AbstractController
 
 
         $form = $this->createForm(EtudiantType::class, $user);
+        
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -289,7 +290,7 @@ class TuteurController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Profil mis à jour avec succès.');
-            return $this->redirectToRoute('etudiant_profil');
+            return $this->redirectToRoute('tuteur_profil');
         }
 
         return $this->render('tuteur/edit_profil.html.twig', [

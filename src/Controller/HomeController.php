@@ -32,6 +32,8 @@ class HomeController extends AbstractController
         
         $salaireMin = $request->query->get('salaire_min');
         $presence = $request->query->get('presence');
+
+        $includesTuteurs = $request->query->get('inclure_tuteurs', false);
         
         // Construction de la requête pour les postes
         $qb = $em->getRepository(Poste::class)->createQueryBuilder('p');
@@ -78,34 +80,45 @@ class HomeController extends AbstractController
         
         $postes = $qb->getQuery()->getResult();
         
-        // Récupération des profils utilisateurs (en supposant que les étudiants ont le rôle ROLE_ETUDIANT)
+       
+        // Construction de la requête pour les profils
         $qbProfils = $em->getRepository(Utilisateur::class)->createQueryBuilder('u')
-        ->where('u.type = :type')
-        ->setParameter('type', 'ETUDIANT');
+        ->where('u.type IN (:types)')
+        ->setParameter('types', ['ETUDIANT', 'TUTEUR']);
             
-        // Vous pouvez ajouter des filtres supplémentaires pour les profils si nécessaire
+        // Recherche dans tous les champs textuels du profil
         if ($searchTerm) {
-            $qbProfils->andWhere('u.nom LIKE :searchTerm OR u.prenom LIKE :searchTerm OR u.decription LIKE :searchTerm')
-                     ->setParameter('searchTerm', '%'.$searchTerm.'%');
+        $qbProfils->andWhere('
+            u.nom LIKE :searchTerm OR 
+            u.prenom LIKE :searchTerm OR 
+            u.bio LIKE :searchTerm OR 
+            u.decription LIKE :searchTerm OR 
+            u.formation LIKE :searchTerm OR 
+            u.experience LIKE :searchTerm OR 
+            u.contact LIKE :searchTerm OR 
+            u.plusSurMoi LIKE :searchTerm
+        ')
+        ->setParameter('searchTerm', '%'.$searchTerm.'%');
         }
+
         $profils = $qbProfils->getQuery()->getResult();
-        
-        // Sinon, on affiche la page d'accueil classique
-        return $this->render('home/index.html.twig', [
-            'postes' => $postes,
-            'profils' => $profils, // Ajout des profils à la vue
-            'searchTerm' => $searchTerm,
-            'selectedContrat' => $contratType,
-            'selectedDuree' => $duree,
-            'selectedSalaireMin' => $salaireMin,
-            'selectedPresence' => $presence,
-            'contratTypes' => Contrat::cases(),
-            'durees' => Duree::cases(),
-            'presences' => Type_presence::cases(),
-            'dureesGrouped' => $dureesGrouped,
-            
-        ]);
-    }
+                        
+                // Sinon, on affiche la page d'accueil classique
+                return $this->render('home/index.html.twig', [
+                    'postes' => $postes,
+                    'profils' => $profils, // Ajout des profils à la vue
+                    'searchTerm' => $searchTerm,
+                    'selectedContrat' => $contratType,
+                    'selectedDuree' => $duree,
+                    'selectedSalaireMin' => $salaireMin,
+                    'selectedPresence' => $presence,
+                    'contratTypes' => Contrat::cases(),
+                    'durees' => Duree::cases(),
+                    'presences' => Type_presence::cases(),
+                    'dureesGrouped' => $dureesGrouped,
+                    
+                ]);
+            }
         
     
     #[Route('/offre/{id}', name: 'offre_details')]
