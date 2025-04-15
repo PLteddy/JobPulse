@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<head>
+    <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/profil.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+</head>
+
+<section class="hero-section container">
+    <div class="hero-div">
+        <div class="imgProfil-div">
+            {% if tuteur.photoProfil is not null %}
+                <img 
+                    src="{{ asset('uploads/images/' ~ tuteur.photoProfil) }}"
+                    alt="Photo de profil" 
+                    class="img-profil"
+                >
+            {% else %}
+                <img 
+                    src="{{ asset('img/profil.png') }}"
+                    alt="Photo de profil" 
+                    class="img-profil"
+                >
+            {% endif %}
+        </div>
+
+        <div class="profil-div">
+            <h1>{{ tuteur.prenom }} {{ tuteur.nom }}</h1>
+            <h3>{{ tuteur.bio|nl2br }}</h3>
+        </div>
+    </div>
+
+    <div class="profil-actions">
+        <!-- Bouton pour retirer le tuteur -->
+        <form method="post" action="{{ path('etudiant_retirer_tuteur', {'id': tuteur.id}) }}" 
+              onsubmit="return confirm('Êtes-vous sûr de vouloir retirer ce tuteur de votre liste ?');">
+            <button type="submit" class="bouton-connexion">
+                Retirer
+                <img src="{{ asset('img/enregistrer-icone.png') }}" alt="icone de retrait">
+            </button>
+        </form>
+    </div>
+</section>
+
+<section class="informations-section container">
+    <div class="informations-div">
+        <h2>Description</h2>
+        <h3>{{ tuteur.decription|nl2br }}</h3>
+    </div>
+    {% if tuteur.formation %}
+    <div class="informations-div">
+        <h2>Formation</h2>
+        <h3>{{ tuteur.formation|nl2br }}</h3>
+    </div>
+    {% endif %}
+    <div class="informations-div">
+        <h2>Expériences</h2>
+        <h3>{{ tuteur.experience|nl2br }}</h3>
+    </div>
+    <div class="informations-div">
+        <h2>Contact</h2>
+        <h3>{{ tuteur.contact|nl2br }}</h3>
+    </div>
+    {% if tuteur.plusSurMoi %}
+    <div class="informations-div">
+        <h2>Plus sur moi</h2>
+        <h3>{{ tuteur.plusSurMoi|nl2br }}</h3>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

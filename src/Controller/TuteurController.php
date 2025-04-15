@@ -84,7 +84,7 @@ class TuteurController extends AbstractController
         $etudiants = $user->getEtudiants();
         
         return $this->render('tuteur/mes_etudiants.html.twig', [
-            'etudiants' => $etudiants
+            'etudiants' => $etudiants,
         ]);
     }
     
@@ -134,7 +134,7 @@ class TuteurController extends AbstractController
         } else {
             $user->addEtudiant($etudiant);
             $entityManager->flush();
-            $this->addFlash('success', 'L\'étudiant a été ajouté à votre liste');
+            $this->addFlash('success', 'Un nouvel étudiant a été ajouté à votre liste');
         }
         
         $referer = $request->headers->get('referer');

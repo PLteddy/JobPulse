@@ -429,10 +429,13 @@ public function addTuteur(self $tuteur): static
 
 public function removeTuteur(self $tuteur): static
 {
-    $this->tuteurs->removeElement($tuteur);
+    if ($this->tuteurs->removeElement($tuteur)) {
+        $tuteur->removeEtudiant($this); 
+    }
 
     return $this;
 }
+
 
 public function hasEtudiant(self $etudiant): bool
 {
