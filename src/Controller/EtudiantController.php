@@ -119,6 +119,9 @@ public function candidatures(string $filter, EntityManagerInterface $em): Respon
         if (!$etudiant->getTuteurs()->contains($tuteur)) {
             throw $this->createAccessDeniedException('Ce tuteur nest pas dans votre liste');
         }
+        return $this->render('etudiant/profil_tuteur.html.twig', [
+            'tuteur' => $tuteur,
+        ]);
     } 
 
     #[Route('/sauvegarder-poste/{id}', name: 'etudiant_sauvegarder_poste')]
