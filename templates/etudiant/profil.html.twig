@@ -1,6 +1,7 @@
 
 {% extends 'base.html.twig' %}
 {% block body %}
+{% set user = utilisateur is defined ? utilisateur : app.user %}
     <head>
     <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
         <link rel="stylesheet" href="{{ asset('css/profil.css') }}">
@@ -9,9 +10,9 @@
     <section class="hero-section container">
         <div class="hero-div">
             <div class="imgProfil-div">
-                {% if app.user.photoProfil is not null %}
+                {% if user.photoProfil is not null %}
                     <img 
-                        src="{{ asset('uploads/images/' ~ app.user.photoProfil) }}"
+                        src="{{ asset('uploads/images/' ~ user.photoProfil) }}"
                         alt="Photo de profil" 
                         class="img-profil"
                     >
@@ -26,22 +27,24 @@
             </div>
         
             <div class="profil-div">
-                <h1>{{ app.user.prenom }} {{ app.user.nom }}</h1>
-                <h3>{{ app.user.bio|nl2br }}</h3>
+                <h1>{{ user.prenom }} {{ user.nom }}</h1>
+                <h3>{{ user.bio|nl2br }}</h3>
             </div>
             
         </div>
         <div class="profil-actions">
-            <!-- Bouton pour modifier le profil -->
-            <a class="bouton-modifier" href="{{ path('etudiant_profil_edit') }}" >
-                <img 
+            {% if app.user and app.user.id == user.id %}
+                <!-- Bouton pour modifier le profil -->
+                <a class="bouton-modifier" href="{{ path('etudiant_profil_edit') }}">
+                    <img 
                         src="{{ asset('img/modifier-icone.png') }}"
                         alt="icone crayon pour modifier">
-            </a>
+                </a>
+            {% endif %}
 
             <!-- Bouton pour télécharger le CV (affiché uniquement si un CV existe) -->
-            {% if app.user.cv is not null %}
-                <a class="bouton-connexion" href="{{ asset('uploads/cv/' ~ app.user.cv) }}" class="btn btn-secondary" download>CV
+            {% if user.cv is not null %}
+                <a class="bouton-connexion" href="{{ asset('uploads/cv/' ~ user.cv) }}" class="btn btn-secondary" download>CV
                     <img 
                         src="{{ asset('img/enregistrer-icone.png') }}"
                         alt="icone de téléchargement">
@@ -52,23 +55,23 @@
     <section class="informations-section container">
         <div class="informations-div">
             <h2>{{ 'Description' }}</h2>
-            <h3>{{ app.user.decription|nl2br }}</h3>
+            <h3>{{ user.decription|nl2br }}</h3>
         </div>
         <div class="informations-div">
             <h2>{{ 'Formation' }}</h2>
-            <h3>{{ app.user.formation|nl2br }}</h3>
+            <h3>{{ user.formation|nl2br }}</h3>
         </div>
         <div class="informations-div">
             <h2>{{ 'Expériences' }}</h2>
-            <h3>{{ app.user.experience|nl2br }}</h3>
+            <h3>{{ user.experience|nl2br }}</h3>
         </div>
         <div class="informations-div">
             <h2>{{ 'Contact' }}</h2>
-            <h3>{{ app.user.contact|nl2br }}</h3>
+            <h3>{{ user.contact|nl2br }}</h3>
         </div>
         <div class="informations-div">
             <h2>{{ 'Plus sur moi' }}</h2>
-            <h3>{{ app.user.plusSurMoi|nl2br }}</h3>
+            <h3>{{ user.plusSurMoi|nl2br }}</h3>
         </div>
         
     

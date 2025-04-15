@@ -185,5 +185,17 @@ public function candidatures(string $filter, EntityManagerInterface $em): Respon
             'cvFileName' => $user->getCv(), 
         ]);
         }
+    #[Route('/etudiant/profil/utilisateur/{id}', name: 'etudiant_profil_utilisateur')]
+    public function afficherProfilUtilisateur(Utilisateur $utilisateur): Response
+    {
         
+        // Vérifie si l'utilisateur existe
+        if (!$utilisateur) {
+            throw $this->createNotFoundException('Utilisateur non trouvé.');
+        }
+        
+        return $this->render('etudiant/profil.html.twig', [
+            'utilisateur' => $utilisateur,
+        ]);
+        }    
 }

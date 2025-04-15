@@ -56,10 +56,33 @@
                                 <p class="domaine-text">{{ poste.domaine }}</p>
                             </div>
                         </div>
-                    </div>
-                {% else %}
-                    <div class="no-results">
-                        <p>Aucune offre trouvée</p>
+
+                        <!-- Section des candidatures -->
+                        <div class="candidatures-section">
+                            {% if poste.candidatures|length > 0 %}
+                                <h5>Candidatures reçues :</h5>
+                                <ul>
+                                    {% for candidature in poste.candidatures %}
+                                        <li>
+                                            <a href="{{ path('etudiant_profil_utilisateur', { id: candidature.utilisateur.id }) }}">
+                                                {{ candidature.utilisateur.nom }} {{ candidature.utilisateur.prenom }}
+                                            </a>
+                                            
+                                            <a href="{{ path('app_messagemessagerie', { id: candidature.utilisateur.id }) }}" class="btn btn-primary">Envoyer un message</a>
+                                            <a href="{{ asset('uploads/cv/' ~ candidature.cvCandidature) }}" class="btn btn-secondary" download>Télécharger le CV</a>
+                                            <form method="post" action="{{ path('candidature_accepter', { id: candidature.id }) }}">
+                                                <button type="submit" class="btn btn-success">Accepter</button>
+                                            </form>
+                                            <form method="post" action="{{ path('candidature_refuser', { id: candidature.id }) }}">
+                                                <button type="submit" class="btn btn-danger">Refuser</button>
+                                            </form>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>Cette offre n'a pas encore de réponse.</p>
+                            {% endif %}
+                        </div>
                     </div>
                 {% endfor %}
             </div>

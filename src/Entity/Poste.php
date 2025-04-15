@@ -8,7 +8,10 @@ use App\Enum\Type_presence;
 use App\Repository\PosteRepository;
 use App\Entity\Utilisateur;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+
 
 #[ORM\Entity(repositoryClass: PosteRepository::class)]
 class Poste
@@ -65,6 +68,14 @@ class Poste
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
+
+    #[ORM\OneToMany(mappedBy: 'poste', targetEntity: Candidature::class, cascade: ['persist', 'remove'])]
+    private Collection $candidatures;
+
+    public function __construct()
+    {
+        $this->candidatures = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -253,6 +264,36 @@ class Poste
     public function setImage(?string $image): static
     {
         $this->image = $image;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Candidature>
+     */
+    public function getCandidatures(): Collection
+    {
+        return $this->candidatures;
+    }
+
+    public function addCandidature(Candidature $candidature): self
+    {
+        if (!$this->candidatures->contains($candidature)) {
+            $this->candidatures->add($candidature);
+            $candidature->setPoste($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCandidature(Candidature $candidature): self
+    {
+        if ($this->candidatures->removeElement($candidature)) {
+            // Set the owning side to null (unless already changed)
+            if ($candidature->getPoste() === $this) {
+                $candidature->setPoste(null);
+            }
+        }
 
         return $this;
     }

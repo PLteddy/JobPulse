@@ -106,31 +106,31 @@ class MessageController extends AbstractController
     }
 
     #[Route('/search', name: '_search', methods: ['GET'])]
-public function search(Request $request, UtilisateurRepository $userRepo): Response
-{
-    $search = trim($request->query->get('q', ''));
-    
-    if (strlen($search) < 2) {
+    public function search(Request $request, UtilisateurRepository $userRepo): Response
+    {
+        $search = trim($request->query->get('q', ''));
+        
+        if (strlen($search) < 2) {
+            return $this->render('message/_search_results.html.twig', [
+                'search' => $search,
+                'results' => []
+            ]);
+        }
+        
+        $results = $userRepo->createQueryBuilder('u')
+            ->where('CONCAT(u.prenom, \' \', u.nom) LIKE :search')
+            ->orWhere('u.prenom LIKE :search')
+            ->orWhere('u.nom LIKE :search')
+            ->setParameter('search', '%'.$search.'%')
+            ->setMaxResults(10) // Limitez les résultats
+            ->getQuery()
+            ->getResult();
+        
         return $this->render('message/_search_results.html.twig', [
             'search' => $search,
-            'results' => []
+            'results' => $results
         ]);
     }
-    
-    $results = $userRepo->createQueryBuilder('u')
-        ->where('CONCAT(u.prenom, \' \', u.nom) LIKE :search')
-        ->orWhere('u.prenom LIKE :search')
-        ->orWhere('u.nom LIKE :search')
-        ->setParameter('search', '%'.$search.'%')
-        ->setMaxResults(10) // Limitez les résultats
-        ->getQuery()
-        ->getResult();
-    
-    return $this->render('message/_search_results.html.twig', [
-        'search' => $search,
-        'results' => $results
-    ]);
-}
 
     #[Route('/new', name: '_new')]
     public function new(Request $request, EntityManagerInterface $em, UtilisateurRepository $userRepo): Response
@@ -180,26 +180,26 @@ public function search(Request $request, UtilisateurRepository $userRepo): Respo
 
 
     #[Route('/delete/{id<\d+>}', name: '_delete', methods: ['POST'])]
-public function deleteConversation(
-    int $id, 
-    UtilisateurRepository $userRepo,
-    MessageRepository $messageRepo
-): JsonResponse
-{
-    $currentUser = $this->getUser();
-    $partner = $userRepo->find($id);
-    
-    if (!$partner) {
-        return $this->json(['success' => false, 'message' => 'Utilisateur non trouvé'], 404);
+    public function deleteConversation(
+        int $id, 
+        UtilisateurRepository $userRepo,
+        MessageRepository $messageRepo
+    ): JsonResponse
+    {
+        $currentUser = $this->getUser();
+        $partner = $userRepo->find($id);
+        
+        if (!$partner) {
+            return $this->json(['success' => false, 'message' => 'Utilisateur non trouvé'], 404);
+        }
+        
+        $deletedCount = $messageRepo->deleteConversationMessages($currentUser, $partner);
+        
+        return $this->json([
+            'success' => true, 
+            'deletedCount' => $deletedCount
+        ]);
     }
-    
-    $deletedCount = $messageRepo->deleteConversationMessages($currentUser, $partner);
-    
-    return $this->json([
-        'success' => true, 
-        'deletedCount' => $deletedCount
-    ]);
-}
     #[Route('/count-unread', name: '_count_unread', methods: ['GET'])]
     public function countUnread(MessageRepository $messageRepo): JsonResponse
     {
@@ -207,5 +207,16 @@ public function deleteConversation(
         $count = $messageRepo->countUnreadMessages($user);
         
         return new JsonResponse(['count' => $count]);
+    }
+    #[Route('/messagerie/{id<\d+>}', name: 'messagerie')]
+    public function messagerie(
+        int $id,
+        UtilisateurRepository $userRepo,
+        MessageRepository $messageRepo,
+        Request $request,
+        EntityManagerInterface $em
+    ): Response {
+        // Réutilise la logique de la méthode conversation
+        return $this->conversation($id, $userRepo, $messageRepo, $request, $em);
     }
 }

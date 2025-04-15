@@ -41,11 +41,13 @@ security:
         - { path: ^/mentions-legales, roles: PUBLIC_ACCESS }
         - { path: ^/politique-de-confidentialite, roles: PUBLIC_ACCESS }
         - { path: ^/$, roles: PUBLIC_ACCESS }
+        - { path: ^/etudiant/profil/utilisateur, roles: [ROLE_ENTREPRISE, ROLE_ETUDIANT] }
         - { path: ^/entreprise, roles: ROLE_ENTREPRISE }
         - { path: ^/tuteur, roles: ROLE_TUTEUR }
         - { path: ^/etudiant, roles: ROLE_ETUDIANT }
         - { path: ^/messagerie, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
+        
 
 
 when@test:
