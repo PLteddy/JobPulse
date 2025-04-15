@@ -73,13 +73,53 @@ public function candidatures(string $filter, EntityManagerInterface $em): Respon
     }
 
     #[Route('/etudiant/tuteur', name: 'etudiant_tuteur')]
-    public function tuteur(): Response
+    public function tuteur(EntityManagerInterface $em): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ETUDIANT');
 
-        // Logique pour afficher les informations sur le tuteur
-        return $this->render('etudiant/tuteur.html.twig');
+        // Récupérer l'utilisateur (étudiant) connecté
+        $etudiant = $this->getUser();
+
+        // Récupérer les tuteurs associés à l'étudiant
+        $tuteurs = $etudiant->getTuteurs();
+
+        // Passer les tuteurs au template
+        return $this->render('etudiant/tuteur.html.twig', [
+            'tuteurs' => $tuteurs
+        ]);
     }
+
+    #[Route('/etudiant/retirer-tuteur/{id}', name: 'etudiant_retirer_tuteur')]
+    public function retirerTuteur(
+        Utilisateur $tuteur, 
+        EntityManagerInterface $entityManager,
+        Request $request
+    ): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ETUDIANT');
+
+        $etudiant = $this->getUser();
+
+        // Retirer le tuteur de la liste de l'étudiant
+        $etudiant->removeTuteur($tuteur);
+
+        $entityManager->flush();
+        $this->addFlash('success', 'Le tuteur a été retiré de votre liste');
+
+        return $this->redirectToRoute('etudiant_tuteur');
+    }
+
+    #[Route('/etudiant/profil-tuteur/{id}', name: 'etudiant_profil_tuteur')]
+    public function profilTuteur(Utilisateur $tuteur): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ETUDIANT');
+
+        // Vérifier que l'utilisateur est bien le tuteur de l'étudiant connecté
+        $etudiant = $this->getUser();
+        if (!$etudiant->getTuteurs()->contains($tuteur)) {
+            throw $this->createAccessDeniedException('Ce tuteur nest pas dans votre liste');
+        }
+    } 
 
     #[Route('/sauvegarder-poste/{id}', name: 'etudiant_sauvegarder_poste')]
     public function sauvegarderPoste(
