@@ -22,6 +22,9 @@
         
     }
 }
+.popup-header h2{
+    margin-bottom: 0px;
+}
 .fleche{
     max-width: 41px;
     margin: 40px 0;
@@ -77,12 +80,12 @@
 }
 
 .popup-content {
-    background-color: #f9f9f9;
+    background-color: #f8f5d7;
     padding: 20px;
     border-radius: 10px;
+    box-shadow:  10px 10px 0px #FF6B35;
     width: 930px;
     max-width: 1000px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     position: relative;
 
     form{
@@ -104,7 +107,59 @@
     font-size: 20px;
     cursor: pointer;
 }
+/* Stylise le champ d'importation de fichier */
+input[type="file"] {
+    padding: 10px;
+    border: 2px solid #FF6B35;
+    border-radius: 8px;
+    background-color: #ffffff;
+    font-weight: bold;
+    cursor: pointer;
+    width: fit-content;
+    color: #333;
+}
+.hidden-file {
+    display: none;
+}
 
+.custom-file-upload-wrapper {
+    margin-bottom: 1rem;
+}
+
+
+
+.file-name-placeholder {
+    font-size: 0.9rem;
+    color: #555;
+    display: inline-block;
+    margin-top: 5px;
+}
+
+
+/* Écarte le label du champ fichier */
+.form-group label {
+    margin-bottom: 6px;
+    display: block;
+    font-weight: 600;
+}
+
+/* Zone de texte motivation */
+textarea {
+    padding: 12px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    resize: vertical;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Espace autour de chaque champ */
+.popup-content .form-group,
+.popup-content .form-row,
+.popup-content form > div {
+    margin-bottom: 20px;
+}
 .form-group {
     margin-bottom: 15px;
 }
@@ -113,7 +168,6 @@ textarea {
     width: 100%;
     height: 100px;
     resize: none;
-    padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 14px;
@@ -126,6 +180,7 @@ textarea {
 }
 
 .btn {
+    margin-top: 40px;
     background-color: #FC8756;
     color: white;
     border: none;
@@ -136,4 +191,27 @@ textarea {
 
 .btn:hover {
     background-color: #e76b3c;
+}
+@media only screen and (max-width:420px){
+    .fleche{
+        max-width: 20px;
+        margin: 20px 0;
+    }
+    .differentes-parties{
+        gap: 20px;
+        .text-muted{
+            font-size: 16px;
+        }
+    }
+
+    .popup-content {
+        width: 90%;
+        padding: 10px;
+    }
+    .popup-close {
+        font-size: 16px;
+    }
+    .form-group {
+        margin-bottom: 10px;
+    }
 }

@@ -48,9 +48,7 @@
                     <button type="button" class="bouton-filtres" id="showFilters">
                             <i class="fas fa-sliders-h"></i> Filtres<img src="{{ asset('img/filtre.svg') }}" alt="filtres" class="filtres">
                     </button>
-                    <button type="button" class="bouton-localisation" id="">
-                            <i class="fas fa-sliders-h"></i><img src="{{ asset('img/localisation.svg') }}" alt="filtres" class="filtres">Localisation<img src="{{ asset('img/triangle.svg') }}" alt="filtres" class="filtres">
-                    </button>
+
                     </div>
                     
             {# LE CSS DES FILTRES EST ENTIEREMENT A REFAIRE #}
@@ -63,7 +61,7 @@
                         <h5>Type de contrat</h5>
                         <div class="filters-grid">
                             {# Type de contrat #}
-                            <div class="filter-group">
+                            <div class="filter-buttons">
                                 
                                 {% for contrat in contratTypes %}
                                     <div class="form-check">
@@ -98,25 +96,26 @@
                         <input type="hidden" name="duree" id="duree_values" value="{{ selectedDuree }}">
                         
                                                   {# Salaire minimum #}
+                                                  <h5>Salaire minimum</h5>
                                                     <div class="filter-group">
-                                                        <h5>Salaire minimum</h5>
+                                                        
                                                         <div class="salary-input">
-                            <label for="salaire_min">Salaire minimum</label>
-                            <input type="range"
-                                id="salaire_min"
-                                name="salaire_min"
-                                min="0"
-                                max="10"
-                                step="1000"
-                                value="{{ selectedSalaireMin|default(10) }}"
-                                class="slider">
+                            <label for="salaire_min"></label>
+<input type="range"
+    id="salaire_min"
+    name="salaire_min"
+    min="0"
+    max="1500"
+    step="5"
+    value="{{ selectedSalaireMin|default(250) }}"
+    class="slider">
                             <span id="salaire_valeur">{{ selectedSalaireMin|default(10) }} €</span>
                         </div>
                         </div>
 
                             {# Télétravail #}
+                            <h5>Mode de travail</h5>
                             <div class="filter-group">
-                                <h5>Mode de travail</h5>
                                 <select name="presence" class="form-select">
                                     <option value="">Tous</option>
                                     {% for presence in presences %}
@@ -130,7 +129,7 @@
                         </div>
 
                         <div class="filters-actions">
-                            <button type="submit" class="btn btn-primary">Appliquer les filtres</button>
+                            <button type="submit" class="bouton-localisation">Appliquer les filtres</button>
                             {% if searchTerm or selectedContrat or selectedDuree or selectedSalaireMin or selectedPresence %}
                                 <a href="{{ path('home') }}" class="btn btn-outline-secondary">Réinitialiser</a>
                             {% endif %}
@@ -228,6 +227,9 @@
                                 <div class="profile-card-body">
                                     <div class="debut-carte">
                                         <h4 class="card-title">{{ profil.prenom }} {{ profil.nom }}</h4>
+                                        <div onclick="event.preventDefault(); {% if is_route_login %}window.location.href='{{ path(route_name) }}'{% else %}window.location.href='{{ path(route_name, {'id': profil.id}) }}'{% endif %}">
+                                            <img src="{{ asset('img/non_enregistre.png') }}" alt="non-enregistré" class="img-deux">
+                                        </div>
                                     </div>
                                     <div class="localisation">
                                         <img src="{{ asset('img/localisation.svg') }}" alt="point de repère" class="mini-icon">

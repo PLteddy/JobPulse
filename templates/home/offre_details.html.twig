@@ -55,17 +55,34 @@
         {% else %}
             <a class="bouton-connexion" href="javascript:void(0);" id="ouvrirPopup">Postuler</a>
 
-            <div id="popupPostuler" class="popup-container">
-                <div class="popup-content">
-                    <button class="popup-close" id="fermerPopup">&times;</button>
-                    <h2>Postuler à cette offre</h2>
-                    {{ form_start(form, { 'attr': { 'enctype': 'multipart/form-data' } }) }}
-                        {{ form_row(form.cvCandidature) }}
-                        {{ form_row(form.motivation) }}
-                        <button type="submit" class="btn btn-primary">Valider</button>
-                    {{ form_end(form) }}
-                </div>
+<div id="popupPostuler" class="popup-container">
+    <div class="popup-content">
+        <div class="popup-header">
+            <h2>Postuler à cette offre</h2>
+            <button type="button" class="btn-close" id="fermerPopup">
+                <img src="{{ asset('img/close.svg') }}" alt="Fermer le menu">
+            </button>
+        </div>
+
+        {{ form_start(form, { 'attr': { 'enctype': 'multipart/form-data' } }) }}
+
+            {{ form_label(form.cvCandidature) }}
+            <div class="custom-file-upload-wrapper">
+                <label for="{{ form.cvCandidature.vars.id }}" class="custom-file-label">
+                    Choisir un fichier
+                </label>
+                {{ form_widget(form.cvCandidature, {'attr': {'class': 'hidden-file'}}) }}
+                <span id="file-name" class="file-name-placeholder"></span>
             </div>
+
+            {{ form_row(form.motivation) }}
+
+            <button type="submit" class="btn btn-primary">Valider</button>
+
+        {{ form_end(form) }}
+    </div>
+</div>
+
         {% endif %}
     </div>
     <div>
@@ -193,7 +210,18 @@
 {% endif %}
 </section>
 <script>
-        
+     document.addEventListener("DOMContentLoaded", function () {
+        const input = document.querySelector('.hidden-file');
+        const fileName = document.getElementById('file-name');
+
+        input.addEventListener('change', function () {
+            if (this.files.length > 0) {
+                fileName.textContent = this.files[0].name;
+            } else {
+                fileName.textContent = '';
+            }
+        });
+    });
         
     document.addEventListener('DOMContentLoaded', function () {
         console.log('Script chargé : DOMContentLoaded');

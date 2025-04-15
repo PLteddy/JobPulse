@@ -116,8 +116,8 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 525px;
-    height: 784px;
+    width: 400px;
+    height: 600px;
     background: rgba(255, 255, 255, 0.98);
     z-index: 1000;
     padding: 30px;
@@ -136,6 +136,7 @@
         color: white;
     }
 }
+
 .salary-input {
     margin: 20px 0;
 }
@@ -187,7 +188,12 @@
 .filters-overlay.active {
     display: block;
 }
-
+.les-filtres{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 50px;
+}
 .filters-header {
     display: flex;
     justify-content: space-between;
@@ -254,6 +260,13 @@
 .job-card-link {
     width: 939px;
     margin: 0 auto;
+}
+.card-text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .job-card {
@@ -418,7 +431,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 30px;
+    gap: 15px;
     width: 100%;
     margin-bottom: 40px;
 }
@@ -468,7 +481,7 @@
 
 
 /* Ajustement pour les cartes de profil sur mobile */
-@media (max-width: 768px) {
+@media only screen and (max-width:420px)  {
     .profil-card-container {
         flex-direction: column;
         width: 100%;
@@ -489,13 +502,211 @@
 
 
 /* Responsive */
-@media (max-width: 768px) {
-    .search-bar {
-        flex-direction: column;
+@media only screen and (max-width:420px)  {
+    .welcome {
+        height: 85px;
+        padding: 10px;
+        width:unset ;
     }
+    .card-body img {
+        width: 12px;
+        height: auto;
     
-    .search-input, .search-btn, .filter-toggle {
+    }
+    .welcome-text {
+        width: 275px;
+        margin: 0;
+        padding:10px;
+        h1{
+            font-size: 20px;
+            line-height: 24px;
+        }
+    }
+    .welcome img {
+        height: 100%;
+        object-fit: cover;
+    }
+    .user-info, .auth-actions {
         width: 100%;
+        padding: 10px;
+    }
+    .quick-links, .inscription-links {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    .quick-links a, .inscription-links a {
+        margin: 0;
+    }
+    .search-container {
+        width: 100%;
+        padding: 10px;
+    }
+    .search-container .card-body {
+        width: fit-content;
+    }
+    .search-bar {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    .search-input {
+        width: 100%;
+        padding: 10px;
+        font-size: 1rem;
+    }
+    .search-btn, .filter-toggle {
+        padding: 10px 15px;
+        font-size: 1rem;
+    }
+    .filter-toggle {
+        width: 100%;
+        justify-content: center;
+    }
+    .filters-overlay {
+        width: 100%;
+        height: auto;
+        padding: 20px;
+        margin: 0 auto;
+        top: 0;
+        left: 0;
+        transform: translate(0, 0);
+    }
+    .filters-grid {
+        grid-template-columns: 1fr;
+    }
+    .filter-group {
+        grid-template-columns: 1fr;
+    }
+    .filter-group h5 {
+        margin-bottom: 10px;
+    }
+    .filter-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    .filter-button {
+        width: 100%;
+        padding: 10px;
+        text-align: center;
+    }
+    .results-grid {
+        grid-template-columns: 1fr;
+    }
+    .job-card {
+        width: 313px;
+        height: 128px;
+        margin: 0 auto;
+    }
+    .card-text {
+        -webkit-line-clamp: 2;
+      }
+    .job-card-link {
+        width: 100%;
+        margin: 0 auto;
+    }
+    .image-container {
+        width:128px;
+        height: 128px;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .les-filtres {
+        margin-top: 25px;
+    }
+    .job-details {
+        margin: 10px 0;
+    }
+    .job-details p {
+        margin: 5px 0;
+    }
+    .no-results {
+        padding: 20px;
+    }
+    .custom-modal-dialog {
+        width: 90%;
+        max-width: 400px;
+    }
+    .custom-modal-content {
+        padding: 15px;
+    }
+    .custom-modal-header {
+        padding: 10px 0;
+    }
+    .custom-modal-body {
+        padding: 10px 0;
+    }
+    .custom-modal-footer {
+        padding: 10px 0;
+    }
+    .profil-card-container {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+    .profil-image-container {
+        margin-bottom: 20px;
+    }
+    .profil-image {
+        width: 125px;
+        height: auto;
+    }
+    .profil-placeholder {
+        width: 100%;
+        height: auto;
+    }
+    .profile-job-card {
+        width: 100%;
+        height: auto;
+        margin: 0 auto;
+    }
+    .profile-job-card:hover {
+        transform: scale(1);
+    }
+    .profile-card-body {
+        padding: 20px;
+    }
+    .card-body {
+        padding: 20px;
+    }
+    .job-details {
+        margin: 10px 0;
+    }
+    .job-details p {
+        margin: 5px 0;
+    }
+    .no-results {
+        padding: 20px;
+    }
+    .custom-modal-dialog {
+        width: 90%;
+        max-width: 400px;
+    }
+    .custom-modal-content {
+        padding: 15px;
+    }
+    .search-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    .search-bar {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    .search-bar {
+        max-width: 90%;
+        width: 100%;
+
+    }
+    .card-body {
+        padding: 15px;
+    }
+    .search-input, .search-btn, .filter-toggle {
+        font-size: 1rem;
+        padding: 20px;
+
     }
     
     .filters-grid {
