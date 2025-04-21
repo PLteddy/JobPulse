@@ -19,9 +19,11 @@ use Symfony\Component\Validator\Constraints\File;
 
 class PosteType extends AbstractType
 {
+    //ça permet de définir les différents champs du formulaire
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            //ajout d'un champ texte pour le titre de l'offre <- c'est comme ça qu'on rajoute un champ et après pour les autres on modifie juste le type genre Textearea ou ChoiceType
             ->add('intitule', TextType::class)
             ->add('description', TextareaType::class)
             ->add('domaine', TextType::class)
@@ -64,7 +66,9 @@ class PosteType extends AbstractType
                 ],
             ]);
     }
-
+    /**
+     * Configure les options du formulaire.
+     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

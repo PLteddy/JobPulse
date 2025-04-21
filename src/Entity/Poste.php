@@ -231,7 +231,6 @@ class Poste
     }
 
 
-    // Ajoutez ces méthodes (à la fin de la classe, avant la dernière })
     public function getEntreprise(): ?Utilisateur
     {
         return $this->entreprise;

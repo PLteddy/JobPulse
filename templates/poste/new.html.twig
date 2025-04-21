@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}{{ (poste.id) ? 'Modifier' : 'Créer' }} une offre{% endblock %}
+{# Définit le titre de la page en fonction de l'action (création ou modification) #}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
@@ -12,7 +13,7 @@
 
 {% block body %}
 
-
+        {# Démarre le formulaire Symfony #}
         {{ form_start(form) }}
 <section class="container">
     
@@ -23,7 +24,9 @@
             <div class="bouton-champ">
                 <!-- Champ d'upload caché -->
             {{ form_widget(form.imageFile, {'attr': {'class': 'hidden-upload'}}) }}
+             {# Champ d'upload pour l'image, caché par défaut #}
             {{ form_errors(form.imageFile) }}
+            {# Affiche les erreurs liées au champ imageFile #}
 
             <!-- Bouton personnalisé -->
             <button type="button" class="bouton-connexion" id="custom-upload-button">Choisir l'image</button>
@@ -34,6 +37,7 @@
 
         <button type="submit" class="bouton-enregistrer">
              {{ (poste.id) ? 'Mettre à jour' : 'Créer' }}
+             {# Texte du bouton en fonction de l'action (création ou modification) #}
             <img src="{{ asset('img/check.png') }}" alt="icone enregistrer" class="icon-enregistrer">
         </button>
         
