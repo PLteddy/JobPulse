@@ -13,8 +13,19 @@ RUN apt-get update && apt-get install -y \
 # Activer Apache mod_rewrite
 RUN a2enmod rewrite
 
-# Créer uniquement le répertoire var à ce stade
-RUN mkdir -p /var/www/html/var && chown -R www-data:www-data /var/www/html/var
+# Configurer le DocumentRoot d'Apache pour pointer vers le dossier public de Symfony
+RUN echo '<VirtualHost *:80>\n\
+    DocumentRoot /var/www/html/public\n\
+    <Directory /var/www/html/public>\n\
+        AllowOverride All\n\
+        Require all granted\n\
+    </Directory>\n\
+    ErrorLog ${APACHE_LOG_DIR}/error.log\n\
+    CustomLog ${APACHE_LOG_DIR}/access.log combined\n\
+</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
+
+# Créer le répertoire var
+RUN mkdir -p /var/www/html/var
 
 # Copier les fichiers du projet dans le conteneur
 COPY . /var/www/html
@@ -25,11 +36,13 @@ WORKDIR /var/www/html
 # Installer Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Installer les dépendances Symfony (cela va créer le répertoire vendor)
+# Installer les dépendances Symfony
 RUN composer install --no-dev --optimize-autoloader --prefer-dist --no-scripts
 
-# Maintenant vous pouvez changer les permissions du répertoire vendor
-RUN chown -R www-data:www-data /var/www/html/var /var/www/html/vendor
+# Définir les bonnes permissions
+RUN chown -R www-data:www-data /var/www/html
+RUN find /var/www/html -type d -exec chmod 755 {} \;
+RUN find /var/www/html -type f -exec chmod 644 {} \;
 
 # Exposer le port 80
 EXPOSE 80
