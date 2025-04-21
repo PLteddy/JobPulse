@@ -6,7 +6,6 @@ Ce projet a été conçu dans le cadre d’un travail universitaire à l’Unive
 
 🔗 [Accéder au site](https://jobpulse-production.up.railway.app/)
 
----
 
 ## Stack technique
 
@@ -16,7 +15,6 @@ Ce projet a été conçu dans le cadre d’un travail universitaire à l’Unive
 - **Déploiement** : Railway
 - **Hébergement** : Railway
 
----
 
 ## Équipe projet
 
@@ -24,7 +22,6 @@ Ce projet a été conçu dans le cadre d’un travail universitaire à l’Unive
 - **Ndayishimiye Victor Emmanuel** – [victor-emmanuel.ndayishimiye@etu.univ-smb.fr](mailto:victor-emmanuel.ndayishimiye@etu.univ-smb.fr)  
 - **Sebdaoui Yussera** – [yussera.sebdaoui@etu.univ-smb.fr](mailto:yussera.sebdaoui@etu.univ-smb.fr)
 
----
 
 **Propriété intellectuelle**  
 L’ensemble des contenus (textes, visuels, logos, etc.) présents sur le site Job Pulse sont la propriété de l'équipe projet ou de leurs auteurs respectifs.  
