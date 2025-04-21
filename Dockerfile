@@ -39,6 +39,13 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Installer les dépendances Symfony
 RUN composer install --no-dev --optimize-autoloader --prefer-dist
 
+# Créer le script pour nettoyer les templates
+RUN echo '#!/bin/bash\n\
+find /var/www/html/templates -type f -name "*.twig" -exec sed -i "s/{{ *dump(.*) *}}/<!-- dump removed -->/g" {} \;\n\
+' > /usr/local/bin/clean-templates.sh
+
+RUN chmod +x /usr/local/bin/clean-templates.sh
+
 # Configurer les permissions adéquates
 RUN chown -R www-data:www-data /var/www/html
 RUN find /var/www/html -type d -exec chmod 755 {} \;
@@ -52,6 +59,7 @@ php bin/console doctrine:database:create --if-not-exists -n || true\n\
 php bin/console doctrine:schema:create -n || true\n\
 php bin/console doctrine:migrations:sync-metadata-storage -n || true\n\
 php bin/console doctrine:migrations:version --add --all -n || true\n\
+/usr/local/bin/clean-templates.sh\n\
 chown -R www-data:www-data /var/www/html/var\n\
 exec apache2-foreground\n\
 ' > /usr/local/bin/entrypoint.sh
