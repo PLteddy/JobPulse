@@ -19,11 +19,11 @@ COPY . /var/www/html
 # Définir le répertoire de travail
 WORKDIR /var/www/html
 
-# Installer Composer
+# Installer Composer (depuis le Docker Composer officiel)
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Installer les dépendances Symfony
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader --prefer-dist
 
 # Droits
 RUN chown -R www-data:www-data /var/www/html/var /var/www/html/vendor
