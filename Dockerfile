@@ -23,7 +23,7 @@ WORKDIR /var/www/html
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Installer les dépendances Symfony
-RUN composer install --no-dev --optimize-autoloader --prefer-dist
+RUN composer install --no-dev --optimize-autoloader --prefer-dist --no-scripts
 
 # Droits
 RUN chown -R www-data:www-data /var/www/html/var /var/www/html/vendor
