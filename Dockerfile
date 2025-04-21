@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
 
 # Activer Apache mod_rewrite
 RUN a2enmod rewrite
+RUN mkdir -p /var/www/html/var && chown -R www-data:www-data /var/www/html/var /var/www/html/vendor
 
 # Copier les fichiers du projet dans le conteneur
 COPY . /var/www/html
