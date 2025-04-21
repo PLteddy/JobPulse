@@ -24,8 +24,8 @@ RUN echo '<VirtualHost *:80>\n\
     CustomLog ${APACHE_LOG_DIR}/access.log combined\n\
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
 
-# Créer les répertoires nécessaires
-RUN mkdir -p /var/www/html/var
+# Préparer les répertoires avec les permissions correctes
+RUN mkdir -p /var/www/html/var/cache /var/www/html/var/log
 
 # Copier les fichiers du projet
 COPY . /var/www/html
@@ -39,16 +39,27 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Installer les dépendances Symfony
 RUN composer install --no-dev --optimize-autoloader --prefer-dist
 
-# Permissions
+# Configurer les permissions adéquates
 RUN chown -R www-data:www-data /var/www/html
 RUN find /var/www/html -type d -exec chmod 755 {} \;
 RUN find /var/www/html -type f -exec chmod 644 {} \;
+RUN chmod -R 777 /var/www/html/var
 
-# Nettoyer le cache et chauffer le cache de production
-RUN APP_ENV=prod APP_DEBUG=0 php bin/console cache:clear --no-warmup
-RUN APP_ENV=prod APP_DEBUG=0 php bin/console cache:warmup
+# Créer un script d'entrée pour gérer le démarrage
+RUN echo '#!/bin/bash\n\
+set -e\n\
+php bin/console doctrine:database:create --if-not-exists -n || true\n\
+php bin/console doctrine:schema:create -n || true\n\
+php bin/console doctrine:migrations:sync-metadata-storage -n || true\n\
+php bin/console doctrine:migrations:version --add --all -n || true\n\
+chown -R www-data:www-data /var/www/html/var\n\
+exec apache2-foreground\n\
+' > /usr/local/bin/entrypoint.sh
 
-# Créer la base de données et exécuter les migrations si DATABASE_URL est défini
-CMD php bin/console doctrine:database:create --if-not-exists -n || true \
-    && php bin/console doctrine:migrations:migrate -n || true \
-    && apache2-foreground
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Exposer le port 80
+EXPOSE 80
+
+# Utiliser le script d'entrée comme point d'entrée
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
