@@ -10,15 +10,22 @@ RUN apt-get update && apt-get install -y \
     zip \
     && docker-php-ext-install intl pdo pdo_mysql zip
 
-# Activer Apache mod_rewrite
-RUN a2enmod rewrite
+# Activer Apache mod_rewrite et headers
+RUN a2enmod rewrite headers
 
-# Configurer le DocumentRoot d'Apache
+# Configurer le DocumentRoot d'Apache avec les bonnes règles de réécriture
 RUN echo '<VirtualHost *:80>\n\
     DocumentRoot /var/www/html/public\n\
     <Directory /var/www/html/public>\n\
-        AllowOverride All\n\
+        AllowOverride None\n\
         Require all granted\n\
+        FallbackResource /index.php\n\
+        <IfModule mod_rewrite.c>\n\
+            Options -MultiViews\n\
+            RewriteEngine On\n\
+            RewriteCond %{REQUEST_FILENAME} !-f\n\
+            RewriteRule ^(.*)$ index.php [QSA,L]\n\
+        </IfModule>\n\
     </Directory>\n\
     ErrorLog ${APACHE_LOG_DIR}/error.log\n\
     CustomLog ${APACHE_LOG_DIR}/access.log combined\n\
@@ -29,6 +36,13 @@ RUN mkdir -p /var/www/html/var/cache /var/www/html/var/log
 
 # Copier les fichiers du projet
 COPY . /var/www/html
+
+# Créer un .htaccess approprié si nécessaire
+RUN echo '<IfModule mod_rewrite.c>\n\
+    RewriteEngine On\n\
+    RewriteCond %{REQUEST_FILENAME} !-f\n\
+    RewriteRule ^(.*)$ index.php [QSA,L]\n\
+</IfModule>' > /var/www/html/public/.htaccess
 
 # Définir le répertoire de travail
 WORKDIR /var/www/html
