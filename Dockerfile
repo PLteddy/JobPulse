@@ -17,7 +17,7 @@ RUN a2enmod rewrite headers
 RUN echo '<VirtualHost *:80>\n\
     DocumentRoot /var/www/html/public\n\
     <Directory /var/www/html/public>\n\
-        AllowOverride None\n\
+        AllowOverride All\n\
         Require all granted\n\
         FallbackResource /index.php\n\
         <IfModule mod_rewrite.c>\n\
@@ -53,6 +53,14 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Installer les dépendances Symfony
 RUN composer install --no-dev --optimize-autoloader --prefer-dist
 
+# Configurer PHP pour afficher les erreurs en production
+RUN { \
+    echo 'display_errors = On'; \
+    echo 'display_startup_errors = On'; \
+    echo 'error_reporting = E_ALL'; \
+    echo 'log_errors = On'; \
+} > /usr/local/etc/php/conf.d/error-logging.ini
+
 # Créer le script pour nettoyer les templates
 RUN echo '#!/bin/bash\n\
 find /var/www/html/templates -type f -name "*.twig" -exec sed -i "s/{{ *dump(.*) *}}/<!-- dump removed -->/g" {} \;\n\
@@ -69,12 +77,25 @@ RUN chmod -R 777 /var/www/html/var
 # Créer un script d'entrée pour gérer le démarrage
 RUN echo '#!/bin/bash\n\
 set -e\n\
+# Afficher les variables d'environnement (sans les secrets)\n\
+env | grep -v PASSWORD | grep -v SECRET | grep -v TOKEN\n\
+\n\
+echo "Vérification de la base de données..."\n\
 php bin/console doctrine:database:create --if-not-exists -n || true\n\
 php bin/console doctrine:schema:create -n || true\n\
 php bin/console doctrine:migrations:sync-metadata-storage -n || true\n\
 php bin/console doctrine:migrations:version --add --all -n || true\n\
+\n\
+echo "Nettoyage des templates..."\n\
 /usr/local/bin/clean-templates.sh\n\
+\n\
+echo "Vérification des permissions..."\n\
 chown -R www-data:www-data /var/www/html/var\n\
+\n\
+echo "Nettoyage du cache..."\n\
+php bin/console cache:clear\n\
+\n\
+echo "Démarrage du serveur..."\n\
 exec apache2-foreground\n\
 ' > /usr/local/bin/entrypoint.sh
 
