@@ -16,24 +16,22 @@ RUN apt-get update && apt-get install -y \
 RUN a2enmod rewrite headers
 
 # Configurer le DocumentRoot d'Apache
-RUN cat > /etc/apache2/sites-available/000-default.conf << 'EOL'
-<VirtualHost *:80>
-    DocumentRoot /var/www/html/public
-    <Directory /var/www/html/public>
-        AllowOverride All
-        Require all granted
-        FallbackResource /index.php
-        <IfModule mod_rewrite.c>
-            Options -MultiViews
-            RewriteEngine On
-            RewriteCond %{REQUEST_FILENAME} !-f
-            RewriteRule ^(.*)$ index.php [QSA,L]
-        </IfModule>
-    </Directory>
-    ErrorLog ${APACHE_LOG_DIR}/error.log
-    CustomLog ${APACHE_LOG_DIR}/access.log combined
-</VirtualHost>
-EOL
+RUN echo '<VirtualHost *:80>' > /etc/apache2/sites-available/000-default.conf && \
+    echo '    DocumentRoot /var/www/html/public' >> /etc/apache2/sites-available/000-default.conf && \
+    echo '    <Directory /var/www/html/public>' >> /etc/apache2/sites-available/000-default.conf && \
+    echo '        AllowOverride All' >> /etc/apache2/sites-available/000-default.conf && \
+    echo '        Require all granted' >> /etc/apache2/sites-available/000-default.conf && \
+    echo '        FallbackResource /index.php' >> /etc/apache2/sites-available/000-default.conf && \
+    echo '        <IfModule mod_rewrite.c>' >> /etc/apache2/sites-available/000-default.conf && \
+    echo '            Options -MultiViews' >> /etc/apache2/sites-available/000-default.conf && \
+    echo '            RewriteEngine On' >> /etc/apache2/sites-available/000-default.conf && \
+    echo '            RewriteCond %{REQUEST_FILENAME} !-f' >> /etc/apache2/sites-available/000-default.conf && \
+    echo '            RewriteRule ^(.*)$ index.php [QSA,L]' >> /etc/apache2/sites-available/000-default.conf && \
+    echo '        </IfModule>' >> /etc/apache2/sites-available/000-default.conf && \
+    echo '    </Directory>' >> /etc/apache2/sites-available/000-default.conf && \
+    echo '    ErrorLog ${APACHE_LOG_DIR}/error.log' >> /etc/apache2/sites-available/000-default.conf && \
+    echo '    CustomLog ${APACHE_LOG_DIR}/access.log combined' >> /etc/apache2/sites-available/000-default.conf && \
+    echo '</VirtualHost>' >> /etc/apache2/sites-available/000-default.conf
 
 # Préparer le répertoire de travail
 WORKDIR /var/www/html
@@ -58,27 +56,21 @@ COPY . .
 RUN APP_ENV=prod composer dump-autoload --optimize --no-dev --classmap-authoritative
 
 # Configurer PHP pour la journalisation des erreurs
-RUN cat > /usr/local/etc/php/conf.d/error-logging.ini << 'EOL'
-display_errors = On
-display_startup_errors = On
-error_reporting = E_ALL
-log_errors = On
-EOL
+RUN echo 'display_errors = On' > /usr/local/etc/php/conf.d/error-logging.ini && \
+    echo 'display_startup_errors = On' >> /usr/local/etc/php/conf.d/error-logging.ini && \
+    echo 'error_reporting = E_ALL' >> /usr/local/etc/php/conf.d/error-logging.ini && \
+    echo 'log_errors = On' >> /usr/local/etc/php/conf.d/error-logging.ini
 
 # Créer un .htaccess
-RUN cat > public/.htaccess << 'EOL'
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^(.*)$ index.php [QSA,L]
-</IfModule>
-EOL
+RUN echo '<IfModule mod_rewrite.c>' > public/.htaccess && \
+    echo '    RewriteEngine On' >> public/.htaccess && \
+    echo '    RewriteCond %{REQUEST_FILENAME} !-f' >> public/.htaccess && \
+    echo '    RewriteRule ^(.*)$ index.php [QSA,L]' >> public/.htaccess && \
+    echo '</IfModule>' >> public/.htaccess
 
 # Créer le script pour nettoyer les templates
-RUN cat > /usr/local/bin/clean-templates.sh << 'EOL'
-#!/bin/bash
-find /var/www/html/templates -type f -name "*.twig" -exec sed -i "s/{{ *dump(.*) *}}/<!-- dump removed -->/g" {} \;
-EOL
+RUN echo '#!/bin/bash' > /usr/local/bin/clean-templates.sh && \
+    echo 'find /var/www/html/templates -type f -name "*.twig" -exec sed -i "s/{{ *dump(.*) *}}/<!-- dump removed -->/g" {} \;' >> /usr/local/bin/clean-templates.sh
 
 RUN chmod +x /usr/local/bin/clean-templates.sh
 
@@ -89,44 +81,42 @@ RUN chown -R www-data:www-data var vendor && \
     chmod -R 777 var
 
 # Créer le script d'entrée
-RUN cat > /usr/local/bin/entrypoint.sh << 'EOL'
-#!/bin/bash
-set -e
-
-# Définir l'environnement si non défini
-if [ -z "$APP_ENV" ]; then
-    export APP_ENV=prod
-    echo "APP_ENV non défini, utilisation de 'prod' par défaut."
-else
-    echo "Environnement Symfony: $APP_ENV"
-fi
-
-# S'assurer que tout est configuré pour la production
-export APP_ENV=prod
-export APP_DEBUG=0
-
-# Afficher les variables d'environnement (sans les secrets)
-env | grep -v PASSWORD | grep -v SECRET | grep -v TOKEN
-
-echo "Vérification de la base de données..."
-php bin/console doctrine:database:create --if-not-exists -n || true
-php bin/console doctrine:schema:create -n || true
-php bin/console doctrine:migrations:sync-metadata-storage -n || true
-php bin/console doctrine:migrations:version --add --all -n || true
-
-echo "Nettoyage des templates..."
-/usr/local/bin/clean-templates.sh
-
-echo "Vérification des permissions..."
-chown -R www-data:www-data /var/www/html/var
-
-echo "Nettoyage du cache..."
-APP_ENV=prod php bin/console cache:clear --no-warmup
-APP_ENV=prod php bin/console cache:warmup
-
-echo "Démarrage du serveur..."
-exec apache2-foreground
-EOL
+RUN echo '#!/bin/bash' > /usr/local/bin/entrypoint.sh && \
+    echo 'set -e' >> /usr/local/bin/entrypoint.sh && \
+    echo '' >> /usr/local/bin/entrypoint.sh && \
+    echo '# Définir l'"'"'environnement si non défini' >> /usr/local/bin/entrypoint.sh && \
+    echo 'if [ -z "$APP_ENV" ]; then' >> /usr/local/bin/entrypoint.sh && \
+    echo '    export APP_ENV=prod' >> /usr/local/bin/entrypoint.sh && \
+    echo '    echo "APP_ENV non défini, utilisation de '"'"'prod'"'"' par défaut."' >> /usr/local/bin/entrypoint.sh && \
+    echo 'else' >> /usr/local/bin/entrypoint.sh && \
+    echo '    echo "Environnement Symfony: $APP_ENV"' >> /usr/local/bin/entrypoint.sh && \
+    echo 'fi' >> /usr/local/bin/entrypoint.sh && \
+    echo '' >> /usr/local/bin/entrypoint.sh && \
+    echo '# S'"'"'assurer que tout est configuré pour la production' >> /usr/local/bin/entrypoint.sh && \
+    echo 'export APP_ENV=prod' >> /usr/local/bin/entrypoint.sh && \
+    echo 'export APP_DEBUG=0' >> /usr/local/bin/entrypoint.sh && \
+    echo '' >> /usr/local/bin/entrypoint.sh && \
+    echo '# Afficher les variables d'"'"'environnement (sans les secrets)' >> /usr/local/bin/entrypoint.sh && \
+    echo 'env | grep -v PASSWORD | grep -v SECRET | grep -v TOKEN' >> /usr/local/bin/entrypoint.sh && \
+    echo '' >> /usr/local/bin/entrypoint.sh && \
+    echo 'echo "Vérification de la base de données..."' >> /usr/local/bin/entrypoint.sh && \
+    echo 'php bin/console doctrine:database:create --if-not-exists -n || true' >> /usr/local/bin/entrypoint.sh && \
+    echo 'php bin/console doctrine:schema:create -n || true' >> /usr/local/bin/entrypoint.sh && \
+    echo 'php bin/console doctrine:migrations:sync-metadata-storage -n || true' >> /usr/local/bin/entrypoint.sh && \
+    echo 'php bin/console doctrine:migrations:version --add --all -n || true' >> /usr/local/bin/entrypoint.sh && \
+    echo '' >> /usr/local/bin/entrypoint.sh && \
+    echo 'echo "Nettoyage des templates..."' >> /usr/local/bin/entrypoint.sh && \
+    echo '/usr/local/bin/clean-templates.sh' >> /usr/local/bin/entrypoint.sh && \
+    echo '' >> /usr/local/bin/entrypoint.sh && \
+    echo 'echo "Vérification des permissions..."' >> /usr/local/bin/entrypoint.sh && \
+    echo 'chown -R www-data:www-data /var/www/html/var' >> /usr/local/bin/entrypoint.sh && \
+    echo '' >> /usr/local/bin/entrypoint.sh && \
+    echo 'echo "Nettoyage du cache..."' >> /usr/local/bin/entrypoint.sh && \
+    echo 'APP_ENV=prod php bin/console cache:clear --no-warmup' >> /usr/local/bin/entrypoint.sh && \
+    echo 'APP_ENV=prod php bin/console cache:warmup' >> /usr/local/bin/entrypoint.sh && \
+    echo '' >> /usr/local/bin/entrypoint.sh && \
+    echo 'echo "Démarrage du serveur..."' >> /usr/local/bin/entrypoint.sh && \
+    echo 'exec apache2-foreground' >> /usr/local/bin/entrypoint.sh
 
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
