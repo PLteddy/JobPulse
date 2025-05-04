@@ -33,11 +33,11 @@
             <div class="popup-content">
                 <button class="popup-close" id="fermerPopup">&times;</button>
                 <h2>Postuler à cette offre</h2>
-                {{ form_start(form) }}
-                    {{ form_row(form.cv) }}
-                    {{ form_row(form.message) }}
-                    <button type="submit" class="btn btn-primary">Valider</button>
-                {{ form_end(form) }}
+        {{ form_start(form) }}
+            {{ form_row(form.cvCandidature) }}
+            {{ form_row(form.motivation) }}
+            <button type="submit" class="btn btn-primary">Valider</button>
+        {{ form_end(form) }}
             </div>
         </div>
             {# Ajouter un bouton de partage pour les tuteurs #}
