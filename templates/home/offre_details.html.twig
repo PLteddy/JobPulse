@@ -11,155 +11,146 @@
 {% block body %}
 <section class="container">
     <div class="welcome">
-    {% if poste.image is defined and poste.image %}
-        <img src="{{ asset('uploads/images/' ~ poste.image) }}" alt="{{ poste.intitule }}">
-    {% endif %}
+    <img src="{{ asset('uploads/images/' ~ poste.image) }}" alt="{{ poste.intitule }}">
     </div>
     
     <a href="{{ path('home') }}">
-        <img src="{{ asset('img/fleche_retour.svg') }}" alt="flèche retour" class="fleche">
-    </a>
+    <img src="{{ asset('img/fleche_retour.svg') }}" alt="flèche retour" class="fleche">
+</a>
+
+
     
     <div class="differentes-parties">
         <div class="titre-postule">
         <div class="info-debut">
             <h1>{{ poste.intitule|nl2br }}</h1>
-            {% if poste.domaine is defined and poste.localisation is defined %}
-                <p class="text-muted">{{ poste.domaine|nl2br }} - {{ poste.localisation|nl2br }}</p>
-            {% endif %}
+            <p class="text-muted">{{ poste.domaine|nl2br }} - {{ poste.localisation|nl2br }}</p>
         </div> 
         {% if not app.user %}
-            {# Si l'utilisateur n'est pas connecté, on affiche juste un bouton de connexion #}
-            <a class="bouton-connexion" href="{{ path('app_login') }}">Postuler</a>
+        <a class="bouton-connexion" href="{{ path('app_login') }}">Postuler</a>
+
+        <div id="popupPostuler" class="popup-container">
+            <div class="popup-content">
+                <button class="popup-close" id="fermerPopup">&times;</button>
+                <h2>Postuler à cette offre</h2>
+                {{ form_start(form) }}
+                    {{ form_row(form.cv) }}
+                    {{ form_row(form.message) }}
+                    <button type="submit" class="btn btn-primary">Valider</button>
+                {{ form_end(form) }}
+            </div>
+        </div>
+            {# Ajouter un bouton de partage pour les tuteurs #}
         {% elseif is_granted('ROLE_TUTEUR') %}
             <div class="actions-tuteur">                
-                {% if app.user.etudiants is defined and app.user.etudiants is not empty %}
+                {% if app.user.etudiants is not empty %}
                     <button type="button" class="bouton-connexion" id="ouvrirModal">
-                        Partager
-                    </button>
+                    Partager
+                </button>
                 {% endif %}
-            </div>
-        {% elseif is_granted('ROLE_ENTREPRISE') %}
-            {# L'utilisateur est une entreprise, on n'affiche rien #}
+                            </div>
+            {% elseif is_granted('ROLE_ENTREPRISE') %}
+                {# L'utilisateur est une entreprise on affiche rien #}
+
         {% else %}
-            {# Utilisateur connecté (probablement étudiant), on affiche le bouton pour postuler #}
             <a class="bouton-connexion" href="javascript:void(0);" id="ouvrirPopup">Postuler</a>
 
-            {# Popup de candidature uniquement si l'utilisateur est connecté et le formulaire existe #}
-            {% if form is not null %}
-            <div id="popupPostuler" class="popup-container">
-                <div class="popup-content">
-                    <div class="popup-header">
-                        <h2>Postuler à cette offre</h2>
-                        <button type="button" class="btn-close" id="fermerPopup">
-                            <img src="{{ asset('img/close.svg') }}" alt="Fermer le menu">
-                        </button>
-                    </div>
+<div id="popupPostuler" class="popup-container">
+    <div class="popup-content">
+        <div class="popup-header">
+            <h2>Postuler à cette offre</h2>
+            <button type="button" class="btn-close" id="fermerPopup">
+                <img src="{{ asset('img/close.svg') }}" alt="Fermer le menu">
+            </button>
+        </div>
 
-                    {{ form_start(form, { 'attr': { 'enctype': 'multipart/form-data' } }) }}
-                    
-                    {% if form.cvCandidature is defined %}
-                        {{ form_label(form.cvCandidature) }}
-                        <div class="custom-file-upload-wrapper">
-                            <label for="{{ form.cvCandidature.vars.id }}" class="custom-file-label">
-                                Choisir un fichier
-                            </label>
-                            {{ form_widget(form.cvCandidature, {'attr': {'class': 'hidden-file'}}) }}
-                            <span id="file-name" class="file-name-placeholder"></span>
-                        </div>
-                    {% endif %}
+        {{ form_start(form, { 'attr': { 'enctype': 'multipart/form-data' } }) }}
 
-                    {% if form.motivation is defined %}
-                        {{ form_row(form.motivation) }}
-                    {% endif %}
-
-                    <button type="submit" class="btn btn-primary">Valider</button>
-
-                    {{ form_end(form) }}
-                </div>
+            {{ form_label(form.cvCandidature) }}
+            <div class="custom-file-upload-wrapper">
+                <label for="{{ form.cvCandidature.vars.id }}" class="custom-file-label">
+                    Choisir un fichier
+                </label>
+                {{ form_widget(form.cvCandidature, {'attr': {'class': 'hidden-file'}}) }}
+                <span id="file-name" class="file-name-placeholder"></span>
             </div>
-            {% endif %}
+
+            {{ form_row(form.motivation) }}
+
+            <button type="submit" class="btn btn-primary">Valider</button>
+
+        {{ form_end(form) }}
+    </div>
+</div>
+
         {% endif %}
     </div>
-
     <div>
         <h2>Description du poste</h2>
         <p>{{ poste.description|nl2br }}</p>
     </div>  
-
-    {% if poste.missions is defined %}
     <div>
         <h2>Missions</h2>
         <p>{{ poste.missions|nl2br }}</p>
     </div>             
-    {% endif %}
-
-    {% if poste.profilRecherche is defined %}
     <div>
-        <h2>Profil recherché</h2>
-        <p>{{ poste.profilRecherche|nl2br }}</p>
+    <h2>Profil recherché</h2>
+    <p>{{ poste.profilRecherche|nl2br }}</p>
     </div>
-    {% endif %}
-                    
-    {% if poste.infoSupp is defined and poste.infoSupp %}
-    <div>    
-        <h2>Informations supplémentaires</h2>
-        <p>{{ poste.infoSupp|nl2br }}</p>
-    </div>
-    {% endif %}
                     
     <div>    
-        <h2>Détails de l'offre</h2>
-        {% if poste.contratType is defined %}<p><strong>Type de contrat:</strong> {{ poste.contratType.value }}</p>{% endif %}
-        {% if poste.duree is defined %}<p><strong>Durée:</strong> {{ poste.duree.value }}</p>{% endif %}
-        {% if poste.presence is defined %}<p><strong>Présence:</strong> {{ poste.presence.value }}</p>{% endif %}
-        {% if poste.salaire is defined %}<p><strong>Salaire:</strong> {{ poste.salaire|nl2br }} €</p>{% endif %}
-    </div>
-
-    {% if poste.contact is defined %}
-    <div>
-        <h2>Contact</h2>
-        <p>{{ poste.contact|nl2br }}</p>
-    </div>
+    {% if poste.infoSupp %}
+    <h2>Informations supplémentaires</h2>
+    <p>{{ poste.infoSupp|nl2br }}</p>
     {% endif %}
-
-    {% if poste.entreprise is defined %}
-    <div>
-        <h2>Présentation de l'entreprise</h2>
-        <h3>{{ poste.entreprise.nom|nl2br}}</h3>
-        {% if poste.presentationEntreprise is defined %}
-            <p>{{ poste.presentationEntreprise|nl2br }}</p>
-        {% endif %}
     </div>
-    {% endif %}
+                    
+    <div>    
+    <h2>Détails de l'offre</h2>
+    <p><strong>Type de contrat:</strong> {{ poste.contratType.value }}</p>
+    <p><strong>Durée:</strong> {{ poste.duree.value }}</p>
+    <p><strong>Présence:</strong> {{ poste.presence.value }}</p>
+    Salaire:</strong> {{ poste.salaire|nl2br }} €</p>
+    </p>
+    </div>
+        <div>
+    <h2>Contact</h2>
+    <p>{{ poste.contact|nl2br }}</p>
+    </div>
+    <div>
+    <h2>Présentation de l’entreprise</h2>
+    <h3>{{ poste.entreprise.nom|nl2br}}</h3>
+    <p>{{ poste.presentationEntreprise|nl2br }}</p>
+    </div>
     </div>
     
-{% if is_granted('ROLE_TUTEUR') and app.user.etudiants is defined and app.user.etudiants is not empty %}
+{% if is_granted('ROLE_TUTEUR') and app.user.etudiants is not empty %}
     <!-- Modal personnalisé sans Bootstrap -->
     <div id="partageModal" class="custom-modal">
         <div class="custom-modal-dialog">
             <div class="custom-modal-content">
                 <div class="custom-modal-header">
                     <h5 class="modal-title">Partager cette offre</h5>
-                    <button type="button" class="btn-close" id="fermerModal">
-                        <img src="{{ asset('img/close.svg') }}" alt="Fermer le menu">
-                    </button>
+<button type="button" class="btn-close" id="fermerModal">
+    <img src="{{ asset('img/close.svg') }}" alt="Fermer le menu">
+</button>
                 </div>
                 <div class="custom-modal-body">
                     <form method="post" id="partagerForm" action="{{ path('tuteur_partager_multiple', {'posteId': poste.id}) }}">
                         <label class="form-label">Sélectionner les étudiants</label>
-                        <div class="list-group">
-                            <div class="list-group-item">
-                                <input type="checkbox" id="select-all" class="checkbox-orange" onclick="toggleSelectAll()">
-                                <label for="select-all">Sélectionner tous les étudiants</label>
-                            </div>
-                            {% for etudiant in app.user.etudiants %}
-                                <div class="list-group-item">
-                                    <input type="checkbox" name="etudiants[]" value="{{ etudiant.id }}" id="etudiant-{{ etudiant.id }}" class="checkbox-orange">
-                                    <label for="etudiant-{{ etudiant.id }}">{{ etudiant.nom }} {{ etudiant.prenom }}</label>
-                                </div>
-                            {% endfor %}
-                        </div>
+<div class="list-group">
+    <div class="list-group-item">
+        <input type="checkbox" id="select-all" class="checkbox-orange" onclick="toggleSelectAll()">
+        <label for="select-all">Sélectionner tous les étudiants</label>
+    </div>
+    {% for etudiant in app.user.etudiants %}
+        <div class="list-group-item">
+            <input type="checkbox" name="etudiants[]" value="{{ etudiant.id }}" id="etudiant-{{ etudiant.id }}" class="checkbox-orange">
+            <label for="etudiant-{{ etudiant.id }}">{{ etudiant.nom }} {{ etudiant.prenom }}</label>
+        </div>
+    {% endfor %}
+</div>
+
                     </form>
                 </div>
                 <div class="custom-modal-footer">
@@ -171,105 +162,109 @@
     </div>
 
     <script>
+        const modal = document.getElementById('partageModal');
+        const ouvrirBtn = document.getElementById('ouvrirModal'); // ce bouton doit exister ailleurs dans ta page
+        const fermerBtns = [
+            document.getElementById('fermerModal'),
+            document.getElementById('fermerModal2')
+        ];
         function toggleSelectAll() {
-            // Récupérer l'état du checkbox "Sélectionner tous les étudiants"
-            var isChecked = document.getElementById('select-all').checked;
+    // Récupérer l'état du checkbox "Sélectionner tous les étudiants"
+    var isChecked = document.getElementById('select-all').checked;
 
-            // Sélectionner tous les checkboxes d'étudiants
-            var checkboxes = document.querySelectorAll('input[name="etudiants[]"]');
+    // Sélectionner tous les checkboxes d'étudiants
+    var checkboxes = document.querySelectorAll('input[name="etudiants[]"]');
 
-            // Parcourir tous les checkboxes et les cocher ou décocher
-            checkboxes.forEach(function(checkbox) {
-                checkbox.checked = isChecked;
+    // Parcourir tous les checkboxes et les cocher ou décocher
+    checkboxes.forEach(function(checkbox) {
+        checkbox.checked = isChecked;
+    });
+}
+        ouvrirBtn?.addEventListener('click', () => {
+            modal.style.display = 'block';
+        });
+
+        fermerBtns.forEach(btn => {
+            btn?.addEventListener('click', () => {
+                modal.style.display = 'none';
             });
-        }
+        });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('partageModal');
-            const ouvrirBtn = document.getElementById('ouvrirModal');
-            const fermerBtns = [
-                document.getElementById('fermerModal'),
-                document.getElementById('fermerModal2')
-            ];
-            
-            if (ouvrirBtn) {
-                ouvrirBtn.addEventListener('click', () => {
-                    if (modal) modal.style.display = 'block';
-                });
-            }
-
-            if (fermerBtns) {
-                fermerBtns.forEach(btn => {
-                    if (btn) {
-                        btn.addEventListener('click', () => {
-                            if (modal) modal.style.display = 'none';
-                        });
-                    }
-                });
-            }
-
-            if (modal) {
-                window.addEventListener('click', (e) => {
-                    if (e.target === modal) {
-                        modal.style.display = 'none';
-                    }
-                });
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
             }
         });
 
         function partagerOffre() {
-            const form = document.getElementById('partagerForm');
-            if (!form) return;
-            
             const checkboxes = document.querySelectorAll('input[name="etudiants[]"]:checked');
             if (checkboxes.length === 0) {
                 alert('Veuillez sélectionner au moins un étudiant');
                 return;
             }
-            form.submit();
+            document.getElementById('partagerForm').submit();
         }
     </script>
+    
+    
 {% endif %}
 </section>
-
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+     document.addEventListener("DOMContentLoaded", function () {
         const input = document.querySelector('.hidden-file');
         const fileName = document.getElementById('file-name');
 
-        if (input && fileName) {
-            input.addEventListener('change', function () {
-                if (this.files.length > 0) {
-                    fileName.textContent = this.files[0].name;
-                } else {
-                    fileName.textContent = '';
-                }
-            });
-        }
+        input.addEventListener('change', function () {
+            if (this.files.length > 0) {
+                fileName.textContent = this.files[0].name;
+            } else {
+                fileName.textContent = '';
+            }
+        });
+    });
         
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('Script chargé : DOMContentLoaded');
         const ouvrirPopup = document.getElementById('ouvrirPopup');
         const fermerPopup = document.getElementById('fermerPopup');
         const popup = document.getElementById('popupPostuler');
         
-        if (ouvrirPopup && popup) {
-            ouvrirPopup.addEventListener('click', () => {
-                popup.style.display = 'flex';
-            });
+        // Vérifiez si les éléments existent
+        if (!ouvrirPopup) {
+            console.error('Élément avec l\'ID "ouvrirPopup" introuvable.');
+        } else {
+            console.log('Élément "ouvrirPopup" trouvé.');
         }
+
+        if (!fermerPopup) {
+            console.error('Élément avec l\'ID "fermerPopup" introuvable.');
+        } else {
+            console.log('Élément "fermerPopup" trouvé.');
+        }
+
+        if (!popup) {
+            console.error('Élément avec l\'ID "popupPostuler" introuvable.');
+        } else {
+            console.log('Élément "popupPostuler" trouvé.');
+        }
+        // Ouvrir la pop-up
+        ouvrirPopup.addEventListener('click', () => {
+            popup.style.display = 'flex';
+        });
     
-        if (fermerPopup && popup) {
-            fermerPopup.addEventListener('click', () => {
+        // Fermer la pop-up
+        fermerPopup.addEventListener('click', () => {
+            popup.style.display = 'none';
+        });
+    
+        // Fermer la pop-up en cliquant à l'extérieur
+        window.addEventListener('click', (e) => {
+            if (e.target === popup) {
                 popup.style.display = 'none';
-            });
-        }
-    
-        if (popup) {
-            window.addEventListener('click', (e) => {
-                if (e.target === popup) {
-                    popup.style.display = 'none';
-                }
-            });
-        }
+            }
+        });
     });
+    
+    
 </script>
 {% endblock %}
