@@ -68,7 +68,7 @@ RUN echo '<IfModule mod_rewrite.c>\n\
     RewriteEngine On\n\
     RewriteCond %{REQUEST_FILENAME} !-f\n\
     RewriteRule ^(.*)$ index.php [QSA,L]\n\
-</IfModule>' > /public/.htaccess
+</IfModule>' > public/.htaccess
 
 # Créer le script pour nettoyer les templates
 RUN echo '#!/bin/bash\n\
