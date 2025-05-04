@@ -134,49 +134,64 @@ class HomeController extends AbstractController
                     
                     $form->handleRequest($request);
                     if ($form->isSubmitted() && $form->isValid()) {
-                        // Gestion de l'upload du CV
-                        $cvFile = $form->get('cvCandidature')->getData();
-                        if ($cvFile) {
-                            $originalFilename = pathinfo($cvFile->getClientOriginalName(), PATHINFO_FILENAME);
-                            $safeFilename = $slugger->slug($originalFilename);
-                            $cvFileName = $safeFilename . '-' . uniqid() . '.' . $cvFile->guessExtension();
-                    
-                            try {
-                                $cvFile->move(
-                                    $this->getParameter('uploads_directory'),
-                                    $cvFileName
-                                );
-                            } catch (\Exception $e) {
-                                $this->addFlash('error', 'Une erreur est survenue lors de l\'upload du CV.');
-                                return $this->redirectToRoute('offre_details', ['id' => $poste->getId()]);
+                        try {
+                            // Gestion de l'upload du CV
+                            $cvFile = $form->get('cvCandidature')->getData();
+                            if ($cvFile) {
+                                $originalFilename = pathinfo($cvFile->getClientOriginalName(), PATHINFO_FILENAME);
+                                $safeFilename = $slugger->slug($originalFilename);
+                                $cvFileName = $safeFilename . '-' . uniqid() . '.' . $cvFile->guessExtension();
+                        
+                                try {
+                                    $cvFile->move(
+                                        $this->getParameter('uploads_directory'),
+                                        $cvFileName
+                                    );
+                                } catch (\Exception $e) {
+                                    $this->addFlash('error', 'Une erreur est survenue lors de l\'upload du CV: ' . $e->getMessage());
+                                    return $this->redirectToRoute('offre_details', ['id' => $poste->getId()]);
+                                }
+                        
+                                $candidature->setCvCandidature($cvFileName);
                             }
-                    
-                            $candidature->setCvCandidature($cvFileName);
+                        
+                            // Récupération manuelle de la motivation
+                            $motivation = $form->get('motivation')->getData();
+                            $candidature->setMotivation($motivation);
+                        
+                            // Lier l'utilisateur et le poste à la candidature
+                            $candidature->setUtilisateur($user);
+                            $candidature->setPoste($poste);
+                            $candidature->setEtat(Etat::EN_ATTENTE);
+                        
+                            $em->persist($candidature);
+                            $em->flush();
+                        
+                            $this->addFlash('success', 'Votre candidature a été envoyée avec succès.');
+                            return $this->redirectToRoute('offre_details', ['id' => $poste->getId()]);
+                        } catch (\Exception $e) {
+                            // Log l'erreur et affiche un message d'erreur générique
+                            error_log('Erreur lors de la candidature: ' . $e->getMessage());
+                            $this->addFlash('error', 'Une erreur est survenue lors de l\'envoi de votre candidature.');
+                            return $this->redirectToRoute('offre_details', ['id' => $poste->getId()]);
                         }
-                    
-                        // Récupération manuelle de la motivation
-                        $motivation = $form->get('motivation')->getData();
-                        $candidature->setMotivation($motivation);
-                    
-                        // Lier l'utilisateur et le poste à la candidature
-                        $candidature->setUtilisateur($user);
-                        $candidature->setPoste($poste);
-                        $candidature->setEtat(Etat::EN_ATTENTE);
-                    
-                        $em->persist($candidature);
-                        $em->flush();
-                    
-                        $this->addFlash('success', 'Votre candidature a été envoyée avec succès.');
-                        return $this->redirectToRoute('offre_details', ['id' => $poste->getId()]);
                     }
                 }
                 
-                return $this->render('home/offre_details.html.twig', [
-                    'poste' => $poste,
-                    'form' => $form ? $form->createView() : null,
-                ]);
+                // Assure-toi que l'entité Poste est complètement chargée avec toutes ses relations
+                try {
+                    return $this->render('home/offre_details.html.twig', [
+                        'poste' => $poste,
+                        'form' => $form ? $form->createView() : null,
+                    ]);
+                } catch (\Exception $e) {
+                    // Log l'erreur
+                    error_log('Erreur lors du rendu de la page offre_details: ' . $e->getMessage());
+                    $this->addFlash('error', 'Une erreur est survenue lors de l\'affichage de cette offre.');
+                    return $this->redirectToRoute('home');
+                }
             }
-    
+            
     #[Route('/profil/{id}', name: 'profil_details')]
     public function profilDetails(Utilisateur $utilisateur): Response
     {
