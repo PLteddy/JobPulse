@@ -35,7 +35,7 @@ RUN composer install --no-dev --optimize-autoloader --prefer-dist --no-scripts -
 COPY . .
 
 # Finaliser l'installation de Composer avec autoloader
-RUN composer dump-autoloader --optimize --no-dev
+RUN composer dump-autoload --optimize --no-dev
 
 # Configurer le DocumentRoot d'Apache avec les bonnes règles de réécriture
 RUN echo '<VirtualHost *:80>\n\
