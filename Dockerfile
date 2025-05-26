@@ -21,6 +21,10 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Définir le répertoire de travail
 WORKDIR /var/www/html
 
+# Variables d'environnement importantes
+ENV APP_ENV=prod
+ENV APP_DEBUG=0
+
 # Copier composer.json et composer.lock en premier pour optimiser le cache Docker
 COPY composer.json composer.lock ./
 
@@ -31,7 +35,7 @@ RUN composer install --no-dev --optimize-autoloader --prefer-dist --no-scripts -
 COPY . .
 
 # Finaliser l'installation de Composer avec autoloader
-RUN composer dump-autoload --optimize --no-dev
+RUN composer dump-autoloader --optimize --no-dev
 
 # Configurer le DocumentRoot d'Apache avec les bonnes règles de réécriture
 RUN echo '<VirtualHost *:80>\n\
@@ -61,33 +65,44 @@ RUN echo '<IfModule mod_rewrite.c>\n\
     RewriteRule ^(.*)$ index.php [QSA,L]\n\
 </IfModule>' > /var/www/html/public/.htaccess
 
-# Créer le script pour nettoyer les templates
-RUN echo '#!/bin/bash\n\
-find /var/www/html/templates -type f -name "*.twig" -exec sed -i "s/{{ *dump(.*) *}}/<!-- dump removed -->/g" {} + 2>/dev/null || true\n\
-' > /usr/local/bin/clean-templates.sh && chmod +x /usr/local/bin/clean-templates.sh
-
-# Créer un script d'entrée pour gérer le démarrage
+# Script d'entrée plus robuste avec gestion d'erreurs
 RUN echo '#!/bin/bash\n\
 set -e\n\
 \n\
-echo "Initialisation de la base de données..."\n\
-php bin/console doctrine:database:create --if-not-exists -n || echo "Database creation failed or already exists"\n\
-php bin/console doctrine:schema:create -n || echo "Schema creation failed or already exists"\n\
-php bin/console doctrine:migrations:sync-metadata-storage -n || echo "Migration sync failed"\n\
-php bin/console doctrine:migrations:version --add --all -n || echo "Migration versioning failed"\n\
+echo "=== Démarrage de l'\''application Symfony ==="\n\
 \n\
-echo "Nettoyage des templates..."\n\
-/usr/local/bin/clean-templates.sh\n\
+# Vérifier que les fichiers essentiels existent\n\
+if [ ! -f "/var/www/html/bin/console" ]; then\n\
+    echo "ERREUR: bin/console introuvable"\n\
+    exit 1\n\
+fi\n\
 \n\
-echo "Préparation du cache..."\n\
-php bin/console cache:clear --env=prod --no-debug\n\
-php bin/console cache:warmup --env=prod --no-debug\n\
-\n\
+# Configuration des permissions AVANT les commandes Symfony\n\
 echo "Configuration des permissions..."\n\
-chown -R www-data:www-data /var/www/html/var\n\
-chmod -R 775 /var/www/html/var\n\
+chown -R www-data:www-data /var/www/html/var || true\n\
+chmod -R 775 /var/www/html/var || true\n\
 \n\
-echo "Démarrage dApache..."\n\
+# Tentative de préparation du cache (non bloquante)\n\
+echo "Nettoyage du cache..."\n\
+php bin/console cache:clear --env=prod --no-debug || echo "Warning: Cache clear failed"\n\
+\n\
+# Si base de données configurée, tenter les migrations\n\
+if [ ! -z "$DATABASE_URL" ]; then\n\
+    echo "Configuration de la base de données..."\n\
+    php bin/console doctrine:database:create --if-not-exists -n || echo "Warning: Database creation failed or already exists"\n\
+    php bin/console doctrine:migrations:migrate -n --allow-no-migration || echo "Warning: Migration failed"\n\
+else\n\
+    echo "Pas de DATABASE_URL configurée, passage des migrations DB"\n\
+fi\n\
+\n\
+# Réchauffage du cache\n\
+echo "Réchauffage du cache..."\n\
+php bin/console cache:warmup --env=prod --no-debug || echo "Warning: Cache warmup failed"\n\
+\n\
+# Permissions finales\n\
+chown -R www-data:www-data /var/www/html/var || true\n\
+\n\
+echo "=== Démarrage d'\''Apache ==="\n\
 exec apache2-foreground\n\
 ' > /usr/local/bin/entrypoint.sh && chmod +x /usr/local/bin/entrypoint.sh
 
