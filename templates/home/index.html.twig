@@ -1,6 +1,4 @@
-
 {% extends 'base.html.twig' %}
-
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
@@ -89,10 +87,7 @@
                         </div>
 
                         <!-- L'input caché pour stocker les valeurs -->
-                            <!-- L'input caché pour stocker les valeurs -->
-                        {% if dureeValues is defined %}
-                            {{ dump(dureeValues) }}
-                        {% endif %}
+                        {# Suppression du dump() qui cause l'erreur 500 #}
                         <input type="hidden" name="duree" id="duree_values" value="{{ selectedDuree }}">
                         
                                                   {# Salaire minimum #}
