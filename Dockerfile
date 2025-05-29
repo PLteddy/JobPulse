@@ -22,61 +22,70 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Définir le répertoire de travail
 WORKDIR /var/www/html
 
-# Copier composer.json et composer.lock en premier (pour le cache Docker)
+# Copier composer.json et composer.lock en premier
 COPY composer.json composer.lock* ./
 
-# Diagnostic initial amélioré
-RUN echo "=== DIAGNOSTIC INITIAL ===" && \
-    pwd && \
-    ls -la && \
-    echo "Composer version:" && \
+# Diagnostic initial
+RUN echo "=== DIAGNOSTIC COMPOSER ===" && \
     composer --version && \
-    echo "PHP version:" && \
-    php --version && \
-    echo "Memory limit:" && \
-    php -r "echo ini_get('memory_limit');" && \
-    echo "" && \
-    echo "Composer.json content:" && \
-    cat composer.json 2>/dev/null || echo "composer.json NOT FOUND" && \
+    echo "Validating composer.json:" && \
+    composer validate --no-check-publish || echo "Validation failed" && \
+    echo "Composer.json content (first 50 lines):" && \
+    head -50 composer.json && \
     echo "=========================="
 
-# Installation Composer avec gestion d'erreur améliorée
-RUN if [ -f "composer.json" ]; then \
-        echo "Installing Composer dependencies..." && \
-        # Augmenter la limite mémoire pour Composer
-        php -d memory_limit=512M /usr/bin/composer install \
-            --no-dev \
-            --optimize-autoloader \
-            --no-interaction \
-            --verbose \
-            --no-cache \
-            --ignore-platform-reqs 2>&1 | tee composer-install.log || { \
-                echo "=== COMPOSER INSTALL FAILED ==="; \
-                echo "Exit code: $?"; \
-                echo "Last 20 lines of output:"; \
-                tail -20 composer-install.log 2>/dev/null || echo "No log available"; \
-                echo "Composer diagnose:"; \
-                composer diagnose || true; \
-                echo "Available memory:"; \
-                free -h || true; \
-                echo "Disk space:"; \
-                df -h || true; \
+# Installation Composer AVEC dépendances dev pour les bundles requis
+RUN echo "Installing Composer dependencies (including dev for bundles)..." && \
+    php -d memory_limit=1G /usr/bin/composer install \
+        --optimize-autoloader \
+        --no-interaction \
+        --verbose \
+        --no-cache \
+        --ignore-platform-reqs 2>&1 | tee composer-install.log || { \
+            echo "=== COMPOSER INSTALL FAILED ==="; \
+            echo "Trying to install missing bundle manually..."; \
+            composer require sensio/framework-extra-bundle --no-cache --ignore-platform-reqs || true; \
+            echo "Retrying full install..."; \
+            composer install --optimize-autoloader --no-interaction --ignore-platform-reqs || { \
+                echo "Final composer install failed. Logs:"; \
+                cat composer-install.log; \
                 exit 1; \
             }; \
-    else \
-        echo "No composer.json found, skipping composer install"; \
-    fi
+        }
 
-# Copier le reste des fichiers après l'installation Composer
+# Vérification des bundles installés
+RUN echo "=== BUNDLES VERIFICATION ===" && \
+    echo "Checking for SensioFrameworkExtraBundle:" && \
+    find vendor/ -name "*SensioFrameworkExtraBundle*" -type d 2>/dev/null || echo "Bundle not found in vendor/" && \
+    echo "Checking autoload files:" && \
+    ls -la vendor/composer/ && \
+    echo "Autoload classmap check:" && \
+    grep -r "SensioFrameworkExtraBundle" vendor/composer/ || echo "Not found in autoload" && \
+    echo "=========================="
+
+# Copier le reste des fichiers
 COPY . .
 
-# Fix pour éviter les erreurs de bundles dev en production
+# Vérification et correction de la configuration des bundles
 RUN if [ -f "config/bundles.php" ]; then \
-        echo "Checking bundles configuration..." && \
-        grep -q "DebugBundle" config/bundles.php && echo "DebugBundle found in config" || echo "DebugBundle not in config"; \
+        echo "=== BUNDLES CONFIGURATION ===" && \
+        echo "Current bundles.php content:" && \
+        cat config/bundles.php && \
+        echo "Checking for SensioFrameworkExtraBundle registration..." && \
+        if ! grep -q "SensioFrameworkExtraBundle" config/bundles.php; then \
+            echo "Adding SensioFrameworkExtraBundle to bundles.php..."; \
+            cp config/bundles.php config/bundles.php.backup; \
+            sed -i "/return \[/a\\    Sensio\\\\Bundle\\\\FrameworkExtraBundle\\\\SensioFrameworkExtraBundle::class => ['all' => true]," config/bundles.php; \
+        fi; \
+        echo "Final bundles.php:"; \
+        cat config/bundles.php; \
+        echo "========================"; \
     fi
 
-# Configuration Apache avec ServerName
+# Regénérer l'autoloader après les modifications
+RUN composer dump-autoload --optimize --no-dev
+
+# Configuration Apache
 RUN echo 'ServerName localhost' > /etc/apache2/conf-available/servername.conf && \
     a2enconf servername
 
@@ -97,12 +106,12 @@ RUN echo '<VirtualHost *:80>\n\
 RUN mkdir -p var/cache var/log var/sessions && \
     chown -R www-data:www-data var/
 
-# .htaccess simple
+# .htaccess
 RUN echo 'RewriteEngine On\n\
 RewriteCond %{REQUEST_FILENAME} !-f\n\
 RewriteRule ^(.*)$ index.php [QSA,L]' > public/.htaccess
 
-# Script d'entrée avec plus de stabilité
+# Script d'entrée amélioré avec vérification des bundles
 RUN echo '#!/bin/bash\n\
 set -e\n\
 \n\
@@ -110,16 +119,26 @@ echo "=== STARTING JOBPULSE ==="\n\
 echo "Date: $(date)"\n\
 echo "PHP Version: $(php -v | head -n 1)"\n\
 echo "Working Directory: $(pwd)"\n\
-echo "Container User: $(whoami)"\n\
 \n\
-# Test critique\n\
+# Vérifications critiques\n\
 if [ ! -f "public/index.php" ]; then\n\
     echo "ERROR: public/index.php not found!"\n\
-    echo "Available PHP files:"\n\
-    find . -name "*.php" -type f | head -10\n\
     exit 1\n\
 fi\n\
 echo "✓ public/index.php found"\n\
+\n\
+# Vérification du bundle manquant\n\
+echo "Checking SensioFrameworkExtraBundle availability..."\n\
+php -r "spl_autoload_register(function(\$class) { include __DIR__ . '\''/vendor/autoload.php\''; }); \n\
+if (class_exists('\'Sensio\\\\Bundle\\\\FrameworkExtraBundle\\\\SensioFrameworkExtraBundle\'')) { \n\
+    echo '✓ SensioFrameworkExtraBundle is available'; \n\
+} else { \n\
+    echo '✗ SensioFrameworkExtraBundle NOT FOUND'; \n\
+    echo 'Available Sensio classes:'; \n\
+    foreach (get_declared_classes() as \$class) { \n\
+        if (strpos(\$class, '\'Sensio\'') === 0) echo \$class . PHP_EOL; \n\
+    } \n\
+}" || echo "Bundle check failed"\n\
 \n\
 # Test de syntaxe PHP\n\
 php -l public/index.php || exit 1\n\
@@ -129,7 +148,7 @@ echo "✓ PHP syntax OK"\n\
 export APP_ENV=prod\n\
 export APP_DEBUG=0\n\
 \n\
-# Cache Symfony (optionnel)\n\
+# Cache Symfony\n\
 if [ -f "bin/console" ]; then\n\
     echo "Clearing Symfony cache..."\n\
     php bin/console cache:clear --env=prod --no-debug 2>/dev/null || {\n\
@@ -139,23 +158,16 @@ if [ -f "bin/console" ]; then\n\
     echo "✓ Cache ready"\n\
 fi\n\
 \n\
-# Permissions finales\n\
+# Permissions\n\
 chown -R www-data:www-data var/ 2>/dev/null || true\n\
 chmod -R 775 var/ 2>/dev/null || true\n\
 \n\
-# Test Apache configuration\n\
-apache2ctl configtest || {\n\
-    echo "Apache config test failed!"\n\
-    exit 1\n\
-}\n\
+# Test Apache\n\
+apache2ctl configtest || exit 1\n\
 echo "✓ Apache config OK"\n\
 \n\
 echo "=== STARTING APACHE SERVER ==="\n\
-echo "Server will be available on port 80"\n\
-\n\
-# Trap pour gérer les signaux proprement\n\
 trap "echo Stopping...; apache2ctl graceful-stop; exit 0" SIGTERM SIGINT\n\
-\n\
 exec apache2-foreground\n\
 ' > /usr/local/bin/start.sh && chmod +x /usr/local/bin/start.sh
 
