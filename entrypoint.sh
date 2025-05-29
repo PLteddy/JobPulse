@@ -16,6 +16,10 @@ chmod -R 775 var/
 # S'assurer que les répertoires de cache Twig sont accessibles en écriture
 chmod -R 777 var/cache/
 
+echo "Installing JavaScript assets..."
+# Installer les assets JavaScript manquants
+php bin/console importmap:install || true
+
 echo "Clearing cache..."
 # Vider le cache en tant que www-data
 su -s /bin/bash www-data -c "php bin/console cache:clear --env=prod --no-debug" || true
