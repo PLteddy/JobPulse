@@ -25,17 +25,8 @@ WORKDIR /var/www/html
 # Copier composer.json et composer.lock en premier
 COPY composer.json composer.lock* ./
 
-# Diagnostic initial
-RUN echo "=== DIAGNOSTIC COMPOSER ===" && \
-    composer --version && \
-    echo "Validating composer.json:" && \
-    composer validate --no-check-publish || echo "Validation failed" && \
-    echo "Composer.json content (first 50 lines):" && \
-    head -50 composer.json && \
-    echo "=========================="
-
-# Installation Composer AVEC dépendances dev pour les bundles requis
-RUN echo "Installing Composer dependencies (including dev for bundles)..." && \
+# Installation Composer - GARDER les dépendances de dev si nécessaires
+RUN echo "Installing Composer dependencies..." && \
     php -d memory_limit=1G /usr/bin/composer install \
         --optimize-autoloader \
         --no-interaction \
@@ -43,47 +34,55 @@ RUN echo "Installing Composer dependencies (including dev for bundles)..." && \
         --no-cache \
         --ignore-platform-reqs 2>&1 | tee composer-install.log || { \
             echo "=== COMPOSER INSTALL FAILED ==="; \
-            echo "Trying to install missing bundle manually..."; \
-            composer require sensio/framework-extra-bundle --no-cache --ignore-platform-reqs || true; \
-            echo "Retrying full install..."; \
-            composer install --optimize-autoloader --no-interaction --ignore-platform-reqs || { \
-                echo "Final composer install failed. Logs:"; \
-                cat composer-install.log; \
-                exit 1; \
-            }; \
+            cat composer-install.log; \
+            exit 1; \
         }
 
-# Vérification des bundles installés
-RUN echo "=== BUNDLES VERIFICATION ===" && \
-    echo "Checking for SensioFrameworkExtraBundle:" && \
-    find vendor/ -name "*SensioFrameworkExtraBundle*" -type d 2>/dev/null || echo "Bundle not found in vendor/" && \
-    echo "Checking autoload files:" && \
-    ls -la vendor/composer/ && \
-    echo "Autoload classmap check:" && \
-    grep -r "SensioFrameworkExtraBundle" vendor/composer/ || echo "Not found in autoload" && \
-    echo "=========================="
+# Vérifier que SensioFrameworkExtraBundle est installé
+RUN echo "=== BUNDLE VERIFICATION ===" && \
+    php -r "
+    require 'vendor/autoload.php';
+    if (class_exists('Sensio\\Bundle\\FrameworkExtraBundle\\SensioFrameworkExtraBundle')) {
+        echo '✓ SensioFrameworkExtraBundle found and loaded\n';
+    } else {
+        echo '✗ SensioFrameworkExtraBundle NOT FOUND\n';
+        echo 'Installed packages:\n';
+        \$installed = json_decode(file_get_contents('vendor/composer/installed.json'), true);
+        foreach (\$installed['packages'] ?? \$installed as \$package) {
+            if (strpos(\$package['name'], 'sensio') !== false) {
+                echo '- ' . \$package['name'] . ' (' . \$package['version'] . ')\n';
+            }
+        }
+        exit(1);
+    }
+    "
 
 # Copier le reste des fichiers
 COPY . .
 
-# Vérification et correction de la configuration des bundles
+# Vérifier la configuration des bundles
 RUN if [ -f "config/bundles.php" ]; then \
         echo "=== BUNDLES CONFIGURATION ===" && \
-        echo "Current bundles.php content:" && \
         cat config/bundles.php && \
-        echo "Checking for SensioFrameworkExtraBundle registration..." && \
-        if ! grep -q "SensioFrameworkExtraBundle" config/bundles.php; then \
-            echo "Adding SensioFrameworkExtraBundle to bundles.php..."; \
-            cp config/bundles.php config/bundles.php.backup; \
-            sed -i "/return \[/a\\    Sensio\\\\Bundle\\\\FrameworkExtraBundle\\\\SensioFrameworkExtraBundle::class => ['all' => true]," config/bundles.php; \
-        fi; \
-        echo "Final bundles.php:"; \
-        cat config/bundles.php; \
-        echo "========================"; \
+        php -r "
+        \$bundles = require 'config/bundles.php';
+        \$found = false;
+        foreach (\$bundles as \$class => \$envs) {
+            if (strpos(\$class, 'SensioFrameworkExtraBundle') !== false) {
+                echo '✓ SensioFrameworkExtraBundle registered in bundles.php\n';
+                \$found = true;
+                break;
+            }
+        }
+        if (!\$found) {
+            echo '✗ SensioFrameworkExtraBundle NOT registered in bundles.php\n';
+            exit(1);
+        }
+        "; \
     fi
 
-# Regénérer l'autoloader après les modifications
-RUN composer dump-autoload --optimize --no-dev
+# NE PAS régénérer l'autoloader avec --no-dev si on a besoin des bundles de dev
+# RUN composer dump-autoload --optimize
 
 # Configuration Apache
 RUN echo 'ServerName localhost' > /etc/apache2/conf-available/servername.conf && \
@@ -106,19 +105,18 @@ RUN echo '<VirtualHost *:80>\n\
 RUN mkdir -p var/cache var/log var/sessions && \
     chown -R www-data:www-data var/
 
-# .htaccess
+# .htaccess pour le routing Symfony
 RUN echo 'RewriteEngine On\n\
 RewriteCond %{REQUEST_FILENAME} !-f\n\
 RewriteRule ^(.*)$ index.php [QSA,L]' > public/.htaccess
 
-# Script d'entrée amélioré avec vérification des bundles
+# Script d'entrée simplifié
 RUN echo '#!/bin/bash\n\
 set -e\n\
 \n\
 echo "=== STARTING JOBPULSE ==="\n\
 echo "Date: $(date)"\n\
 echo "PHP Version: $(php -v | head -n 1)"\n\
-echo "Working Directory: $(pwd)"\n\
 \n\
 # Vérifications critiques\n\
 if [ ! -f "public/index.php" ]; then\n\
@@ -127,22 +125,16 @@ if [ ! -f "public/index.php" ]; then\n\
 fi\n\
 echo "✓ public/index.php found"\n\
 \n\
-# Vérification du bundle manquant\n\
-echo "Checking SensioFrameworkExtraBundle availability..."\n\
-php -r "spl_autoload_register(function(\$class) { include __DIR__ . '\''/vendor/autoload.php\''; }); \n\
-if (class_exists('\'Sensio\\\\Bundle\\\\FrameworkExtraBundle\\\\SensioFrameworkExtraBundle\'')) { \n\
-    echo '✓ SensioFrameworkExtraBundle is available'; \n\
-} else { \n\
-    echo '✗ SensioFrameworkExtraBundle NOT FOUND'; \n\
-    echo 'Available Sensio classes:'; \n\
-    foreach (get_declared_classes() as \$class) { \n\
-        if (strpos(\$class, '\'Sensio\'') === 0) echo \$class . PHP_EOL; \n\
-    } \n\
-}" || echo "Bundle check failed"\n\
-\n\
-# Test de syntaxe PHP\n\
-php -l public/index.php || exit 1\n\
-echo "✓ PHP syntax OK"\n\
+# Test final du bundle\n\
+php -r "\n\
+require '\''vendor/autoload.php'\'';\n\
+if (class_exists('\''Sensio\\\\Bundle\\\\FrameworkExtraBundle\\\\SensioFrameworkExtraBundle'\'')) {\n\
+    echo '\''✓ SensioFrameworkExtraBundle is available\\n'\'';\n\
+} else {\n\
+    echo '\''✗ SensioFrameworkExtraBundle NOT FOUND\\n'\'';\n\
+    exit(1);\n\
+}\n\
+" || exit 1\n\
 \n\
 # Configuration Symfony\n\
 export APP_ENV=prod\n\
@@ -167,14 +159,13 @@ apache2ctl configtest || exit 1\n\
 echo "✓ Apache config OK"\n\
 \n\
 echo "=== STARTING APACHE SERVER ==="\n\
-trap "echo Stopping...; apache2ctl graceful-stop; exit 0" SIGTERM SIGINT\n\
 exec apache2-foreground\n\
 ' > /usr/local/bin/start.sh && chmod +x /usr/local/bin/start.sh
 
 # Variables d'environnement
 ENV COMPOSER_ALLOW_SUPERUSER=1
-ENV APP_ENV=prod
-ENV APP_DEBUG=0
+ENV APP_ENV=dev
+ENV APP_DEBUG=1
 
 EXPOSE 80
 
