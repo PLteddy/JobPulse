@@ -50,8 +50,12 @@ WORKDIR /var/www/html
 # Installer Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Installer les dépendances Symfony
-RUN composer install --no-dev --optimize-autoloader --prefer-dist
+# Configurer les variables d'environnement pour la production
+ENV APP_ENV=prod
+ENV APP_DEBUG=0
+
+# Installer les dépendances Symfony (sans les dépendances de dev en production)
+RUN composer install --no-dev --optimize-autoloader --prefer-dist --no-interaction
 
 # Créer le script pour nettoyer les templates
 RUN echo '#!/bin/bash\n\
@@ -69,6 +73,8 @@ RUN chmod -R 777 /var/www/html/var
 # Créer un script d'entrée pour gérer le démarrage
 RUN echo '#!/bin/bash\n\
 set -e\n\
+# Nettoyer le cache Symfony\n\
+php bin/console cache:clear --env=prod --no-debug || true\n\
 php bin/console doctrine:database:create --if-not-exists -n || true\n\
 php bin/console doctrine:schema:create -n || true\n\
 php bin/console doctrine:migrations:sync-metadata-storage -n || true\n\
