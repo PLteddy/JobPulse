@@ -1,0 +1,33 @@
+# Utilisez la version front controller la plus récente.
+# https://httpd.apache.org/docs/current/mod/mod_rewrite.html#rewriterule
+DirectoryIndex index.php
+
+# Par défaut, Apache ne traite pas les directives RewriteRule dans .htaccess
+# sans ce réglage: https://httpd.apache.org/docs/current/mod/mod_rewrite.html#rewriteengine
+RewriteEngine On
+
+# Détermine le RewriteBase automatiquement et définit une variable d'environnement.
+# Si vous utilisez Apache alias pour effectuer cette installation dans un sous-répertoire,
+# la base sera probablement redéfinie à quelque chose comme /subdirectory, et vous devriez
+# définir cela manuellement : 'RewriteBase /subdirectory'
+
+RewriteCond %{REQUEST_URI}::$0 ^(/.+)/(.*)::\2$
+RewriteRule .* - [E=BASE:%1]
+
+# Définit l'en-tête d'autorisation HTTP supprimé par Apache
+RewriteCond %{HTTP:Authorization} .+
+RewriteRule ^ - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# Redirige vers l'URI sans le contrôleur frontal pour empêcher la duplication de contenu
+# (avec une exception pour les fichiers de carte et de base de données)
+RewriteCond %{ENV:REDIRECT_STATUS} =""
+RewriteRule ^index\.php(?:/(.*)|$) %{ENV:BASE}/$1 [R=301,L]
+
+# Si le fichier demandé existe, le servir directement
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# Réécrit toutes les autres requêtes vers le contrôleur frontal.
+# Suivez la convention du contrôleur frontal en préfixant l'en-tête Authorization 
+# avec REDIRECT_ s'il a une valeur
+RewriteRule ^ %{ENV:BASE}/index.php [L]

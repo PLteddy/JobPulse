@@ -33,6 +33,25 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts --no-autoloader
 # Copier le reste des fichiers de l'application
 COPY . .
 
+# Créer le fichier .htaccess pour Symfony
+RUN echo 'DirectoryIndex index.php\n\
+\n\
+RewriteEngine On\n\
+\n\
+RewriteCond %{REQUEST_URI}::$0 ^(/.+)/(.*)::\2$\n\
+RewriteRule .* - [E=BASE:%1]\n\
+\n\
+RewriteCond %{HTTP:Authorization} .+\n\
+RewriteRule ^ - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]\n\
+\n\
+RewriteCond %{ENV:REDIRECT_STATUS} ""\n\
+RewriteRule ^index\.php(?:/(.*)|$) %{ENV:BASE}/$1 [R=301,L]\n\
+\n\
+RewriteCond %{REQUEST_FILENAME} -f\n\
+RewriteRule ^ - [L]\n\
+\n\
+RewriteRule ^ %{ENV:BASE}/index.php [L]' > public/.htaccess
+
 # Finaliser l'installation de Composer
 RUN composer dump-autoload --optimize
 
@@ -42,14 +61,32 @@ RUN mkdir -p var/cache/prod/twig/cc var/cache/dev/twig/cc var/log var/sessions \
     && chmod -R 775 var \
     && chmod -R 777 var/cache
 
-# Fixer le DocumentRoot Apache vers /public
-RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /etc/apache2/sites-available/000-default.conf
-
-# Configuration Apache pour Symfony
-RUN echo '<Directory /var/www/html/public>\n\
-    AllowOverride All\n\
-    Require all granted\n\
-</Directory>' >> /etc/apache2/sites-available/000-default.conf
+# Configuration Apache complète pour Symfony
+RUN echo '<VirtualHost *:80>\n\
+    DocumentRoot /var/www/html/public\n\
+    <Directory /var/www/html/public>\n\
+        AllowOverride All\n\
+        Require all granted\n\
+        Options -Indexes\n\
+        DirectoryIndex index.php\n\
+        \n\
+        # Gestion des routes Symfony\n\
+        <IfModule mod_rewrite.c>\n\
+            RewriteEngine On\n\
+            RewriteCond %{REQUEST_URI}::$0 ^(/.+)/(.*)::\2$\n\
+            RewriteRule .* - [E=BASE:%1]\n\
+            RewriteCond %{HTTP:Authorization} .\n\
+            RewriteRule ^ - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]\n\
+            RewriteCond %{ENV:REDIRECT_STATUS} !\n\
+            RewriteRule ^index\.php(?:/(.*)|$) %{ENV:BASE}/$1 [R=301,L]\n\
+            RewriteCond %{REQUEST_FILENAME} !-f\n\
+            RewriteRule ^ %{ENV:BASE}/index.php [L]\n\
+        </IfModule>\n\
+    </Directory>\n\
+    \n\
+    ErrorLog ${APACHE_LOG_DIR}/error.log\n\
+    CustomLog ${APACHE_LOG_DIR}/access.log combined\n\
+</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
 
 # Copier et rendre exécutable l'entrypoint
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
