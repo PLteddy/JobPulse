@@ -26,16 +26,32 @@ WORKDIR /var/www/html
 # Copier composer.json et composer.lock en premier pour optimiser le cache Docker
 COPY composer.json composer.lock* ./
 
-# Installation des dépendances Composer
+# Installation des dépendances Composer avec gestion d'erreurs
 RUN set -ex && \
+    # Vérifier que composer.json existe
+    if [ ! -f "composer.json" ]; then \
+        echo "ERREUR: composer.json introuvable!"; \
+        exit 1; \
+    fi && \
+    # Afficher le contenu de composer.json pour diagnostic
+    echo "=== COMPOSER.JSON ===" && \
+    head -20 composer.json && \
+    echo "===================" && \
+    # Installation avec gestion d'erreurs étape par étape
+    COMPOSER_ALLOW_SUPERUSER=1 composer validate --no-check-publish || echo "Validation failed but continuing..." && \
     COMPOSER_ALLOW_SUPERUSER=1 composer install \
         --no-dev \
         --optimize-autoloader \
         --prefer-dist \
         --no-interaction \
         --no-progress \
-        --ignore-platform-reqs && \
-    composer clear-cache
+        --ignore-platform-reqs \
+        --verbose && \
+    # Vérifier l'installation
+    ls -la vendor/ && \
+    echo "Composer install successful" && \
+    # Nettoyer le cache
+    composer clear-cache || echo "Cache clear failed but continuing..."
 
 # Copier tous les autres fichiers du projet
 COPY . .
