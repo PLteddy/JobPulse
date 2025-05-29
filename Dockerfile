@@ -25,7 +25,7 @@ RUN echo "=== COMPOSER DEBUG ===" && \
     echo "Memory limit: $(php -r 'echo ini_get("memory_limit");')" && \
     echo "========================"
 
-# Install with better error handling
+# Install with better error handling and runtime
 RUN php -d memory_limit=1G composer install \
     --optimize-autoloader \
     --no-interaction \
@@ -35,13 +35,20 @@ RUN php -d memory_limit=1G composer install \
         echo "=== COMPOSER INSTALL FAILED ==="; \
         echo "Error log:"; \
         cat composer-install.log; \
-        echo "Trying without lock file..."; \
-        rm -f composer.lock; \
+        echo "Trying to install symfony/runtime specifically..."; \
+        composer require symfony/runtime --ignore-platform-reqs || true; \
+        echo "Retrying install..."; \
         php -d memory_limit=1G composer install \
             --no-interaction \
-            --ignore-platform-reqs \
-            --no-cache || exit 1; \
+            --ignore-platform-reqs || exit 1; \
     }
+
+# Verify runtime autoloader
+RUN echo "=== VERIFYING AUTOLOADER ===" && \
+    ls -la vendor/autoload* && \
+    echo "Checking symfony/runtime..." && \
+    find vendor/ -name "*runtime*" -type f | head -10 && \
+    echo "========================"
 
 # Code
 COPY . .
