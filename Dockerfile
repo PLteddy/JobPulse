@@ -1,6 +1,6 @@
 FROM php:8.2-apache
 
-# Installer les extensions PHP nécessaires
+# Installer les extensions PHP nécessaires et dépendances pour Composer
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -8,12 +8,13 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libzip-dev \
     zip \
+    curl \
     && docker-php-ext-install intl pdo pdo_mysql zip
 
 # Activer Apache mod_rewrite et headers
 RUN a2enmod rewrite headers
 
-# Configurer le DocumentRoot d'Apache avec les bonnes règles de réécriture
+# Configurer le DocumentRoot d'Apache
 RUN echo '<VirtualHost *:80>\n\
     DocumentRoot /var/www/html/public\n\
     <Directory /var/www/html/public>\n\
@@ -31,38 +32,40 @@ RUN echo '<VirtualHost *:80>\n\
     CustomLog ${APACHE_LOG_DIR}/access.log combined\n\
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
 
-# Installer Composer d'abord
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Installer Composer (dernière version stable)
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
 
 # Définir le répertoire de travail
 WORKDIR /var/www/html
 
-# Copier d'abord les fichiers de configuration Composer
+# Copier les fichiers composer uniquement pour optimiser les layers
 COPY composer.json composer.lock* ./
 
-# Configurer les variables d'environnement pour la production
+# Configurer les variables d'environnement
 ENV APP_ENV=prod
 ENV APP_DEBUG=0
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Installer les dépendances Symfony avec gestion d'erreur
-RUN composer validate --no-check-publish || (echo "composer.json invalide" && exit 1)
+# Assurer les permissions avant l’installation Composer
+RUN chown -R www-data:www-data /var/www/html
+
+# Installer les dépendances Symfony
 RUN composer install --no-dev --optimize-autoloader --prefer-dist --no-interaction --verbose || (echo "Échec installation composer" && exit 1)
 
-# Maintenant copier le reste des fichiers du projet
+# Copier le reste du projet
 COPY . /var/www/html
 
-# Préparer les répertoires avec les permissions correctes
+# Créer les répertoires nécessaires
 RUN mkdir -p /var/www/html/var/cache /var/www/html/var/log
 
-# Créer un .htaccess approprié si nécessaire
+# Créer un .htaccess si besoin
 RUN echo '<IfModule mod_rewrite.c>\n\
     RewriteEngine On\n\
     RewriteCond %{REQUEST_FILENAME} !-f\n\
     RewriteRule ^(.*)$ index.php [QSA,L]\n\
 </IfModule>' > /var/www/html/public/.htaccess
 
-# Créer le script pour nettoyer les templates
+# Script pour nettoyer les templates
 RUN echo '#!/bin/bash\n\
 find /var/www/html/templates -type f -name "*.twig" -exec sed -i "s/{{ *dump(.*) *}}/<!-- dump removed -->/g" {} \;\n\
 ' > /usr/local/bin/clean-templates.sh
@@ -75,10 +78,9 @@ RUN find /var/www/html -type d -exec chmod 755 {} \;
 RUN find /var/www/html -type f -exec chmod 644 {} \;
 RUN chmod -R 777 /var/www/html/var
 
-# Créer un script d'entrée pour gérer le démarrage
+# Script d’entrée
 RUN echo '#!/bin/bash\n\
 set -e\n\
-# Nettoyer le cache Symfony\n\
 php bin/console cache:clear --env=prod --no-debug || true\n\
 php bin/console doctrine:database:create --if-not-exists -n || true\n\
 php bin/console doctrine:schema:create -n || true\n\
@@ -91,8 +93,6 @@ exec apache2-foreground\n\
 
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Exposer le port 80
 EXPOSE 80
 
-# Utiliser le script d'entrée comme point d'entrée
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
