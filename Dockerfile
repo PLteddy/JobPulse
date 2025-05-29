@@ -22,28 +22,53 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Définir le répertoire de travail
 WORKDIR /var/www/html
 
-# Copier tous les fichiers en une fois (plus simple pour déboguer)
-COPY . .
+# Copier composer.json et composer.lock en premier (pour le cache Docker)
+COPY composer.json composer.lock* ./
 
-# Diagnostic initial
+# Diagnostic initial amélioré
 RUN echo "=== DIAGNOSTIC INITIAL ===" && \
+    pwd && \
     ls -la && \
-    echo "Composer.json exists:" && \
-    ls -la composer.json 2>/dev/null || echo "composer.json NOT FOUND" && \
+    echo "Composer version:" && \
+    composer --version && \
+    echo "PHP version:" && \
+    php --version && \
+    echo "Memory limit:" && \
+    php -r "echo ini_get('memory_limit');" && \
+    echo "" && \
+    echo "Composer.json content:" && \
+    cat composer.json 2>/dev/null || echo "composer.json NOT FOUND" && \
     echo "=========================="
 
-# Installation Composer simplifiée avec plus de diagnostics
+# Installation Composer avec gestion d'erreur améliorée
 RUN if [ -f "composer.json" ]; then \
         echo "Installing Composer dependencies..." && \
-        COMPOSER_ALLOW_SUPERUSER=1 composer install \
+        # Augmenter la limite mémoire pour Composer
+        php -d memory_limit=512M /usr/bin/composer install \
             --no-dev \
             --optimize-autoloader \
             --no-interaction \
             --verbose \
-            --ignore-platform-reqs; \
+            --no-cache \
+            --ignore-platform-reqs 2>&1 | tee composer-install.log || { \
+                echo "=== COMPOSER INSTALL FAILED ==="; \
+                echo "Exit code: $?"; \
+                echo "Last 20 lines of output:"; \
+                tail -20 composer-install.log 2>/dev/null || echo "No log available"; \
+                echo "Composer diagnose:"; \
+                composer diagnose || true; \
+                echo "Available memory:"; \
+                free -h || true; \
+                echo "Disk space:"; \
+                df -h || true; \
+                exit 1; \
+            }; \
     else \
         echo "No composer.json found, skipping composer install"; \
     fi
+
+# Copier le reste des fichiers après l'installation Composer
+COPY . .
 
 # Fix pour éviter les erreurs de bundles dev en production
 RUN if [ -f "config/bundles.php" ]; then \
