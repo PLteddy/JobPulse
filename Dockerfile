@@ -16,7 +16,32 @@ WORKDIR /var/www/html
 
 # Dependencies
 COPY composer.json composer.lock* ./
-RUN composer install --optimize-autoloader --no-interaction --ignore-platform-reqs
+
+# Debug Composer
+RUN echo "=== COMPOSER DEBUG ===" && \
+    composer --version && \
+    echo "Validating composer.json:" && \
+    composer validate --no-check-publish || echo "Validation issues found" && \
+    echo "Memory limit: $(php -r 'echo ini_get("memory_limit");')" && \
+    echo "========================"
+
+# Install with better error handling
+RUN php -d memory_limit=1G composer install \
+    --optimize-autoloader \
+    --no-interaction \
+    --ignore-platform-reqs \
+    --verbose \
+    2>&1 | tee composer-install.log || { \
+        echo "=== COMPOSER INSTALL FAILED ==="; \
+        echo "Error log:"; \
+        cat composer-install.log; \
+        echo "Trying without lock file..."; \
+        rm -f composer.lock; \
+        php -d memory_limit=1G composer install \
+            --no-interaction \
+            --ignore-platform-reqs \
+            --no-cache || exit 1; \
+    }
 
 # Code
 COPY . .
