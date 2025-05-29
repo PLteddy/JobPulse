@@ -1,111 +1,87 @@
 FROM php:8.2-apache
 
-# Install system dependencies
+# Installer les extensions PHP nécessaires
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
     libicu-dev \
     libonig-dev \
     libzip-dev \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
     zip \
-    curl \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install intl pdo pdo_mysql zip gd \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && docker-php-ext-install intl pdo pdo_mysql zip
 
-# Enable Apache modules
+# Activer Apache mod_rewrite et headers
 RUN a2enmod rewrite headers
 
-# Install Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-
-# Set environment variables
-ENV COMPOSER_ALLOW_SUPERUSER=1
-ENV COMPOSER_MEMORY_LIMIT=-1
-
-WORKDIR /var/www/html
-
-# Copy composer files
-COPY composer.json ./
-# Copy composer.lock only if it exists
-COPY composer.loc[k] ./
-
-# DEBUGGING: Show what we copied
-RUN echo "=== FILES COPIED ===" && \
-    ls -la && \
-    echo "=== COMPOSER.JSON CONTENT ===" && \
-    cat composer.json && \
-    echo "=== END DEBUG ==="
-
-# DEBUGGING: Check Composer and PHP
-RUN echo "=== SYSTEM INFO ===" && \
-    php -v && \
-    composer --version && \
-    php -m | grep -E "(curl|openssl|zip|json)" && \
-    echo "=== END SYSTEM INFO ==="
-
-# DEBUGGING: Validate composer.json
-RUN echo "=== COMPOSER VALIDATION ===" && \
-    composer validate --strict --no-check-publish 2>&1 || echo "Validation failed but continuing..."
-
-# DEBUGGING: Check platform requirements
-RUN echo "=== PLATFORM REQUIREMENTS ===" && \
-    composer check-platform-reqs --no-dev 2>&1 || echo "Platform check failed but continuing with --ignore-platform-reqs"
-
-# DEBUGGING: Show what Composer would do
-RUN echo "=== DRY RUN ===" && \
-    composer install --dry-run --no-dev --verbose 2>&1 || echo "Dry run failed"
-
-# Try to install with maximum verbosity and error reporting
-RUN echo "=== COMPOSER INSTALL ATTEMPT ===" && \
-    composer install \
-    --no-dev \
-    --optimize-autoloader \
-    --no-interaction \
-    --prefer-dist \
-    --ignore-platform-reqs \
-    --verbose \
-    --profile \
-    2>&1 | tee /tmp/composer.log || \
-    (echo "=== COMPOSER INSTALL FAILED ===" && \
-     echo "=== ERROR LOG ===" && \
-     cat /tmp/composer.log && \
-     echo "=== TRYING ALTERNATIVE ===" && \
-     composer install --no-dev --ignore-platform-reqs --no-scripts --verbose 2>&1 || \
-     exit 1)
-
-# Verify installation
-RUN echo "=== VERIFICATION ===" && \
-    ls -la vendor/ && \
-    test -f vendor/autoload.php && \
-    echo "✓ Autoloader found" || \
-    (echo "✗ Autoloader missing" && exit 1)
-
-# Copy rest of application
-COPY . .
-
-# Basic Apache setup
+# Configurer le DocumentRoot d'Apache avec les bonnes règles de réécriture
 RUN echo '<VirtualHost *:80>\n\
     DocumentRoot /var/www/html/public\n\
     <Directory /var/www/html/public>\n\
-        AllowOverride All\n\
+        AllowOverride None\n\
         Require all granted\n\
+        FallbackResource /index.php\n\
+        <IfModule mod_rewrite.c>\n\
+            Options -MultiViews\n\
+            RewriteEngine On\n\
+            RewriteCond %{REQUEST_FILENAME} !-f\n\
+            RewriteRule ^(.*)$ index.php [QSA,L]\n\
+        </IfModule>\n\
     </Directory>\n\
+    ErrorLog ${APACHE_LOG_DIR}/error.log\n\
+    CustomLog ${APACHE_LOG_DIR}/access.log combined\n\
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
 
-# Create basic structure
-RUN mkdir -p public && \
-    if [ ! -f public/index.php ]; then \
-        echo '<?php require_once "../vendor/autoload.php"; echo "App running!"; ?>' > public/index.php; \
-    fi
+# Préparer les répertoires avec les permissions correctes
+RUN mkdir -p /var/www/html/var/cache /var/www/html/var/log
 
-# Fix permissions
-RUN chown -R www-data:www-data /var/www/html && \
-    chmod -R 755 /var/www/html
+# Copier les fichiers du projet
+COPY . /var/www/html
 
+# Créer un .htaccess approprié si nécessaire
+RUN echo '<IfModule mod_rewrite.c>\n\
+    RewriteEngine On\n\
+    RewriteCond %{REQUEST_FILENAME} !-f\n\
+    RewriteRule ^(.*)$ index.php [QSA,L]\n\
+</IfModule>' > /var/www/html/public/.htaccess
+
+# Définir le répertoire de travail
+WORKDIR /var/www/html
+
+# Installer Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Installer les dépendances Symfony
+RUN composer install --no-dev --optimize-autoloader --prefer-dist
+
+# Créer le script pour nettoyer les templates
+RUN echo '#!/bin/bash\n\
+find /var/www/html/templates -type f -name "*.twig" -exec sed -i "s/{{ *dump(.*) *}}/<!-- dump removed -->/g" {} \;\n\
+' > /usr/local/bin/clean-templates.sh
+
+RUN chmod +x /usr/local/bin/clean-templates.sh
+
+# Configurer les permissions adéquates
+RUN chown -R www-data:www-data /var/www/html
+RUN find /var/www/html -type d -exec chmod 755 {} \;
+RUN find /var/www/html -type f -exec chmod 644 {} \;
+RUN chmod -R 777 /var/www/html/var
+
+# Créer un script d'entrée pour gérer le démarrage
+RUN echo '#!/bin/bash\n\
+set -e\n\
+php bin/console doctrine:database:create --if-not-exists -n || true\n\
+php bin/console doctrine:schema:create -n || true\n\
+php bin/console doctrine:migrations:sync-metadata-storage -n || true\n\
+php bin/console doctrine:migrations:version --add --all -n || true\n\
+/usr/local/bin/clean-templates.sh\n\
+chown -R www-data:www-data /var/www/html/var\n\
+exec apache2-foreground\n\
+' > /usr/local/bin/entrypoint.sh
+
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Exposer le port 80
 EXPOSE 80
-CMD ["apache2-foreground"]
+
+# Utiliser le script d'entrée comme point d'entrée
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
