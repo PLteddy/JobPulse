@@ -33,24 +33,28 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts --no-autoloader
 # Copier le reste des fichiers de l'application
 COPY . .
 
-# Créer le fichier .htaccess pour Symfony
+# Créer le fichier .htaccess simplifié pour Symfony
 RUN echo 'DirectoryIndex index.php\n\
 \n\
-RewriteEngine On\n\
-\n\
-RewriteCond %{REQUEST_URI}::$0 ^(/.+)/(.*)::\2$\n\
-RewriteRule .* - [E=BASE:%1]\n\
-\n\
-RewriteCond %{HTTP:Authorization} .+\n\
-RewriteRule ^ - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]\n\
-\n\
-RewriteCond %{ENV:REDIRECT_STATUS} ""\n\
-RewriteRule ^index\.php(?:/(.*)|$) %{ENV:BASE}/$1 [R=301,L]\n\
-\n\
-RewriteCond %{REQUEST_FILENAME} -f\n\
-RewriteRule ^ - [L]\n\
-\n\
-RewriteRule ^ %{ENV:BASE}/index.php [L]' > public/.htaccess
+<IfModule mod_rewrite.c>\n\
+    RewriteEngine On\n\
+    \n\
+    # Gestion de l'"'"'autorisation HTTP\n\
+    RewriteCond %{HTTP:Authorization} ^(.*)\n\
+    RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]\n\
+    \n\
+    # Redirige vers l'"'"'URI sans le contrôleur frontal\n\
+    RewriteCond %{ENV:REDIRECT_STATUS} ^$\n\
+    RewriteRule ^index\.php(?:/(.*)|$) /$1 [R=301,L]\n\
+    \n\
+    # Si le fichier ou répertoire existe, le servir directement\n\
+    RewriteCond %{REQUEST_FILENAME} -f [OR]\n\
+    RewriteCond %{REQUEST_FILENAME} -d\n\
+    RewriteRule ^ - [L]\n\
+    \n\
+    # Sinon, rediriger vers index.php\n\
+    RewriteRule ^ index.php [L]\n\
+</IfModule>' > public/.htaccess
 
 # Finaliser l'installation de Composer
 RUN composer dump-autoload --optimize
@@ -61,27 +65,14 @@ RUN mkdir -p var/cache/prod/twig/cc var/cache/dev/twig/cc var/log var/sessions \
     && chmod -R 775 var \
     && chmod -R 777 var/cache
 
-# Configuration Apache complète pour Symfony
+# Configuration Apache simple pour Symfony
 RUN echo '<VirtualHost *:80>\n\
     DocumentRoot /var/www/html/public\n\
     <Directory /var/www/html/public>\n\
         AllowOverride All\n\
         Require all granted\n\
-        Options -Indexes\n\
+        Options -Indexes +FollowSymLinks\n\
         DirectoryIndex index.php\n\
-        \n\
-        # Gestion des routes Symfony\n\
-        <IfModule mod_rewrite.c>\n\
-            RewriteEngine On\n\
-            RewriteCond %{REQUEST_URI}::$0 ^(/.+)/(.*)::\2$\n\
-            RewriteRule .* - [E=BASE:%1]\n\
-            RewriteCond %{HTTP:Authorization} .\n\
-            RewriteRule ^ - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]\n\
-            RewriteCond %{ENV:REDIRECT_STATUS} !\n\
-            RewriteRule ^index\.php(?:/(.*)|$) %{ENV:BASE}/$1 [R=301,L]\n\
-            RewriteCond %{REQUEST_FILENAME} !-f\n\
-            RewriteRule ^ %{ENV:BASE}/index.php [L]\n\
-        </IfModule>\n\
     </Directory>\n\
     \n\
     ErrorLog ${APACHE_LOG_DIR}/error.log\n\
