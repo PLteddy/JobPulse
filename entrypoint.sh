@@ -1,11 +1,10 @@
 #!/bin/bash
 set -e
 
-# Définir APP_ENV si non présent
-export APP_ENV=${APP_ENV:-prod}
-
-# Attendre que la base soit dispo (optionnel)
-# ./bin/console doctrine:query:sql "SELECT 1" || sleep 5
+# Assurer les bonnes permissions au runtime (au cas où Railway override les droits)
+mkdir -p var/cache var/log
+chown -R www-data:www-data var
+chmod -R 775 var
 
 # Commandes Symfony post-deploy
 php bin/console cache:clear --no-debug || true

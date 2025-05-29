@@ -23,19 +23,19 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Définir le répertoire de travail
 WORKDIR /var/www/html
 
-# Copier les fichiers de l'application (en excluant vendor/ si .dockerignore est en place)
+# Copier les fichiers de l'application
 COPY . .
+
+# Créer les répertoires var avec les bonnes permissions
+RUN mkdir -p var/cache var/log \
+    && chown -R www-data:www-data var \
+    && chmod -R 775 var
 
 # Installer les dépendances Composer sans exécuter les scripts
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
 # Fixer le DocumentRoot Apache vers /public
 RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /etc/apache2/sites-available/000-default.conf
-
-# Créer les répertoires nécessaires et fixer les permissions
-RUN mkdir -p var/cache var/log \
-    && chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 var
 
 # Entrypoint pour initialisation dynamique (cache, DB, migrations)
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
