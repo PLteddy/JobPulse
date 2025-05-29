@@ -7,15 +7,18 @@ RUN apt-get update && apt-get install -y \
     libicu-dev \
     libonig-dev \
     libzip-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
     zip \
     curl \
-    && docker-php-ext-install intl pdo pdo_mysql zip \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install intl pdo pdo_mysql zip gd \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Enable Apache modules
 RUN a2enmod rewrite headers
-RUN echo 'ServerName localhost' > /etc/apache2/conf-available/servername.conf && a2enconf servername
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -23,106 +26,86 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Set environment variables
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV COMPOSER_MEMORY_LIMIT=-1
-ENV APP_ENV=prod
-ENV APP_DEBUG=0
 
-# Set working directory
 WORKDIR /var/www/html
 
-# Copy composer files first
-COPY composer.json composer.lock* ./
+# Copy composer files
+COPY composer.json ./
+# Copy composer.lock only if it exists
+COPY composer.loc[k] ./
 
-# Install dependencies
-RUN composer install \
+# DEBUGGING: Show what we copied
+RUN echo "=== FILES COPIED ===" && \
+    ls -la && \
+    echo "=== COMPOSER.JSON CONTENT ===" && \
+    cat composer.json && \
+    echo "=== END DEBUG ==="
+
+# DEBUGGING: Check Composer and PHP
+RUN echo "=== SYSTEM INFO ===" && \
+    php -v && \
+    composer --version && \
+    php -m | grep -E "(curl|openssl|zip|json)" && \
+    echo "=== END SYSTEM INFO ==="
+
+# DEBUGGING: Validate composer.json
+RUN echo "=== COMPOSER VALIDATION ===" && \
+    composer validate --strict --no-check-publish 2>&1 || echo "Validation failed but continuing..."
+
+# DEBUGGING: Check platform requirements
+RUN echo "=== PLATFORM REQUIREMENTS ===" && \
+    composer check-platform-reqs --no-dev 2>&1 || echo "Platform check failed but continuing with --ignore-platform-reqs"
+
+# DEBUGGING: Show what Composer would do
+RUN echo "=== DRY RUN ===" && \
+    composer install --dry-run --no-dev --verbose 2>&1 || echo "Dry run failed"
+
+# Try to install with maximum verbosity and error reporting
+RUN echo "=== COMPOSER INSTALL ATTEMPT ===" && \
+    composer install \
     --no-dev \
     --optimize-autoloader \
     --no-interaction \
     --prefer-dist \
     --ignore-platform-reqs \
-    --verbose
+    --verbose \
+    --profile \
+    2>&1 | tee /tmp/composer.log || \
+    (echo "=== COMPOSER INSTALL FAILED ===" && \
+     echo "=== ERROR LOG ===" && \
+     cat /tmp/composer.log && \
+     echo "=== TRYING ALTERNATIVE ===" && \
+     composer install --no-dev --ignore-platform-reqs --no-scripts --verbose 2>&1 || \
+     exit 1)
 
-# Copy ALL application files
+# Verify installation
+RUN echo "=== VERIFICATION ===" && \
+    ls -la vendor/ && \
+    test -f vendor/autoload.php && \
+    echo "✓ Autoloader found" || \
+    (echo "✗ Autoloader missing" && exit 1)
+
+# Copy rest of application
 COPY . .
 
-# Create necessary directories
-RUN mkdir -p public var/cache var/log
-
-# Create a basic index.php if it doesn't exist
-RUN if [ ! -f public/index.php ]; then \
-        echo '<?php' > public/index.php && \
-        echo 'echo "<h1>Application is running!</h1>";' >> public/index.php && \
-        echo 'echo "<p>PHP Version: " . phpversion() . "</p>";' >> public/index.php && \
-        echo 'if (file_exists("../vendor/autoload.php")) {' >> public/index.php && \
-        echo '    echo "<p>✓ Composer autoloader found</p>";' >> public/index.php && \
-        echo '} else {' >> public/index.php && \
-        echo '    echo "<p>✗ Composer autoloader missing</p>";' >> public/index.php && \
-        echo '}' >> public/index.php && \
-        echo '?>' >> public/index.php; \
-    fi
-
-# Fix all permissions BEFORE setting up Apache
-RUN chown -R www-data:www-data /var/www/html && \
-    chmod -R 755 /var/www/html && \
-    chmod -R 775 var/ && \
-    chmod 644 public/index.php
-
-# Set up Apache virtual host with proper permissions
+# Basic Apache setup
 RUN echo '<VirtualHost *:80>\n\
     DocumentRoot /var/www/html/public\n\
-    \n\
-    <Directory /var/www/html>\n\
-        Options Indexes FollowSymLinks\n\
-        AllowOverride All\n\
-        Require all granted\n\
-    </Directory>\n\
-    \n\
     <Directory /var/www/html/public>\n\
-        Options Indexes FollowSymLinks\n\
         AllowOverride All\n\
         Require all granted\n\
-        DirectoryIndex index.php index.html\n\
-        \n\
-        <IfModule mod_rewrite.c>\n\
-            RewriteEngine On\n\
-            RewriteCond %{REQUEST_FILENAME} !-f\n\
-            RewriteCond %{REQUEST_FILENAME} !-d\n\
-            RewriteRule ^(.*)$ index.php [QSA,L]\n\
-        </IfModule>\n\
     </Directory>\n\
-    \n\
-    <FilesMatch "^\.ht">\n\
-        Require all denied\n\
-    </FilesMatch>\n\
-    \n\
-    ErrorLog ${APACHE_LOG_DIR}/error.log\n\
-    CustomLog ${APACHE_LOG_DIR}/access.log combined\n\
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
 
-# Add a simple .htaccess for fallback
-RUN echo 'DirectoryIndex index.php index.html' > public/.htaccess && \
-    echo 'Options +FollowSymLinks' >> public/.htaccess && \
-    echo 'RewriteEngine On' >> public/.htaccess && \
-    echo 'RewriteCond %{REQUEST_FILENAME} !-f' >> public/.htaccess && \
-    echo 'RewriteCond %{REQUEST_FILENAME} !-d' >> public/.htaccess && \
-    echo 'RewriteRule ^(.*)$ index.php [QSA,L]' >> public/.htaccess
+# Create basic structure
+RUN mkdir -p public && \
+    if [ ! -f public/index.php ]; then \
+        echo '<?php require_once "../vendor/autoload.php"; echo "App running!"; ?>' > public/index.php; \
+    fi
 
-# Final permission fix
+# Fix permissions
 RUN chown -R www-data:www-data /var/www/html && \
-    find /var/www/html -type d -exec chmod 755 {} \; && \
-    find /var/www/html -type f -exec chmod 644 {} \;
-
-# Debug information
-RUN echo "=== DEBUGGING INFO ===" && \
-    ls -la /var/www/html/ && \
-    echo "=== PUBLIC DIRECTORY ===" && \
-    ls -la /var/www/html/public/ && \
-    echo "=== PERMISSIONS CHECK ===" && \
-    stat /var/www/html/public/index.php && \
-    echo "=== APACHE CONFIG CHECK ===" && \
-    apache2ctl -t && \
-    echo "======================="
+    chmod -R 755 /var/www/html
 
 EXPOSE 80
-
-# Use exec form to ensure proper signal handling
 CMD ["apache2-foreground"]
