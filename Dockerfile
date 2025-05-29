@@ -31,11 +31,29 @@ RUN echo '<VirtualHost *:80>\n\
     CustomLog ${APACHE_LOG_DIR}/access.log combined\n\
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
 
+# Installer Composer d'abord
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Définir le répertoire de travail
+WORKDIR /var/www/html
+
+# Copier d'abord les fichiers de configuration Composer
+COPY composer.json composer.lock* ./
+
+# Configurer les variables d'environnement pour la production
+ENV APP_ENV=prod
+ENV APP_DEBUG=0
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+# Installer les dépendances Symfony avec gestion d'erreur
+RUN composer validate --no-check-publish || (echo "composer.json invalide" && exit 1)
+RUN composer install --no-dev --optimize-autoloader --prefer-dist --no-interaction --verbose || (echo "Échec installation composer" && exit 1)
+
+# Maintenant copier le reste des fichiers du projet
+COPY . /var/www/html
+
 # Préparer les répertoires avec les permissions correctes
 RUN mkdir -p /var/www/html/var/cache /var/www/html/var/log
-
-# Copier les fichiers du projet
-COPY . /var/www/html
 
 # Créer un .htaccess approprié si nécessaire
 RUN echo '<IfModule mod_rewrite.c>\n\
@@ -43,19 +61,6 @@ RUN echo '<IfModule mod_rewrite.c>\n\
     RewriteCond %{REQUEST_FILENAME} !-f\n\
     RewriteRule ^(.*)$ index.php [QSA,L]\n\
 </IfModule>' > /var/www/html/public/.htaccess
-
-# Définir le répertoire de travail
-WORKDIR /var/www/html
-
-# Installer Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-
-# Configurer les variables d'environnement pour la production
-ENV APP_ENV=prod
-ENV APP_DEBUG=0
-
-# Installer les dépendances Symfony (sans les dépendances de dev en production)
-RUN composer install --no-dev --optimize-autoloader --prefer-dist --no-interaction
 
 # Créer le script pour nettoyer les templates
 RUN echo '#!/bin/bash\n\
