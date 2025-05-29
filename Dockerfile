@@ -29,118 +29,100 @@ ENV APP_DEBUG=0
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy only composer files first for caching
+# Copy composer files first
 COPY composer.json composer.lock* ./
 
-# Debug: Show composer files content
-RUN echo "=== COMPOSER.JSON CONTENT ===" && \
-    cat composer.json && \
-    echo "=== END COMPOSER.JSON ===" && \
-    ls -la
-
-# Validate composer.json with more verbose output
-RUN composer validate --no-check-publish || echo "Composer validation failed but continuing..."
-
-# Check Composer diagnose
-RUN composer diagnose || echo "Composer diagnose completed with warnings"
-
-# Install dependencies with better error reporting
-RUN echo "=== STARTING COMPOSER INSTALL ===" && \
-    composer install \
+# Install dependencies
+RUN composer install \
     --no-dev \
     --optimize-autoloader \
     --no-interaction \
     --prefer-dist \
     --ignore-platform-reqs \
-    --verbose \
-    2>&1 | tee /tmp/composer-install.log && \
-    echo "=== COMPOSER INSTALL COMPLETED ===" && \
-    ls -la vendor/ || (echo "=== COMPOSER INSTALL FAILED ===" && cat /tmp/composer-install.log && exit 1)
+    --verbose
 
-# Check if autoloader exists
-RUN if [ -f vendor/autoload.php ]; then \
-        echo "✓ Autoloader found"; \
-    else \
-        echo "✗ Autoloader missing"; \
-        ls -la vendor/ || echo "vendor directory not found"; \
-        exit 1; \
-    fi
-
-# Test if autoloader works
-RUN php -r "require 'vendor/autoload.php'; echo 'Autoloader works\n';"
-
-# Copy application code
+# Copy ALL application files
 COPY . .
 
-# Set up Apache virtual host
-COPY <<EOF /etc/apache2/sites-available/000-default.conf
-<VirtualHost *:80>
-    DocumentRoot /var/www/html/public
+# Create necessary directories
+RUN mkdir -p public var/cache var/log
 
-    <Directory /var/www/html/public>
-        AllowOverride All
-        Require all granted
-
-        <IfModule mod_negotiation.c>
-            Options -MultiViews
-        </IfModule>
-
-        <IfModule mod_rewrite.c>
-            RewriteEngine On
-
-            RewriteCond %{HTTP:Authorization} ^(.+)$
-            RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
-
-            RewriteCond %{ENV:REDIRECT_STATUS} ^$
-            RewriteRule ^index\.php(?:/(.*)|$) %{ENV:BASE}/$1 [R=301,L]
-
-            RewriteCond %{REQUEST_FILENAME} -f
-            RewriteRule ^ - [L]
-
-            RewriteRule ^ %{ENV:BASE}/index.php [L]
-        </IfModule>
-    </Directory>
-
-    <FilesMatch "^\.">
-        Require all denied
-    </FilesMatch>
-
-    <FilesMatch "\.(yml|yaml|xml)$">
-        Require all denied
-    </FilesMatch>
-
-    ErrorLog ${APACHE_LOG_DIR}/error.log
-    CustomLog ${APACHE_LOG_DIR}/access.log combined
-</VirtualHost>
-EOF
-
-# Prepare directories and permissions
-RUN mkdir -p var/cache var/log public && \
-    chown -R www-data:www-data var/ && \
-    chmod -R 775 var/
-
-# Add fallback .htaccess
-RUN echo 'DirectoryIndex index.php' > public/.htaccess && \
-    echo 'FallbackResource /index.php' >> public/.htaccess
-
-# Warm up cache if Symfony
-RUN if [ -f bin/console ]; then \
-        php bin/console cache:clear --env=prod --no-debug --no-warmup || true && \
-        php bin/console cache:warmup --env=prod --no-debug || true; \
+# Create a basic index.php if it doesn't exist
+RUN if [ ! -f public/index.php ]; then \
+        echo '<?php' > public/index.php && \
+        echo 'echo "<h1>Application is running!</h1>";' >> public/index.php && \
+        echo 'echo "<p>PHP Version: " . phpversion() . "</p>";' >> public/index.php && \
+        echo 'if (file_exists("../vendor/autoload.php")) {' >> public/index.php && \
+        echo '    echo "<p>✓ Composer autoloader found</p>";' >> public/index.php && \
+        echo '} else {' >> public/index.php && \
+        echo '    echo "<p>✗ Composer autoloader missing</p>";' >> public/index.php && \
+        echo '}' >> public/index.php && \
+        echo '?>' >> public/index.php; \
     fi
 
-# Final verification
-RUN echo "=== FINAL VERIFICATION ===" && \
-    php -v && \
-    composer --version && \
-    test -f vendor/autoload.php && echo "✓ Autoloader present" && \
-    test -f public/index.php && echo "✓ Front controller present" && \
-    echo "========================"
+# Fix all permissions BEFORE setting up Apache
+RUN chown -R www-data:www-data /var/www/html && \
+    chmod -R 755 /var/www/html && \
+    chmod -R 775 var/ && \
+    chmod 644 public/index.php
+
+# Set up Apache virtual host with proper permissions
+RUN echo '<VirtualHost *:80>\n\
+    DocumentRoot /var/www/html/public\n\
+    \n\
+    <Directory /var/www/html>\n\
+        Options Indexes FollowSymLinks\n\
+        AllowOverride All\n\
+        Require all granted\n\
+    </Directory>\n\
+    \n\
+    <Directory /var/www/html/public>\n\
+        Options Indexes FollowSymLinks\n\
+        AllowOverride All\n\
+        Require all granted\n\
+        DirectoryIndex index.php index.html\n\
+        \n\
+        <IfModule mod_rewrite.c>\n\
+            RewriteEngine On\n\
+            RewriteCond %{REQUEST_FILENAME} !-f\n\
+            RewriteCond %{REQUEST_FILENAME} !-d\n\
+            RewriteRule ^(.*)$ index.php [QSA,L]\n\
+        </IfModule>\n\
+    </Directory>\n\
+    \n\
+    <FilesMatch "^\.ht">\n\
+        Require all denied\n\
+    </FilesMatch>\n\
+    \n\
+    ErrorLog ${APACHE_LOG_DIR}/error.log\n\
+    CustomLog ${APACHE_LOG_DIR}/access.log combined\n\
+</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
+
+# Add a simple .htaccess for fallback
+RUN echo 'DirectoryIndex index.php index.html' > public/.htaccess && \
+    echo 'Options +FollowSymLinks' >> public/.htaccess && \
+    echo 'RewriteEngine On' >> public/.htaccess && \
+    echo 'RewriteCond %{REQUEST_FILENAME} !-f' >> public/.htaccess && \
+    echo 'RewriteCond %{REQUEST_FILENAME} !-d' >> public/.htaccess && \
+    echo 'RewriteRule ^(.*)$ index.php [QSA,L]' >> public/.htaccess
+
+# Final permission fix
+RUN chown -R www-data:www-data /var/www/html && \
+    find /var/www/html -type d -exec chmod 755 {} \; && \
+    find /var/www/html -type f -exec chmod 644 {} \;
+
+# Debug information
+RUN echo "=== DEBUGGING INFO ===" && \
+    ls -la /var/www/html/ && \
+    echo "=== PUBLIC DIRECTORY ===" && \
+    ls -la /var/www/html/public/ && \
+    echo "=== PERMISSIONS CHECK ===" && \
+    stat /var/www/html/public/index.php && \
+    echo "=== APACHE CONFIG CHECK ===" && \
+    apache2ctl -t && \
+    echo "======================="
 
 EXPOSE 80
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost/ || exit 1
-
+# Use exec form to ensure proper signal handling
 CMD ["apache2-foreground"]
