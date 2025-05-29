@@ -32,27 +32,37 @@ WORKDIR /var/www/html
 # Copy only composer files first for caching
 COPY composer.json composer.lock* ./
 
-# Validate composer.json
-RUN composer validate --no-check-publish --no-check-lock || echo "Composer validation warnings (continuing...)"
+# Debug: Show composer files content
+RUN echo "=== COMPOSER.JSON CONTENT ===" && \
+    cat composer.json && \
+    echo "=== END COMPOSER.JSON ===" && \
+    ls -la
 
-# Install dependencies
-RUN echo "=== STARTING COMPOSER INSTALL ==="
-RUN composer install \
+# Validate composer.json with more verbose output
+RUN composer validate --no-check-publish || echo "Composer validation failed but continuing..."
+
+# Check Composer diagnose
+RUN composer diagnose || echo "Composer diagnose completed with warnings"
+
+# Install dependencies with better error reporting
+RUN echo "=== STARTING COMPOSER INSTALL ===" && \
+    composer install \
     --no-dev \
     --optimize-autoloader \
     --no-interaction \
-    --no-progress \
     --prefer-dist \
     --ignore-platform-reqs \
-    --verbose
-RUN echo "=== COMPOSER INSTALL COMPLETED ==="
-RUN ls -la vendor/
+    --verbose \
+    2>&1 | tee /tmp/composer-install.log && \
+    echo "=== COMPOSER INSTALL COMPLETED ===" && \
+    ls -la vendor/ || (echo "=== COMPOSER INSTALL FAILED ===" && cat /tmp/composer-install.log && exit 1)
 
 # Check if autoloader exists
 RUN if [ -f vendor/autoload.php ]; then \
         echo "✓ Autoloader found"; \
     else \
         echo "✗ Autoloader missing"; \
+        ls -la vendor/ || echo "vendor directory not found"; \
         exit 1; \
     fi
 
