@@ -27,7 +27,7 @@
             <p class="text-muted">{{ poste.domaine|nl2br }} - {{ poste.localisation|nl2br }}</p>
         </div> 
         {% if not app.user %}
-        <a class="bouton-connexion" href="{{ path('app_login') }}">Postuler</a>
+        <a class="bouton-connexion" href="{{ path('app_login', {'refreshed': 1}) }}">Postuler</a>
 
         <div id="popupPostuler" class="popup-container">
             <div class="popup-content">
