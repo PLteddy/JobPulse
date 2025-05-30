@@ -61,32 +61,47 @@
             </form>
         </div>
     </section>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const openPopupButton = document.getElementById('open-popup');
-            const closePopupButton = document.getElementById('close-popup');
-            const popup = document.getElementById('popup');
+   <script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Actualisation automatique de la page au chargement
+    if (!sessionStorage.getItem('loginPageRefreshed')) {
+        sessionStorage.setItem('loginPageRefreshed', 'true');
+        window.location.reload();
+        return; // Arrêter l'exécution du reste du script
+    }
+    
+    // Nettoyer le flag quand on quitte la page
+    window.addEventListener('beforeunload', function() {
+        sessionStorage.removeItem('loginPageRefreshed');
+    });
 
-            // Ouvrir la popup
-            openPopupButton.addEventListener('click', function () {
-                popup.classList.add('show');
-                popup.classList.remove('hidden');
-            });
+    // Votre code existant pour la popup
+    const openPopupButton = document.getElementById('open-popup');
+    const closePopupButton = document.getElementById('close-popup');
+    const popup = document.getElementById('popup');
 
-            // Fermer la popup
-            closePopupButton.addEventListener('click', function () {
+    if (openPopupButton && closePopupButton && popup) {
+        // Ouvrir la popup
+        openPopupButton.addEventListener('click', function () {
+            popup.classList.add('show');
+            popup.classList.remove('hidden');
+        });
+
+        // Fermer la popup
+        closePopupButton.addEventListener('click', function () {
+            popup.classList.remove('show');
+            popup.classList.add('hidden');
+        });
+
+        // Fermer la popup en cliquant en dehors
+        window.addEventListener('click', function (event) {
+            if (event.target === popup) {
                 popup.classList.remove('show');
                 popup.classList.add('hidden');
-            });
-
-            // Fermer la popup en cliquant en dehors
-            window.addEventListener('click', function (event) {
-                if (event.target === popup) {
-                    popup.classList.remove('show');
-                    popup.classList.add('hidden');
-                }
-            });
+            }
         });
-    </script>
+    }
+});
+</script>
 </body>
 {% endblock %}
