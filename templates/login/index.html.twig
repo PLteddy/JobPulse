@@ -63,6 +63,7 @@
     </section>
   <script>
 document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
     // Forcer l'actualisation complète de la page de login (équivalent F5)
     const urlParams = new URLSearchParams(window.location.search);
     const hasRefreshParam = urlParams.has('auto_refreshed');
@@ -87,16 +88,34 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
     
-    // Code popup existant (s'exécute seulement après l'actualisation)
+    // Code popup avec vérification et actualisation en cas d'erreur
     const openPopupButton = document.getElementById('open-popup');
     const closePopupButton = document.getElementById('close-popup');
     const popup = document.getElementById('popup');
 
     if (openPopupButton && closePopupButton && popup) {
-        // Ouvrir la popup
+        // Ouvrir la popup avec vérification
         openPopupButton.addEventListener('click', function () {
-            popup.classList.add('show');
-            popup.classList.remove('hidden');
+            try {
+                popup.classList.add('show');
+                popup.classList.remove('hidden');
+                
+                // Vérifier si la popup s'est bien ouverte après un court délai
+                setTimeout(function() {
+                    const isPopupVisible = popup.classList.contains('show') && 
+                                         !popup.classList.contains('hidden') &&
+                                         window.getComputedStyle(popup).display !== 'none';
+                    
+                    if (!isPopupVisible) {
+                        console.warn('Popup ne s\'est pas ouverte correctement, actualisation de la page...');
+                        window.location.reload(true); // Actualisation forcée
+                    }
+                }, 100); // Délai de 100ms pour laisser le temps au CSS de s'appliquer
+                
+            } catch (error) {
+                console.error('Erreur lors de l\'ouverture de la popup:', error);
+                window.location.reload(true); // Actualisation forcée en cas d'erreur
+            }
         });
 
         // Fermer la popup
@@ -112,6 +131,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 popup.classList.add('hidden');
             }
         });
+    } else {
+        // Si les éléments de la popup ne sont pas trouvés, actualiser la page
+        console.warn('Éléments de popup non trouvés, actualisation de la page...');
+        window.location.reload(true);
     }
     
     // Nettoyer l'URL après l'actualisation (optionnel)
