@@ -61,12 +61,12 @@
 </section>
 
 <script>
-// Variables globales pour éviter les event listeners multiples
-let popupInitialized = false;
+document.addEventListener('DOMContentLoaded', function () {
+    // Initialiser la popup directement sans refresh
+    initializePopup();
+});
 
 function initializePopup() {
-    if (popupInitialized) return;
-    
     const openPopupButton = document.getElementById('open-popup');
     const closePopupButton = document.getElementById('close-popup');
     const popup = document.getElementById('popup');
@@ -95,18 +95,8 @@ function initializePopup() {
                 popup.classList.add('hidden');
             }
         });
-        
-        popupInitialized = true;
     }
 }
-
-// Écouter les événements Turbo ET DOMContentLoaded
-document.addEventListener('DOMContentLoaded', initializePopup);
-document.addEventListener('turbo:load', initializePopup);
-document.addEventListener('turbo:render', initializePopup);
-
-// Fallback avec setTimeout au cas où
-setTimeout(initializePopup, 100);
 </script>
 </body>
 {% endblock %}
