@@ -11,262 +11,251 @@
 {% block body %}
 <section class="container">
     <div class="welcome">
-        <img src="{{ asset('uploads/images/' ~ poste.image) }}" alt="{{ poste.intitule }}">
+    <img src="{{ asset('uploads/images/' ~ poste.image) }}" alt="{{ poste.intitule }}">
     </div>
     
     <a href="{{ path('home') }}">
-        <img src="{{ asset('img/fleche_retour.svg') }}" alt="flèche retour" class="fleche">
-    </a>
+    <img src="{{ asset('img/fleche_retour.svg') }}" alt="flèche retour" class="fleche">
+</a>
+
+
     
     <div class="differentes-parties">
         <div class="titre-postule">
-            <div class="info-debut">
-                <h1>{{ poste.intitule|nl2br }}</h1>
-                <p class="text-muted">{{ poste.domaine|nl2br }} - {{ poste.localisation|nl2br }}</p>
-            </div> 
-            
-            {# Boutons d'action selon le rôle #}
-            {% if not app.user %}
-                <a class="bouton-connexion" href="{{ path('app_login') }}">Postuler</a>
-            {% elseif is_granted('ROLE_TUTEUR') %}
-                <div class="actions-tuteur">                
-                    {% if app.user.etudiants is not empty %}
-                        <button type="button" class="bouton-connexion" id="ouvrirModalPartage">
-                            Partager
-                        </button>
-                    {% endif %}
-                </div>
+        <div class="info-debut">
+            <h1>{{ poste.intitule|nl2br }}</h1>
+            <p class="text-muted">{{ poste.domaine|nl2br }} - {{ poste.localisation|nl2br }}</p>
+        </div> 
+        {% if not app.user %}
+        <a class="bouton-connexion" href="{{ path('app_login') }}">Postuler</a>
+
+        <div id="popupPostuler" class="popup-container">
+            <div class="popup-content">
+                <button class="popup-close" id="fermerPopup">&times;</button>
+                <h2>Postuler à cette offre</h2>
+        {{ form_start(form) }}
+            {{ form_row(form.cvCandidature) }}
+            {{ form_row(form.motivation) }}
+            <button type="submit" class="btn btn-primary">Valider</button>
+        {{ form_end(form) }}
+            </div>
+        </div>
+            {# Ajouter un bouton de partage pour les tuteurs #}
+        {% elseif is_granted('ROLE_TUTEUR') %}
+            <div class="actions-tuteur">                
+                {% if app.user.etudiants is not empty %}
+                    <button type="button" class="bouton-connexion" id="ouvrirModal">
+                    Partager
+                </button>
+                {% endif %}
+                            </div>
             {% elseif is_granted('ROLE_ENTREPRISE') %}
                 {# L'utilisateur est une entreprise on affiche rien #}
-            {% else %}
-                <a class="bouton-connexion" href="javascript:void(0);" id="ouvrirPopupPostuler">Postuler</a>
-            {% endif %}
-        </div>
-        
-        {# Contenu de l'offre #}
-        <div>
-            <h2>Description du poste</h2>
-            <p>{{ poste.description|nl2br }}</p>
-        </div>  
-        <div>
-            <h2>Missions</h2>
-            <p>{{ poste.missions|nl2br }}</p>
-        </div>             
-        <div>
-            <h2>Profil recherché</h2>
-            <p>{{ poste.profilRecherche|nl2br }}</p>
-        </div>
-                        
-        <div>    
-            {% if poste.infoSupp %}
-                <h2>Informations supplémentaires</h2>
-                <p>{{ poste.infoSupp|nl2br }}</p>
-            {% endif %}
-        </div>
-                        
-        <div>    
-            <h2>Détails de l'offre</h2>
-            <p><strong>Type de contrat:</strong> {{ poste.contratType.value }}</p>
-            <p><strong>Durée:</strong> {{ poste.duree.value }}</p>
-            <p><strong>Présence:</strong> {{ poste.presence.value }}</p>
-            <p><strong>Salaire:</strong> {{ poste.salaire|nl2br }} €</p>
-        </div>
-        
-        <div>
-            <h2>Contact</h2>
-            <p>{{ poste.contact|nl2br }}</p>
-        </div>
-        
-        <div>
-            <h2>Présentation de l'entreprise</h2>
-            <h3>{{ poste.entreprise.nom|nl2br}}</h3>
-            <p>{{ poste.presentationEntreprise|nl2br }}</p>
-        </div>
-    </div>
-</section>
 
-{# Popup de candidature - uniquement pour les utilisateurs connectés non-entreprise #}
-{% if app.user and not is_granted('ROLE_ENTREPRISE') and not is_granted('ROLE_TUTEUR') %}
-    <div id="popupPostuler" class="popup-container" style="display: none;">
-        <div class="popup-content">
-            <div class="popup-header">
-                <h2>Postuler à cette offre</h2>
-                <button type="button" class="btn-close" id="fermerPopupPostuler">
-                    <img src="{{ asset('img/close.svg') }}" alt="Fermer le menu">
-                </button>
+        {% else %}
+            <a class="bouton-connexion" href="javascript:void(0);" id="ouvrirPopup">Postuler</a>
+
+<div id="popupPostuler" class="popup-container">
+    <div class="popup-content">
+        <div class="popup-header">
+            <h2>Postuler à cette offre</h2>
+            <button type="button" class="btn-close" id="fermerPopup">
+                <img src="{{ asset('img/close.svg') }}" alt="Fermer le menu">
+            </button>
+        </div>
+
+        {{ form_start(form, { 'attr': { 'enctype': 'multipart/form-data' } }) }}
+
+            {{ form_label(form.cvCandidature) }}
+            <div class="custom-file-upload-wrapper">
+                <label for="{{ form.cvCandidature.vars.id }}" class="custom-file-label">
+                    Choisir un fichier
+                </label>
+                {{ form_widget(form.cvCandidature, {'attr': {'class': 'hidden-file'}}) }}
+                <span id="file-name" class="file-name-placeholder"></span>
             </div>
 
-            {{ form_start(form, { 'attr': { 'enctype': 'multipart/form-data' } }) }}
-                {{ form_label(form.cvCandidature) }}
-                <div class="custom-file-upload-wrapper">
-                    <label for="{{ form.cvCandidature.vars.id }}" class="custom-file-label">
-                        Choisir un fichier
-                    </label>
-                    {{ form_widget(form.cvCandidature, {'attr': {'class': 'hidden-file'}}) }}
-                    <span id="file-name" class="file-name-placeholder"></span>
-                </div>
+            {{ form_row(form.motivation) }}
 
-                {{ form_row(form.motivation) }}
+            <button type="submit" class="btn btn-primary">Valider</button>
 
-                <button type="submit" class="btn btn-primary">Valider</button>
-            {{ form_end(form) }}
-        </div>
+        {{ form_end(form) }}
     </div>
-{% endif %}
+</div>
 
-{# Modal de partage pour les tuteurs #}
+        {% endif %}
+    </div>
+    <div>
+        <h2>Description du poste</h2>
+        <p>{{ poste.description|nl2br }}</p>
+    </div>  
+    <div>
+        <h2>Missions</h2>
+        <p>{{ poste.missions|nl2br }}</p>
+    </div>             
+    <div>
+    <h2>Profil recherché</h2>
+    <p>{{ poste.profilRecherche|nl2br }}</p>
+    </div>
+                    
+    <div>    
+    {% if poste.infoSupp %}
+    <h2>Informations supplémentaires</h2>
+    <p>{{ poste.infoSupp|nl2br }}</p>
+    {% endif %}
+    </div>
+                    
+    <div>    
+    <h2>Détails de l'offre</h2>
+    <p><strong>Type de contrat:</strong> {{ poste.contratType.value }}</p>
+    <p><strong>Durée:</strong> {{ poste.duree.value }}</p>
+    <p><strong>Présence:</strong> {{ poste.presence.value }}</p>
+    Salaire:</strong> {{ poste.salaire|nl2br }} €</p>
+    </p>
+    </div>
+        <div>
+    <h2>Contact</h2>
+    <p>{{ poste.contact|nl2br }}</p>
+    </div>
+    <div>
+    <h2>Présentation de l’entreprise</h2>
+    <h3>{{ poste.entreprise.nom|nl2br}}</h3>
+    <p>{{ poste.presentationEntreprise|nl2br }}</p>
+    </div>
+    </div>
+    
 {% if is_granted('ROLE_TUTEUR') and app.user.etudiants is not empty %}
-    <div id="partageModal" class="custom-modal" style="display: none;">
+    <!-- Modal personnalisé sans Bootstrap -->
+    <div id="partageModal" class="custom-modal">
         <div class="custom-modal-dialog">
             <div class="custom-modal-content">
                 <div class="custom-modal-header">
                     <h5 class="modal-title">Partager cette offre</h5>
-                    <button type="button" class="btn-close" id="fermerModalPartage">
-                        <img src="{{ asset('img/close.svg') }}" alt="Fermer le menu">
-                    </button>
+<button type="button" class="btn-close" id="fermerModal">
+    <img src="{{ asset('img/close.svg') }}" alt="Fermer le menu">
+</button>
                 </div>
                 <div class="custom-modal-body">
                     <form method="post" id="partagerForm" action="{{ path('tuteur_partager_multiple', {'posteId': poste.id}) }}">
                         <label class="form-label">Sélectionner les étudiants</label>
-                        <div class="list-group">
-                            <div class="list-group-item">
-                                <input type="checkbox" id="select-all" class="checkbox-orange">
-                                <label for="select-all">Sélectionner tous les étudiants</label>
-                            </div>
-                            {% for etudiant in app.user.etudiants %}
-                                <div class="list-group-item">
-                                    <input type="checkbox" name="etudiants[]" value="{{ etudiant.id }}" id="etudiant-{{ etudiant.id }}" class="checkbox-orange">
-                                    <label for="etudiant-{{ etudiant.id }}">{{ etudiant.nom }} {{ etudiant.prenom }}</label>
-                                </div>
-                            {% endfor %}
-                        </div>
+<div class="list-group">
+    <div class="list-group-item">
+        <input type="checkbox" id="select-all" class="checkbox-orange" onclick="toggleSelectAll()">
+        <label for="select-all">Sélectionner tous les étudiants</label>
+    </div>
+    {% for etudiant in app.user.etudiants %}
+        <div class="list-group-item">
+            <input type="checkbox" name="etudiants[]" value="{{ etudiant.id }}" id="etudiant-{{ etudiant.id }}" class="checkbox-orange">
+            <label for="etudiant-{{ etudiant.id }}">{{ etudiant.nom }} {{ etudiant.prenom }}</label>
+        </div>
+    {% endfor %}
+</div>
+
                     </form>
                 </div>
                 <div class="custom-modal-footer">
-                    <button type="button" class="bouton-connexion" id="confirmerPartage">
-                        Partager<img src="{{ asset('img/share.svg') }}" alt="Valider">
-                    </button>
-                    <button type="button" class="bouton-localisation" id="annulerPartage">
-                        Annuler<img src="{{ asset('img/close.svg') }}" alt="Fermer">
-                    </button>
+                    <button type="button" class="bouton-connexion" onclick="partagerOffre()">Partager<img src="{{ asset('img/share.svg') }}" alt="Valider"></button>
+                    <button type="button" class="bouton-localisation" id="fermerModal2">Annuler<img src="{{ asset('img/close.svg') }}" alt="Fermer"></button>
                 </div>
             </div>
         </div>
     </div>
-{% endif %}
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    console.log('Script chargé : DOMContentLoaded - Page offre details');
-    
-    // === GESTION DU POPUP DE CANDIDATURE ===
-    const ouvrirPopupBtn = document.getElementById('ouvrirPopupPostuler');
-    const fermerPopupBtn = document.getElementById('fermerPopupPostuler');
-    const popup = document.getElementById('popupPostuler');
-    
-    if (ouvrirPopupBtn && fermerPopupBtn && popup) {
-        console.log('Éléments popup de candidature trouvés - initialisation des événements');
-        
-        // Ouvrir le popup
-        ouvrirPopupBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log('Ouverture du popup de candidature');
-            popup.style.display = 'flex';
-        });
-    
-        // Fermer le popup
-        fermerPopupBtn.addEventListener('click', function() {
-            console.log('Fermeture du popup de candidature');
-            popup.style.display = 'none';
-        });
-    
-        // Fermer en cliquant à l'extérieur
-        window.addEventListener('click', function(e) {
-            if (e.target === popup) {
-                console.log('Fermeture du popup par clic extérieur');
-                popup.style.display = 'none';
-            }
-        });
-    } else {
-        console.log('Éléments popup de candidature non trouvés');
-        console.log('ouvrirPopupBtn:', ouvrirPopupBtn);
-        console.log('fermerPopupBtn:', fermerPopupBtn);
-        console.log('popup:', popup);
-    }
+    <script>
+        const modal = document.getElementById('partageModal');
+        const ouvrirBtn = document.getElementById('ouvrirModal'); // ce bouton doit exister ailleurs dans ta page
+        const fermerBtns = [
+            document.getElementById('fermerModal'),
+            document.getElementById('fermerModal2')
+        ];
+        function toggleSelectAll() {
+    // Récupérer l'état du checkbox "Sélectionner tous les étudiants"
+    var isChecked = document.getElementById('select-all').checked;
 
-    // === GESTION DU FICHIER UPLOAD ===
-    const input = document.querySelector('.hidden-file');
-    const fileName = document.getElementById('file-name');
+    // Sélectionner tous les checkboxes d'étudiants
+    var checkboxes = document.querySelectorAll('input[name="etudiants[]"]');
 
-    if (input && fileName) {
-        console.log('Éléments upload de fichier trouvés');
-        input.addEventListener('change', function () {
-            if (this.files.length > 0) {
-                fileName.textContent = this.files[0].name;
-                console.log('Fichier sélectionné:', this.files[0].name);
-            } else {
-                fileName.textContent = '';
-            }
-        });
-    }
-
-    // === GESTION DU MODAL DE PARTAGE (TUTEURS) ===
-    const ouvrirModalBtn = document.getElementById('ouvrirModalPartage');
-    const fermerModalBtn = document.getElementById('fermerModalPartage');
-    const annulerBtn = document.getElementById('annulerPartage');
-    const confirmerBtn = document.getElementById('confirmerPartage');
-    const modal = document.getElementById('partageModal');
-    const selectAllCheckbox = document.getElementById('select-all');
-
-    if (ouvrirModalBtn && modal) {
-        console.log('Éléments modal de partage trouvés');
-        
-        // Ouvrir le modal
-        ouvrirModalBtn.addEventListener('click', function() {
-            console.log('Ouverture du modal de partage');
+    // Parcourir tous les checkboxes et les cocher ou décocher
+    checkboxes.forEach(function(checkbox) {
+        checkbox.checked = isChecked;
+    });
+}
+        ouvrirBtn?.addEventListener('click', () => {
             modal.style.display = 'block';
         });
 
-        // Fermer le modal
-        [fermerModalBtn, annulerBtn].forEach(btn => {
-            if (btn) {
-                btn.addEventListener('click', function() {
-                    console.log('Fermeture du modal de partage');
-                    modal.style.display = 'none';
-                });
-            }
+        fermerBtns.forEach(btn => {
+            btn?.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
         });
 
-        // Fermer en cliquant à l'extérieur
-        window.addEventListener('click', function(e) {
+        window.addEventListener('click', (e) => {
             if (e.target === modal) {
-                console.log('Fermeture du modal par clic extérieur');
                 modal.style.display = 'none';
             }
         });
 
-        // Gestion du "Sélectionner tout"
-        if (selectAllCheckbox) {
-            selectAllCheckbox.addEventListener('change', function() {
-                const checkboxes = document.querySelectorAll('input[name="etudiants[]"]');
-                checkboxes.forEach(checkbox => {
-                    checkbox.checked = this.checked;
-                });
-                console.log('Sélection globale:', this.checked);
+        function partagerOffre() {
+            const checkboxes = document.querySelectorAll('input[name="etudiants[]"]:checked');
+            if (checkboxes.length === 0) {
+                alert('Veuillez sélectionner au moins un étudiant');
+                return;
+            }
+            document.getElementById('partagerForm').submit();
+        }
+    </script>
+    
+    
+{% endif %}
+</section>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Vérifier qu'on est bien sur la page d'offre details
+    if (window.location.pathname.includes('/offre/') || document.getElementById('popupPostuler')) {
+        
+        // Gestion du fichier upload (seulement si les éléments existent)
+        const input = document.querySelector('.hidden-file');
+        const fileName = document.getElementById('file-name');
+
+        if (input && fileName) {
+            input.addEventListener('change', function () {
+                if (this.files.length > 0) {
+                    fileName.textContent = this.files[0].name;
+                } else {
+                    fileName.textContent = '';
+                }
             });
         }
 
-        // Confirmer le partage
-        if (confirmerBtn) {
-            confirmerBtn.addEventListener('click', function() {
-                const checkboxes = document.querySelectorAll('input[name="etudiants[]"]:checked');
-                if (checkboxes.length === 0) {
-                    alert('Veuillez sélectionner au moins un étudiant');
-                    return;
-                }
-                console.log('Partage confirmé pour', checkboxes.length, 'étudiants');
-                document.getElementById('partagerForm').submit();
+        // Gestion de la popup de candidature
+        console.log('Script chargé : DOMContentLoaded - Page offre details');
+        const ouvrirPopup = document.getElementById('ouvrirPopup');
+        const fermerPopup = document.getElementById('fermerPopup');
+        const popup = document.getElementById('popupPostuler');
+        
+        // Vérification si tous les éléments nécessaires existent
+        if (ouvrirPopup && fermerPopup && popup) {
+            console.log('Tous les éléments popup trouvés - initialisation des événements');
+            
+            // Ouvrir la pop-up
+            ouvrirPopup.addEventListener('click', () => {
+                popup.style.display = 'flex';
             });
+        
+            // Fermer la pop-up
+            fermerPopup.addEventListener('click', () => {
+                popup.style.display = 'none';
+            });
+        
+            // Fermer la pop-up en cliquant à l'extérieur
+            window.addEventListener('click', (e) => {
+                if (e.target === popup) {
+                    popup.style.display = 'none';
+                }
+            });
+        } else {
+            console.log('Éléments popup non présents pour cette condition utilisateur');
         }
     }
 });

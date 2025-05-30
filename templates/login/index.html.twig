@@ -63,16 +63,31 @@
     </section>
   <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Forcer l'actualisation de la page de login si elle n'a pas été actualisée
+    // Forcer l'actualisation complète de la page de login (équivalent F5)
     const urlParams = new URLSearchParams(window.location.search);
-    if (!urlParams.has('refreshed')) {
-        // Ajouter un paramètre pour éviter la boucle infinie
-        const newUrl = window.location.pathname + '?refreshed=1';
-        window.location.replace(newUrl);
+    const hasRefreshParam = urlParams.has('auto_refreshed');
+    
+    // Si la page n'a pas encore été actualisée automatiquement
+    if (!hasRefreshParam) {
+        // Vider le cache et forcer le rechargement complet
+        if ('caches' in window) {
+            caches.keys().then(function(names) {
+                names.forEach(function(name) {
+                    caches.delete(name);
+                });
+            });
+        }
+        
+        // Construire la nouvelle URL avec le paramètre de contrôle
+        const currentUrl = new URL(window.location);
+        currentUrl.searchParams.set('auto_refreshed', Date.now());
+        
+        // Forcer le rechargement complet depuis le serveur (équivalent F5)
+        window.location.replace(currentUrl.toString());
         return;
     }
     
-    // Votre code popup existant
+    // Code popup existant (s'exécute seulement après l'actualisation)
     const openPopupButton = document.getElementById('open-popup');
     const closePopupButton = document.getElementById('close-popup');
     const popup = document.getElementById('popup');
@@ -97,6 +112,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 popup.classList.add('hidden');
             }
         });
+    }
+    
+    // Nettoyer l'URL après l'actualisation (optionnel)
+    if (hasRefreshParam) {
+        const cleanUrl = new URL(window.location);
+        cleanUrl.searchParams.delete('auto_refreshed');
+        window.history.replaceState({}, document.title, cleanUrl.toString());
     }
 });
 </script>
