@@ -72,33 +72,77 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
     
-    // Votre code popup existant
+    // Délai pour s'assurer que tous les éléments sont prêts
+    setTimeout(function() {
+        initializePopup();
+    }, 100);
+});
+
+function initializePopup() {
     const openPopupButton = document.getElementById('open-popup');
     const closePopupButton = document.getElementById('close-popup');
     const popup = document.getElementById('popup');
 
+    // Debug: vérifier si les éléments existent
+    console.log('Elements found:', {
+        openButton: !!openPopupButton,
+        closeButton: !!closePopupButton,
+        popup: !!popup
+    });
+
     if (openPopupButton && closePopupButton && popup) {
+        // Supprimer les anciens event listeners s'ils existent
+        openPopupButton.removeEventListener('click', openPopupHandler);
+        closePopupButton.removeEventListener('click', closePopupHandler);
+        window.removeEventListener('click', windowClickHandler);
+
         // Ouvrir la popup
-        openPopupButton.addEventListener('click', function () {
-            popup.classList.add('show');
-            popup.classList.remove('hidden');
-        });
+        openPopupButton.addEventListener('click', openPopupHandler);
 
         // Fermer la popup
-        closePopupButton.addEventListener('click', function () {
-            popup.classList.remove('show');
-            popup.classList.add('hidden');
-        });
+        closePopupButton.addEventListener('click', closePopupHandler);
 
         // Fermer la popup en cliquant en dehors
-        window.addEventListener('click', function (event) {
-            if (event.target === popup) {
-                popup.classList.remove('show');
-                popup.classList.add('hidden');
-            }
-        });
+        window.addEventListener('click', windowClickHandler);
+        
+        console.log('Popup event listeners attached successfully');
+    } else {
+        console.error('Popup elements not found');
     }
-});
+}
+
+function openPopupHandler(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const popup = document.getElementById('popup');
+    if (popup) {
+        popup.classList.add('show');
+        popup.classList.remove('hidden');
+        console.log('Popup opened');
+    }
+}
+
+function closePopupHandler(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const popup = document.getElementById('popup');
+    if (popup) {
+        popup.classList.remove('show');
+        popup.classList.add('hidden');
+        console.log('Popup closed');
+    }
+}
+
+function windowClickHandler(event) {
+    const popup = document.getElementById('popup');
+    if (event.target === popup) {
+        popup.classList.remove('show');
+        popup.classList.add('hidden');
+        console.log('Popup closed by clicking outside');
+    }
+}
 </script>
 </body>
 {% endblock %}
