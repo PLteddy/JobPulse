@@ -18,8 +18,6 @@
     <img src="{{ asset('img/fleche_retour.svg') }}" alt="flèche retour" class="fleche">
 </a>
 
-
-    
     <div class="differentes-parties">
         <div class="titre-postule">
         <div class="info-debut">
@@ -27,20 +25,8 @@
             <p class="text-muted">{{ poste.domaine|nl2br }} - {{ poste.localisation|nl2br }}</p>
         </div> 
         {% if not app.user %}
-        <a class="bouton-connexion" href="{{ path('app_login', {'refreshed': 1}) }}">Postuler</a>
+        <a class="bouton-connexion" href="{{ path('app_login') }}">Postuler</a>
 
-        <div id="popupPostuler" class="popup-container">
-            <div class="popup-content">
-                <button class="popup-close" id="fermerPopup">&times;</button>
-                <h2>Postuler à cette offre</h2>
-        {{ form_start(form) }}
-            {{ form_row(form.cvCandidature) }}
-            {{ form_row(form.motivation) }}
-            <button type="submit" class="btn btn-primary">Valider</button>
-        {{ form_end(form) }}
-            </div>
-        </div>
-            {# Ajouter un bouton de partage pour les tuteurs #}
         {% elseif is_granted('ROLE_TUTEUR') %}
             <div class="actions-tuteur">                
                 {% if app.user.etudiants is not empty %}
@@ -48,9 +34,9 @@
                     Partager
                 </button>
                 {% endif %}
-                            </div>
-            {% elseif is_granted('ROLE_ENTREPRISE') %}
-                {# L'utilisateur est une entreprise on affiche rien #}
+            </div>
+        {% elseif is_granted('ROLE_ENTREPRISE') %}
+            {# L'utilisateur est une entreprise on affiche rien #}
 
         {% else %}
             <a class="bouton-connexion" href="javascript:void(0);" id="ouvrirPopup">Postuler</a>
@@ -110,15 +96,14 @@
     <p><strong>Type de contrat:</strong> {{ poste.contratType.value }}</p>
     <p><strong>Durée:</strong> {{ poste.duree.value }}</p>
     <p><strong>Présence:</strong> {{ poste.presence.value }}</p>
-    Salaire:</strong> {{ poste.salaire|nl2br }} €</p>
-    </p>
+    <p><strong>Salaire:</strong> {{ poste.salaire|nl2br }} €</p>
     </div>
         <div>
     <h2>Contact</h2>
     <p>{{ poste.contact|nl2br }}</p>
     </div>
     <div>
-    <h2>Présentation de l’entreprise</h2>
+    <h2>Présentation de l'entreprise</h2>
     <h3>{{ poste.entreprise.nom|nl2br}}</h3>
     <p>{{ poste.presentationEntreprise|nl2br }}</p>
     </div>
@@ -163,23 +148,20 @@
 
     <script>
         const modal = document.getElementById('partageModal');
-        const ouvrirBtn = document.getElementById('ouvrirModal'); // ce bouton doit exister ailleurs dans ta page
+        const ouvrirBtn = document.getElementById('ouvrirModal');
         const fermerBtns = [
             document.getElementById('fermerModal'),
             document.getElementById('fermerModal2')
         ];
+        
         function toggleSelectAll() {
-    // Récupérer l'état du checkbox "Sélectionner tous les étudiants"
-    var isChecked = document.getElementById('select-all').checked;
-
-    // Sélectionner tous les checkboxes d'étudiants
-    var checkboxes = document.querySelectorAll('input[name="etudiants[]"]');
-
-    // Parcourir tous les checkboxes et les cocher ou décocher
-    checkboxes.forEach(function(checkbox) {
-        checkbox.checked = isChecked;
-    });
-}
+            var isChecked = document.getElementById('select-all').checked;
+            var checkboxes = document.querySelectorAll('input[name="etudiants[]"]');
+            checkboxes.forEach(function(checkbox) {
+                checkbox.checked = isChecked;
+            });
+        }
+        
         ouvrirBtn?.addEventListener('click', () => {
             modal.style.display = 'block';
         });
@@ -205,10 +187,9 @@
             document.getElementById('partagerForm').submit();
         }
     </script>
-    
-    
 {% endif %}
 </section>
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     // Gestion du fichier upload (seulement si les éléments existent)
@@ -230,28 +211,21 @@ document.addEventListener("DOMContentLoaded", function () {
     const fermerPopup = document.getElementById('fermerPopup');
     const popup = document.getElementById('popupPostuler');
     
-    // Vérification si tous les éléments nécessaires existent
     if (ouvrirPopup && fermerPopup && popup) {
-        console.log('Initialisation de la popup de candidature');
-        
-        // Ouvrir la pop-up
         ouvrirPopup.addEventListener('click', () => {
             popup.style.display = 'flex';
         });
     
-        // Fermer la pop-up
         fermerPopup.addEventListener('click', () => {
             popup.style.display = 'none';
         });
     
-        // Fermer la pop-up en cliquant à l'extérieur
         window.addEventListener('click', (e) => {
             if (e.target === popup) {
                 popup.style.display = 'none';
             }
         });
     }
-    // Supprimez le console.log qui cause le problème
 });
 </script>
 {% endblock %}

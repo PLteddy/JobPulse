@@ -5,77 +5,65 @@
         <link rel="stylesheet" href="{{ asset('css/reset.css') }}">
         <link rel="stylesheet" href="{{ asset('css/style.css') }}">
         <link rel="stylesheet" href="{{ asset('css/connexion.css') }}">
-                <link rel="stylesheet" href="{{ asset('css/home.css') }}">
-
+        <link rel="stylesheet" href="{{ asset('css/home.css') }}">
 {% endblock %}
 
 {% block title %}Connexion{% endblock %}
 
 {% block body %}
+<body>
+<section class="login-section container">
+    <div class="login-form-container">
+        <h1>Connexion</h1>
+        {% if error %}
+            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        {% endif %}
 
-    <body>
-    <section class= "login-section container">
-        <div class="login-form-container">
-            <h1>Connexion</h1>
-            {% if error %}
-                <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-            {% endif %}
-
-            <form method="post" class="login-form">
-                <div class="form-group">
-                    <label for="inputEmail" class="form-label">E-mail</label>
-                    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-input" required autofocus>
-                </div>
-                <div class="form-group">
-                    <label for="inputPassword" class="form-label">Mot de passe</label>
-                    <input type="password" name="password" id="inputPassword" class="form-input" required>
-                </div>
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-                
-                <div class="button-container">
-                    <div class="register-link">
-                        <button id="open-popup" class="popup-button" type="button">
-                            Pas encore de compte? <br>
-                            Créez-en un ici!
-                        </button>
-                        <!-- Popup -->
-                        <div id="popup" class="popup hidden">
-                            <div class="popup-content">
-                                <div class="popup-header">
+        <form method="post" class="login-form">
+            <div class="form-group">
+                <label for="inputEmail" class="form-label">E-mail</label>
+                <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword" class="form-label">Mot de passe</label>
+                <input type="password" name="password" id="inputPassword" class="form-input" required>
+            </div>
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+            
+            <div class="button-container">
+                <div class="register-link">
+                    <button id="open-popup" class="popup-button" type="button">
+                        Pas encore de compte? <br>
+                        Créez-en un ici!
+                    </button>
+                    <!-- Popup -->
+                    <div id="popup" class="popup hidden">
+                        <div class="popup-content">
+                            <div class="popup-header">
                                 <h1 class="inscription">Inscription</h1>
                                 <button type="button" class="btn-close" id="close-popup">
-                                <img src="{{ asset('img/close.svg') }}" alt="Fermer le menu">
+                                    <img src="{{ asset('img/close.svg') }}" alt="Fermer le menu">
                                 </button>
-                                </div>
-                                <h2>Je m'inscris en tant que :</h2>
-                                <ul>
-                                    <li><a href="{{ path('inscription', { type: 'etudiant' }) }}">Étudiant</a></li>
-                                    <li><a href="{{ path('inscription', { type: 'tuteur' }) }}">Tuteur</a></li>
-                                    <li><a href="{{ path('inscription', { type: 'entreprise' }) }}">Entreprise</a></li>
-                                </ul>
                             </div>
+                            <h2>Je m'inscris en tant que :</h2>
+                            <ul>
+                                <li><a href="{{ path('inscription', { type: 'etudiant' }) }}">Étudiant</a></li>
+                                <li><a href="{{ path('inscription', { type: 'tuteur' }) }}">Tuteur</a></li>
+                                <li><a href="{{ path('inscription', { type: 'entreprise' }) }}">Entreprise</a></li>
+                            </ul>
                         </div>
                     </div>
-                    <button class="login-button" type="submit">Connexion</button>
                 </div>
-            </form>
-        </div>
-    </section>
-  <script>
+                <button class="login-button" type="submit">Connexion</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Forcer l'actualisation de la page de login si elle n'a pas été actualisée
-    const urlParams = new URLSearchParams(window.location.search);
-    if (!urlParams.has('refreshed')) {
-        // Ajouter un paramètre pour éviter la boucle infinie
-        const newUrl = window.location.pathname + '?refreshed=1';
-        window.location.replace(newUrl);
-        return;
-    }
-    
-    // Délai pour s'assurer que tous les éléments sont prêts
-    setTimeout(function() {
-        initializePopup();
-    }, 100);
+    // Initialiser la popup directement sans refresh
+    initializePopup();
 });
 
 function initializePopup() {
@@ -83,64 +71,30 @@ function initializePopup() {
     const closePopupButton = document.getElementById('close-popup');
     const popup = document.getElementById('popup');
 
-    // Debug: vérifier si les éléments existent
-    console.log('Elements found:', {
-        openButton: !!openPopupButton,
-        closeButton: !!closePopupButton,
-        popup: !!popup
-    });
-
     if (openPopupButton && closePopupButton && popup) {
-        // Supprimer les anciens event listeners s'ils existent
-        openPopupButton.removeEventListener('click', openPopupHandler);
-        closePopupButton.removeEventListener('click', closePopupHandler);
-        window.removeEventListener('click', windowClickHandler);
-
         // Ouvrir la popup
-        openPopupButton.addEventListener('click', openPopupHandler);
+        openPopupButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            popup.classList.add('show');
+            popup.classList.remove('hidden');
+        });
 
         // Fermer la popup
-        closePopupButton.addEventListener('click', closePopupHandler);
+        closePopupButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            popup.classList.remove('show');
+            popup.classList.add('hidden');
+        });
 
         // Fermer la popup en cliquant en dehors
-        window.addEventListener('click', windowClickHandler);
-        
-        console.log('Popup event listeners attached successfully');
-    } else {
-        console.error('Popup elements not found');
-    }
-}
-
-function openPopupHandler(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    
-    const popup = document.getElementById('popup');
-    if (popup) {
-        popup.classList.add('show');
-        popup.classList.remove('hidden');
-        console.log('Popup opened');
-    }
-}
-
-function closePopupHandler(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    
-    const popup = document.getElementById('popup');
-    if (popup) {
-        popup.classList.remove('show');
-        popup.classList.add('hidden');
-        console.log('Popup closed');
-    }
-}
-
-function windowClickHandler(event) {
-    const popup = document.getElementById('popup');
-    if (event.target === popup) {
-        popup.classList.remove('show');
-        popup.classList.add('hidden');
-        console.log('Popup closed by clicking outside');
+        window.addEventListener('click', function(event) {
+            if (event.target === popup) {
+                popup.classList.remove('show');
+                popup.classList.add('hidden');
+            }
+        });
     }
 }
 </script>
