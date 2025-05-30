@@ -57,6 +57,7 @@ public function inscription(
 
         if ($type === 'tuteur') {
             $utilisateur->setEtablissement($demande->request->get('etablissement'));
+            $utilisateur->setAdresse('');
         }
 
         $gestionnaireEntites->persist($utilisateur);
