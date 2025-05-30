@@ -61,21 +61,18 @@
             </form>
         </div>
     </section>
-   <script>
+  <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Actualisation automatique de la page au chargement
-    if (!sessionStorage.getItem('loginPageRefreshed')) {
-        sessionStorage.setItem('loginPageRefreshed', 'true');
-        window.location.reload();
-        return; // Arrêter l'exécution du reste du script
+    // Forcer l'actualisation de la page de login si elle n'a pas été actualisée
+    const urlParams = new URLSearchParams(window.location.search);
+    if (!urlParams.has('refreshed')) {
+        // Ajouter un paramètre pour éviter la boucle infinie
+        const newUrl = window.location.pathname + '?refreshed=1';
+        window.location.replace(newUrl);
+        return;
     }
     
-    // Nettoyer le flag quand on quitte la page
-    window.addEventListener('beforeunload', function() {
-        sessionStorage.removeItem('loginPageRefreshed');
-    });
-
-    // Votre code existant pour la popup
+    // Votre code popup existant
     const openPopupButton = document.getElementById('open-popup');
     const closePopupButton = document.getElementById('close-popup');
     const popup = document.getElementById('popup');
