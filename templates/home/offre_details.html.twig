@@ -211,52 +211,52 @@
 </section>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    // Gestion du fichier upload (seulement si les éléments existent)
-    const input = document.querySelector('.hidden-file');
-    const fileName = document.getElementById('file-name');
-
-    if (input && fileName) {
-        input.addEventListener('change', function () {
-            if (this.files.length > 0) {
-                fileName.textContent = this.files[0].name;
-            } else {
-                fileName.textContent = '';
-            }
-        });
-    }
-
-    // Gestion de la popup de candidature
-    console.log('Script chargé : DOMContentLoaded');
-    const ouvrirPopup = document.getElementById('ouvrirPopup');
-    const fermerPopup = document.getElementById('fermerPopup');
-    const popup = document.getElementById('popupPostuler');
-    
-    // Vérification si tous les éléments nécessaires existent
-    if (ouvrirPopup && fermerPopup && popup) {
-        console.log('Tous les éléments popup trouvés - initialisation des événements');
+    // Vérifier qu'on est bien sur la page d'offre details
+    if (window.location.pathname.includes('/offre/') || document.getElementById('popupPostuler')) {
         
-        // Ouvrir la pop-up
-        ouvrirPopup.addEventListener('click', () => {
-            popup.style.display = 'flex';
-        });
-    
-        // Fermer la pop-up
-        fermerPopup.addEventListener('click', () => {
-            popup.style.display = 'none';
-        });
-    
-        // Fermer la pop-up en cliquant à l'extérieur
-        window.addEventListener('click', (e) => {
-            if (e.target === popup) {
+        // Gestion du fichier upload (seulement si les éléments existent)
+        const input = document.querySelector('.hidden-file');
+        const fileName = document.getElementById('file-name');
+
+        if (input && fileName) {
+            input.addEventListener('change', function () {
+                if (this.files.length > 0) {
+                    fileName.textContent = this.files[0].name;
+                } else {
+                    fileName.textContent = '';
+                }
+            });
+        }
+
+        // Gestion de la popup de candidature
+        console.log('Script chargé : DOMContentLoaded - Page offre details');
+        const ouvrirPopup = document.getElementById('ouvrirPopup');
+        const fermerPopup = document.getElementById('fermerPopup');
+        const popup = document.getElementById('popupPostuler');
+        
+        // Vérification si tous les éléments nécessaires existent
+        if (ouvrirPopup && fermerPopup && popup) {
+            console.log('Tous les éléments popup trouvés - initialisation des événements');
+            
+            // Ouvrir la pop-up
+            ouvrirPopup.addEventListener('click', () => {
+                popup.style.display = 'flex';
+            });
+        
+            // Fermer la pop-up
+            fermerPopup.addEventListener('click', () => {
                 popup.style.display = 'none';
-            }
-        });
-    } else {
-        console.log('Éléments popup non présents - pas d\'initialisation des événements');
-        // Debug : afficher quels éléments manquent
-        if (!ouvrirPopup) console.log('Élément "ouvrirPopup" manquant');
-        if (!fermerPopup) console.log('Élément "fermerPopup" manquant');
-        if (!popup) console.log('Élément "popupPostuler" manquant');
+            });
+        
+            // Fermer la pop-up en cliquant à l'extérieur
+            window.addEventListener('click', (e) => {
+                if (e.target === popup) {
+                    popup.style.display = 'none';
+                }
+            });
+        } else {
+            console.log('Éléments popup non présents pour cette condition utilisateur');
+        }
     }
 });
 </script>
