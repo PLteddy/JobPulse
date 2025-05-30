@@ -145,8 +145,42 @@
             </div>
         </div>
     </div>
+{% endif %}
+</section>
 
-    <script>
+<script>
+// Variables globales pour éviter les initialisations multiples
+let popupInitialized = false;
+let modalInitialized = false;
+
+function initializePopups() {
+    // Popup de candidature
+    if (!popupInitialized) {
+        const ouvrirPopup = document.getElementById('ouvrirPopup');
+        const fermerPopup = document.getElementById('fermerPopup');
+        const popup = document.getElementById('popupPostuler');
+        
+        if (ouvrirPopup && fermerPopup && popup) {
+            ouvrirPopup.addEventListener('click', () => {
+                popup.style.display = 'flex';
+            });
+        
+            fermerPopup.addEventListener('click', () => {
+                popup.style.display = 'none';
+            });
+        
+            window.addEventListener('click', (e) => {
+                if (e.target === popup) {
+                    popup.style.display = 'none';
+                }
+            });
+            
+            popupInitialized = true;
+        }
+    }
+
+    // Modal de partage pour tuteurs
+    if (!modalInitialized) {
         const modal = document.getElementById('partageModal');
         const ouvrirBtn = document.getElementById('ouvrirModal');
         const fermerBtns = [
@@ -154,45 +188,31 @@
             document.getElementById('fermerModal2')
         ];
         
-        function toggleSelectAll() {
-            var isChecked = document.getElementById('select-all').checked;
-            var checkboxes = document.querySelectorAll('input[name="etudiants[]"]');
-            checkboxes.forEach(function(checkbox) {
-                checkbox.checked = isChecked;
+        if (modal && ouvrirBtn) {
+            ouvrirBtn.addEventListener('click', () => {
+                modal.style.display = 'block';
             });
-        }
-        
-        ouvrirBtn?.addEventListener('click', () => {
-            modal.style.display = 'block';
-        });
 
-        fermerBtns.forEach(btn => {
-            btn?.addEventListener('click', () => {
-                modal.style.display = 'none';
+            fermerBtns.forEach(btn => {
+                if (btn) {
+                    btn.addEventListener('click', () => {
+                        modal.style.display = 'none';
+                    });
+                }
             });
-        });
 
-        window.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.style.display = 'none';
-            }
-        });
-
-        function partagerOffre() {
-            const checkboxes = document.querySelectorAll('input[name="etudiants[]"]:checked');
-            if (checkboxes.length === 0) {
-                alert('Veuillez sélectionner au moins un étudiant');
-                return;
-            }
-            document.getElementById('partagerForm').submit();
+            window.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+            
+            modalInitialized = true;
         }
-    </script>
-{% endif %}
-</section>
+    }
+}
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Gestion du fichier upload (seulement si les éléments existent)
+function initializeFileUpload() {
     const input = document.querySelector('.hidden-file');
     const fileName = document.getElementById('file-name');
 
@@ -205,27 +225,49 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
+}
 
-    // Gestion de la popup de candidature
-    const ouvrirPopup = document.getElementById('ouvrirPopup');
-    const fermerPopup = document.getElementById('fermerPopup');
-    const popup = document.getElementById('popupPostuler');
-    
-    if (ouvrirPopup && fermerPopup && popup) {
-        ouvrirPopup.addEventListener('click', () => {
-            popup.style.display = 'flex';
-        });
-    
-        fermerPopup.addEventListener('click', () => {
-            popup.style.display = 'none';
-        });
-    
-        window.addEventListener('click', (e) => {
-            if (e.target === popup) {
-                popup.style.display = 'none';
-            }
-        });
+// Fonctions pour les tuteurs
+function toggleSelectAll() {
+    var isChecked = document.getElementById('select-all').checked;
+    var checkboxes = document.querySelectorAll('input[name="etudiants[]"]');
+    checkboxes.forEach(function(checkbox) {
+        checkbox.checked = isChecked;
+    });
+}
+
+function partagerOffre() {
+    const checkboxes = document.querySelectorAll('input[name="etudiants[]"]:checked');
+    if (checkboxes.length === 0) {
+        alert('Veuillez sélectionner au moins un étudiant');
+        return;
     }
+    document.getElementById('partagerForm').submit();
+}
+
+// Initialisation avec support Turbo
+document.addEventListener('DOMContentLoaded', function() {
+    initializePopups();
+    initializeFileUpload();
 });
+
+document.addEventListener('turbo:load', function() {
+    // Réinitialiser les flags pour Turbo
+    popupInitialized = false;
+    modalInitialized = false;
+    initializePopups();
+    initializeFileUpload();
+});
+
+document.addEventListener('turbo:render', function() {
+    initializePopups();
+    initializeFileUpload();
+});
+
+// Fallback
+setTimeout(function() {
+    initializePopups();
+    initializeFileUpload();
+}, 100);
 </script>
 {% endblock %}
