@@ -210,10 +210,12 @@
 {% endif %}
 </section>
 <script>
-     document.addEventListener("DOMContentLoaded", function () {
-        const input = document.querySelector('.hidden-file');
-        const fileName = document.getElementById('file-name');
+document.addEventListener("DOMContentLoaded", function () {
+    // Gestion du fichier upload (seulement si les éléments existent)
+    const input = document.querySelector('.hidden-file');
+    const fileName = document.getElementById('file-name');
 
+    if (input && fileName) {
         input.addEventListener('change', function () {
             if (this.files.length > 0) {
                 fileName.textContent = this.files[0].name;
@@ -221,32 +223,18 @@
                 fileName.textContent = '';
             }
         });
-    });
-        
-    document.addEventListener('DOMContentLoaded', function () {
-        console.log('Script chargé : DOMContentLoaded');
-        const ouvrirPopup = document.getElementById('ouvrirPopup');
-        const fermerPopup = document.getElementById('fermerPopup');
-        const popup = document.getElementById('popupPostuler');
-        
-        // Vérifiez si les éléments existent
-        if (!ouvrirPopup) {
-            console.error('Élément avec l\'ID "ouvrirPopup" introuvable.');
-        } else {
-            console.log('Élément "ouvrirPopup" trouvé.');
-        }
+    }
 
-        if (!fermerPopup) {
-            console.error('Élément avec l\'ID "fermerPopup" introuvable.');
-        } else {
-            console.log('Élément "fermerPopup" trouvé.');
-        }
-
-        if (!popup) {
-            console.error('Élément avec l\'ID "popupPostuler" introuvable.');
-        } else {
-            console.log('Élément "popupPostuler" trouvé.');
-        }
+    // Gestion de la popup de candidature
+    console.log('Script chargé : DOMContentLoaded');
+    const ouvrirPopup = document.getElementById('ouvrirPopup');
+    const fermerPopup = document.getElementById('fermerPopup');
+    const popup = document.getElementById('popupPostuler');
+    
+    // Vérification si tous les éléments nécessaires existent
+    if (ouvrirPopup && fermerPopup && popup) {
+        console.log('Tous les éléments popup trouvés - initialisation des événements');
+        
         // Ouvrir la pop-up
         ouvrirPopup.addEventListener('click', () => {
             popup.style.display = 'flex';
@@ -263,8 +251,13 @@
                 popup.style.display = 'none';
             }
         });
-    });
-    
-    
+    } else {
+        console.log('Éléments popup non présents - pas d\'initialisation des événements');
+        // Debug : afficher quels éléments manquent
+        if (!ouvrirPopup) console.log('Élément "ouvrirPopup" manquant');
+        if (!fermerPopup) console.log('Élément "fermerPopup" manquant');
+        if (!popup) console.log('Élément "popupPostuler" manquant');
+    }
+});
 </script>
 {% endblock %}
