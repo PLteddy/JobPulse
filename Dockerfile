@@ -1,5 +1,8 @@
 FROM php:8.2-apache
 
+# Permettre à Composer de s'exécuter en tant que superuser
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
 # Installer les extensions PHP nécessaires
 RUN apt-get update && apt-get install -y \
     git \
@@ -11,8 +14,9 @@ RUN apt-get update && apt-get install -y \
     libgmp-dev \
     zlib1g-dev \
     libssl-dev \
+    libpq-dev \
     zip \
-    && docker-php-ext-install intl pdo pdo_mysql zip gmp \
+    && docker-php-ext-install intl pdo pdo_mysql pdo_pgsql zip gmp \
     && rm -rf /var/lib/apt/lists/*
 
 # Activer les modules Apache
@@ -27,8 +31,8 @@ WORKDIR /var/www/html
 # Copier les fichiers composer en premier pour optimiser le cache Docker
 COPY composer.json composer.lock ./
 
-# Installer les dépendances Composer
-RUN composer install --no-dev --optimize-autoloader --no-scripts --no-autoloader
+# Installer les dépendances Composer (sans --no-dev pour éviter le problème symfony/runtime)
+RUN composer install --optimize-autoloader --no-scripts
 
 # Copier le reste des fichiers de l'application
 COPY . .
